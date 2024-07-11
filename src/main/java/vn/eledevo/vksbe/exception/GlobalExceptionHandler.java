@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.exception;
 
 import static org.springframework.http.HttpStatus.*;
 import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
+import static vn.eledevo.vksbe.constant.ErrorCode.METHOD_ERROR;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 
 @RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends Throwable {
 
     private ResponseEntity<Object> generateExceptionResponse(int code, String message, Exception ex) {
         if (code == INTERNAL_SERVER_ERROR.value()) log.error(ex.getMessage(), ex);
@@ -66,7 +67,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> handleNoSupportedException(HttpRequestMethodNotSupportedException ex) {
-        return generateExceptionResponse(METHOD_NOT_ALLOWED.value(), METHOD_NOT_ALLOWED.getReasonPhrase(), ex);
+        return generateExceptionResponse(METHOD_ERROR, ex);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -92,8 +93,7 @@ public class GlobalExceptionHandler {
             String errorMessage = violation.getMessage();
             errors.put(fieldName, errorMessage);
         });
-        ApiResponse<?> response =
-                new ApiResponse<>(UNPROCESSABLE_ENTITY.value(), UNPROCESSABLE_ENTITY.getReasonPhrase(), errors);
+        ApiResponse<?> response = new ApiResponse<>(FIELD_INVALID.getCode(), FIELD_INVALID.getMessage(), errors);
         return ResponseEntity.ok(response);
     }
 

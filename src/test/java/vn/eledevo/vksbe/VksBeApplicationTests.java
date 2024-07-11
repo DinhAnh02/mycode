@@ -8,6 +8,6 @@ class VksBeApplicationTests {
 
     @Test
     void contextLoads() {
-//        something test here
+        //        something test here
     }
 }
