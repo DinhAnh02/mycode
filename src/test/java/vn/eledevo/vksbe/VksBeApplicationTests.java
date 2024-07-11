@@ -7,5 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class VksBeApplicationTests {
 
     @Test
-    void contextLoads() {}
+    void contextLoads() {
+//        something test here
+    }
 }
