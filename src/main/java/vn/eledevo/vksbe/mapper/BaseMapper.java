@@ -1,4 +1,3 @@
 package vn.eledevo.vksbe.mapper;
 
-public interface BaseMapper {
-}
+public interface BaseMapper {}
