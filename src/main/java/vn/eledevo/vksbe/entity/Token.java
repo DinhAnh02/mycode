@@ -3,9 +3,8 @@ package vn.eledevo.vksbe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.TokenType;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -20,6 +19,8 @@ public class Token {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String accessToken;
+    @Enumerated(EnumType.STRING)
+    TokenType tokenType = TokenType.BEARER;
     Boolean isExpired;
     Boolean isRevoked;
     @ManyToOne(fetch = FetchType.LAZY)
