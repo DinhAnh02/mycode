@@ -15,7 +15,7 @@ pipeline {
   stages {
     stage('Compile code') {
         steps {
-          sh "mvn clean compile"
+          sh "mvn clean compile dependency:copy-dependencies"
       }
     }
     stage('Test with Sonarqube') {
