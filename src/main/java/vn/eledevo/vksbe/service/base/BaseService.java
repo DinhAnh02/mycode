@@ -1,12 +1,12 @@
 package vn.eledevo.vksbe.service.base;
 
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.exception.ValidationException;
-
 import java.util.List;
 import java.util.Set;
 
-public interface BaseService<Rq,Rp,ID> {
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
+
+public interface BaseService<Rq, Rp, ID> {
     Rp insert(Rq rq) throws ValidationException;
 
     Rp update(ID id, Rq rq) throws ValidationException, ApiException;

@@ -1,6 +1,7 @@
 package vn.eledevo.vksbe.config.security;
 
-import lombok.RequiredArgsConstructor;
+import java.util.UUID;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -13,10 +14,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import lombok.RequiredArgsConstructor;
 import vn.eledevo.vksbe.config.security.auditing.ApplicationAuditAware;
 import vn.eledevo.vksbe.repository.UserRepository;
-
-import java.util.UUID;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,8 +31,8 @@ public class ApplicationConfig {
      */
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> (UserDetails) repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> (UserDetails)
+                repository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
     /**
      * Cấu hình bean AuthenticationProvider để xác thực người dùng.
@@ -74,5 +75,4 @@ public class ApplicationConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

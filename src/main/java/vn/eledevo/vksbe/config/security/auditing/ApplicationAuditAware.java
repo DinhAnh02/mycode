@@ -1,13 +1,14 @@
 package vn.eledevo.vksbe.config.security.auditing;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import vn.eledevo.vksbe.entity.User;
 
-import java.util.Optional;
-import java.util.UUID;
+import vn.eledevo.vksbe.entity.User;
 
 public class ApplicationAuditAware implements AuditorAware<UUID> {
 
@@ -19,16 +20,12 @@ public class ApplicationAuditAware implements AuditorAware<UUID> {
      */
     @Override
     public Optional<UUID> getCurrentAuditor() {
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // Nếu không có thông tin xác thực hoặc là xác thực ẩn danh
-        if (authentication == null ||
-                !authentication.isAuthenticated() ||
-                authentication instanceof AnonymousAuthenticationToken
-        ) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
             return Optional.empty();
         }
 

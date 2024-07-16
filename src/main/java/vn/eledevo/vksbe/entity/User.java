@@ -1,16 +1,18 @@
 package vn.eledevo.vksbe.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import vn.eledevo.vksbe.constant.Role;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.persistence.*;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.Role;
 
 @Entity
 @Getter
@@ -24,20 +26,26 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
+
     String username;
     String fullName;
     String password;
+
     @Enumerated(EnumType.STRING)
     Role role;
-    LocalDateTime createAt;
-    UUID createBy;
-    LocalDateTime updateAt;
-    UUID updateBy;
+
+    LocalDateTime createdAt;
+    UUID createdBy;
+    LocalDateTime updatedAt;
+    UUID updatedBy;
     Boolean isDeleted;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<UserDeviceInfoKey> userDeviceInfoKeys;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Token> Tokens;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
@@ -72,5 +80,15 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @PrePersist
+    void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
