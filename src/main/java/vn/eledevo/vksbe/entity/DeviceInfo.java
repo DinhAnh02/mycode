@@ -24,18 +24,26 @@ public class DeviceInfo {
 
     String name;
     String deviceUuid;
-
-    @Column(columnDefinition = "varchar(255) default 'Not Connect'")
     String status;
-
     LocalDateTime createdAt;
     UUID createdBy;
     LocalDateTime updatedAt;
     UUID updatedBy;
-
-    @Column(columnDefinition = "number default 0")
     Boolean isDeleted;
 
     @OneToMany(mappedBy = "deviceInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     List<UserDeviceInfoKey> userDeviceInfoKeys;
+
+    @PrePersist
+    void prePersist() {
+        this.isDeleted = false;
+        this.status = "Not Connect";
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

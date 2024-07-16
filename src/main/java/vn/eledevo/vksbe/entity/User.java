@@ -56,7 +56,6 @@ public class User implements UserDetails {
         return password;
     }
 
-    // Tài khoản đăng nhập hiện đang để là email
     @Override
     public String getUsername() {
         return username;
@@ -85,6 +84,8 @@ public class User implements UserDetails {
     @PrePersist
     void prePersist() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.isDeleted = false;
     }
 
     @PreUpdate

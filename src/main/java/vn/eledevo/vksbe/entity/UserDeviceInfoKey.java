@@ -22,10 +22,10 @@ public class UserDeviceInfoKey {
     Long id;
 
     String keyUsb;
-    LocalDateTime createAt;
-    UUID createBy;
-    LocalDateTime updateAt;
-    UUID updateBy;
+    LocalDateTime createdAt;
+    UUID createdBy;
+    LocalDateTime updatedAt;
+    UUID updatedBy;
     Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,4 +35,16 @@ public class UserDeviceInfoKey {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     User user;
+
+    @PrePersist
+    void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.isDeleted = false;
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
