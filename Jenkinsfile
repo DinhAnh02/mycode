@@ -10,6 +10,11 @@ pipeline {
     STAGING_HOST = '192.168.1.2'
   }
   stages {
+    stage('Compile code') {
+      steps {
+        sh "mvn clean compile"
+      }
+    }
     stage('Test with Sonarqube') {
       steps {
         withSonarQubeEnv('Sonarqube admin server') {
