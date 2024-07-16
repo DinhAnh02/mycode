@@ -9,10 +9,13 @@ pipeline {
     DEVELOP_HOST = '192.168.1.3'
     STAGING_HOST = '192.168.1.2'
   }
+  tools {
+    maven 'maven-3.9.6'
+  }
   stages {
     stage('Compile code') {
-      steps {
-        sh "mvn clean compile"
+        steps {
+          sh "mvn clean compile"
       }
     }
     stage('Test with Sonarqube') {
