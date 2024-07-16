@@ -1,11 +1,12 @@
 package vn.eledevo.vksbe.mapper;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import vn.eledevo.vksbe.dto.response.PageResponse;
-
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
+
+import org.mapstruct.*;
+
+import vn.eledevo.vksbe.dto.response.PageResponse;
 
 public abstract class BaseMapper<Rq, Rp, T> {
     public abstract T toEntity(Rq rq);
@@ -20,5 +21,9 @@ public abstract class BaseMapper<Rq, Rp, T> {
     public PageResponse<Rp> toPageResponse(List<T> tList, int total) {
         List<Rp> rpList = toListResponse(tList);
         return new PageResponse<>(total, rpList);
+    }
+
+    Long mapLocalDateTimeToEpochTimestamp(LocalDateTime dateTime) {
+        return dateTime != null ? dateTime.toEpochSecond(ZoneOffset.UTC) : null;
     }
 }

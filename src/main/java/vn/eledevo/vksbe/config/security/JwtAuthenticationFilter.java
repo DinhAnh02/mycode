@@ -1,10 +1,12 @@
 package vn.eledevo.vksbe.config.security;
 
+import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,9 +15,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import vn.eledevo.vksbe.repository.TokenRepository;
 
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import vn.eledevo.vksbe.repository.TokenRepository;
 
 @Component
 @RequiredArgsConstructor
@@ -37,8 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
 
         // Bỏ qua yêu cầu đến đường dẫn /api/v1/auth (đăng nhập, đăng ký, ...)
         if (request.getServletPath().contains("/api/v1/auth")) {
@@ -46,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");  // Lấy ra header từ request
+        final String authHeader = request.getHeader("Authorization"); // Lấy ra header từ request
         final String jwt;
         final String userEmail;
 
@@ -63,30 +65,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Kiểm tra chuỗi vừa lấy ra có bị null hoặc trong ContextHolder có bị null
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            var isTokenValid = tokenRepository.findByAccessToken(jwt) // Tìm token trong database theo chuỗi jwt
+            var isTokenValid = tokenRepository
+                    .findByAccessToken(jwt) // Tìm token trong database theo chuỗi jwt
                     .map(t -> !t.getIsExpired() && !t.getIsRevoked())
                     .orElse(false);
 
             // Kiểm tra xem token có hợp lệ không, nếu hợp lệ lưu vào ContextHolder
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
         filterChain.doFilter(request, response);
     }
+
     protected void doFilterInternal1(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
 
         // Bỏ qua yêu cầu đến đường dẫn /api/v1/auth (đăng nhập, đăng ký, ...)
         if (request.getServletPath().contains("/api/v1/auth")) {
@@ -94,7 +93,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");  // Lấy ra header từ request
+        final String authHeader = request.getHeader("Authorization"); // Lấy ra header từ request
         final String jwt;
         final String userEmail;
 
@@ -111,20 +110,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Kiểm tra chuỗi vừa lấy ra có bị null hoặc trong ContextHolder có bị null
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            var isTokenValid = tokenRepository.findByAccessToken(jwt) // Tìm token trong database theo chuỗi jwt
+            var isTokenValid = tokenRepository
+                    .findByAccessToken(jwt) // Tìm token trong database theo chuỗi jwt
                     .map(t -> !t.getIsExpired() && !t.getIsRevoked())
                     .orElse(false);
 
             // Kiểm tra xem token có hợp lệ không, nếu hợp lệ lưu vào ContextHolder
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }

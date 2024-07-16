@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.Role;
 
-
 @Setter
 @Getter
 @Builder

@@ -1,19 +1,20 @@
 package vn.eledevo.vksbe.config.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
@@ -79,10 +80,7 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Access token JWT
      */
-    public String generateToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ) {
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
@@ -92,9 +90,7 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Refresh token JWT
      */
-    public String generateRefreshToken(
-            UserDetails userDetails
-    ) {
+    public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
@@ -110,9 +106,8 @@ public class JwtService {
             Map<String, Object> extraClaims, // Đối tượng map
             UserDetails userDetails, // Đối tượng là userDetails
             long expiration // Thời gian tồn tại của token
-    ) {
-        return Jwts
-                .builder()
+            ) {
+        return Jwts.builder()
                 .setClaims(extraClaims) // Khởi tạo 1 object payload
                 // thêm các giá trị vào bên trong payload
                 .setSubject(userDetails.getUsername())
@@ -161,8 +156,7 @@ public class JwtService {
      * @return Đối tượng Claims chứa các claim
      */
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)

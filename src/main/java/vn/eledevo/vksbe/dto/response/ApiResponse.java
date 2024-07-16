@@ -2,6 +2,8 @@ package vn.eledevo.vksbe.dto.response;
 
 import static org.springframework.http.HttpStatus.OK;
 
+import org.springframework.http.ResponseEntity;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,5 +37,9 @@ public class ApiResponse<T> {
         ApiResponse<T> response = new ApiResponse<>();
         response.setResult(body);
         return response;
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> okEntity(T body) {
+        return ResponseEntity.ok(ok(body));
     }
 }

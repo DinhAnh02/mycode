@@ -1,15 +1,15 @@
 package vn.eledevo.vksbe.service.base;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+import java.util.*;
+
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.BaseMapper;
 import vn.eledevo.vksbe.repository.BaseRepository;
-
-import java.util.*;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @FieldDefaults(level = AccessLevel.PROTECTED)
 public abstract class BaseServiceImpl<Rq, Rp, T, ID> implements BaseService<Rq, Rp, ID> {
@@ -95,13 +95,13 @@ public abstract class BaseServiceImpl<Rq, Rp, T, ID> implements BaseService<Rq, 
         return null;
     }
 
-//    @Override
-//    public Rp softDeleteById(ID id) throws ValidationException {
-//        Map<String, String> errors = toDeleteErrors(id);
-//        if (!errors.isEmpty()) {
-//            throw new ValidationException(errors);
-//        }
-//        repository.softDeleteById(id);
-//        return null;
-//    }
+    //    @Override
+    //    public Rp softDeleteById(ID id) throws ValidationException {
+    //        Map<String, String> errors = toDeleteErrors(id);
+    //        if (!errors.isEmpty()) {
+    //            throw new ValidationException(errors);
+    //        }
+    //        repository.softDeleteById(id);
+    //        return null;
+    //    }
 }
