@@ -37,9 +37,9 @@ public class UserServiceImpl implements UserService {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         User userResult = userRepository.save(user);
         UserResponse userResponse = mapper.toResponse(userResult);
-        UserResponse createdUser = mapper.toResponse(
-                userRepository.findById(userResult.getCreatedBy()).orElse(null));
-        userResponse.setCreatedUser(createdUser);
+        //        UserResponse createdUser = mapper.toResponse(
+        //                userRepository.findById(userResult.getCreatedBy()).orElse(null));
+        //        userResponse.setCreatedUser(createdUser);
 
         return userResponse;
     }

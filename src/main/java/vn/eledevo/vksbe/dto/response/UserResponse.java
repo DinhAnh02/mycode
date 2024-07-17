@@ -18,8 +18,6 @@ public class UserResponse {
     String fullName;
     Long createdAt;
     UUID createdBy;
-    UserResponse createdUser;
     Long updatedAt;
     UUID updatedBy;
-    UserResponse updatedUser;
 }
