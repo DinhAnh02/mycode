@@ -13,9 +13,9 @@ pipeline {
     maven 'maven-3.9.6'
   }
   stages {
-    stage('Compile code') {
+    stage('Executing the unit testing') {
         steps {
-          sh "mvn clean compile dependency:copy-dependencies"
+          sh "mvn clean dependency:copy-dependencies test jacoco:report"
       }
     }
     stage('Test with Sonarqube') {
