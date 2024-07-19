@@ -6,18 +6,18 @@ import java.util.Set;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 
-public interface BaseService<Rq, Rp, ID> {
-    Rp insert(Rq rq) throws ValidationException;
+public interface BaseService<I, O, T> {
+    O insert(I rq) throws ValidationException;
 
-    Rp update(ID id, Rq rq) throws ValidationException, ApiException;
+    O update(T id, I rq) throws ValidationException, ApiException;
 
-    Rp getById(ID id);
+    O getById(T id);
 
-    List<Rp> getByIds(Set<ID> ids);
+    List<O> getByIds(Set<T> ids);
 
-    Rp deleteById(ID id) throws ValidationException;
+    O deleteById(T id) throws ValidationException;
 
-    List<Rp> deleteByIds(Set<ID> ids) throws ValidationException;
+    List<O> deleteByIds(Set<T> ids) throws ValidationException;
 
-    Rp softDeleteById(ID id) throws ValidationException;
+    O softDeleteById(T id) throws ValidationException;
 }

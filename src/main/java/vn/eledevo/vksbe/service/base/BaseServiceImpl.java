@@ -12,69 +12,69 @@ import vn.eledevo.vksbe.mapper.BaseMapper;
 import vn.eledevo.vksbe.repository.BaseRepository;
 
 @FieldDefaults(level = AccessLevel.PROTECTED)
-public abstract class BaseServiceImpl<Rq, Rp, T, ID> implements BaseService<Rq, Rp, ID> {
-    BaseMapper<Rq, Rp, T> mapper;
+public abstract class BaseServiceImpl<I, O, E, T> implements BaseService<I, O, T> {
+    BaseMapper<I, O, E> mapper;
 
-    BaseRepository<T, ID> repository;
+    BaseRepository<E, T> repository;
 
-    protected BaseServiceImpl(BaseMapper<Rq, Rp, T> mapper, BaseRepository<T, ID> repository) {
+    protected BaseServiceImpl(BaseMapper<I, O, E> mapper, BaseRepository<E, T> repository) {
         this.mapper = mapper;
         this.repository = repository;
     }
 
-    protected Map<String, String> toInsertErrors(Rq rq) {
+    protected Map<String, String> toInsertErrors(I rq) {
         return new HashMap<>();
     }
 
-    protected Map<String, String> toUpdateErrors(ID id, Rq rq) {
+    protected Map<String, String> toUpdateErrors(T id, I rq) {
         return new HashMap<>();
     }
 
-    protected Map<String, String> toDeleteErrors(ID id) {
+    protected Map<String, String> toDeleteErrors(T id) {
         return new HashMap<>();
     }
 
-    protected Map<String, String> toDeleteErrors(Set<ID> ids) {
+    protected Map<String, String> toDeleteErrors(Set<T> ids) {
         return new HashMap<>();
     }
 
     @Override
-    public Rp insert(Rq rq) throws ValidationException {
+    public O insert(I rq) throws ValidationException {
         Map<String, String> errors = toInsertErrors(rq);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        T t = mapper.toEntity(rq);
-        T tResult = repository.save(t);
+        E t = mapper.toEntity(rq);
+        E tResult = repository.save(t);
         return mapper.toResponse(tResult);
     }
 
     @Override
-    public Rp update(ID id, Rq rq) throws ValidationException, ApiException {
-        T t = repository.findById(id).orElseThrow(() -> new ApiException(EX_NOT_FOUND));
+    public O update(T id, I rq) throws ValidationException, ApiException {
+        E t = repository.findById(id).orElseThrow(() -> new ApiException(EX_NOT_FOUND));
         Map<String, String> errors = toUpdateErrors(id, rq);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        T tUpdate = mapper.toEntityUpdate(rq, t);
-        T tResult = repository.save(tUpdate);
+        E tUpdate = mapper.toEntityUpdate(rq, t);
+        E tResult = repository.save(tUpdate);
         return mapper.toResponse(tResult);
     }
 
     @Override
-    public Rp getById(ID id) {
-        Optional<T> tOptional = repository.findById(id);
+    public O getById(T id) {
+        Optional<E> tOptional = repository.findById(id);
         return mapper.toResponse(tOptional.orElse(null));
     }
 
     @Override
-    public List<Rp> getByIds(Set<ID> ids) {
-        List<T> tList = repository.findAllById(ids);
+    public List<O> getByIds(Set<T> ids) {
+        List<E> tList = repository.findAllById(ids);
         return mapper.toListResponse(tList);
     }
 
     @Override
-    public Rp deleteById(ID id) throws ValidationException {
+    public O deleteById(T id) throws ValidationException {
         Map<String, String> errors = toDeleteErrors(id);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
@@ -84,13 +84,13 @@ public abstract class BaseServiceImpl<Rq, Rp, T, ID> implements BaseService<Rq, 
     }
 
     @Override
-    public List<Rp> deleteByIds(Set<ID> ids) throws ValidationException {
+    public List<O> deleteByIds(Set<T> ids) throws ValidationException {
         Map<String, String> errors = toDeleteErrors(ids);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
         repository.deleteAllById(ids);
-        return null;
+        return Collections.emptyList();
     }
 
     //    @Override
