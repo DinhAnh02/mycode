@@ -9,18 +9,18 @@ import org.mapstruct.*;
 
 import vn.eledevo.vksbe.dto.response.PageResponse;
 
-public abstract class BaseMapper<Rq, Rp, T> {
-    public abstract T toEntity(Rq rq);
+public abstract class BaseMapper<I, O, E> {
+    public abstract E toEntity(I rq);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    public abstract T toEntityUpdate(Rq rq, @MappingTarget T t);
+    public abstract E toEntityUpdate(I rq, @MappingTarget E e);
 
-    public abstract Rp toResponse(T t);
+    public abstract O toResponse(E e);
 
-    public abstract List<Rp> toListResponse(List<T> tList);
+    public abstract List<O> toListResponse(List<E> eList);
 
-    public PageResponse<Rp> toPageResponse(List<T> tList, int total) {
-        List<Rp> rpList = toListResponse(tList);
+    public PageResponse<O> toPageResponse(List<E> eList, int total) {
+        List<O> rpList = toListResponse(eList);
         return new PageResponse<>(total, rpList);
     }
 

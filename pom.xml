@@ -105,6 +105,15 @@
             <artifactId>jjwt-impl</artifactId>
             <version>0.11.5</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.230</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -146,6 +155,7 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <showWarnings>true</showWarnings>
                     <compilerArgs>
                         <arg>-Amapstruct.suppressGeneratorTimestamp=true</arg>
                         <arg>-Amapstruct.defaultComponentModel=spring</arg>
@@ -206,6 +216,12 @@
                 <configuration>
                     <excludes>
                         <exclude>vn/eledevo/vksbe/config/**</exclude>
+                        <exclude>vn/eledevo/vksbe/constant/**</exclude>
+                        <exclude>vn/eledevo/vksbe/dto/**</exclude>
+                        <exclude>vn/eledevo/vksbe/entity/**</exclude>
+                        <exclude>vn/eledevo/vksbe/exception/**</exclude>
+                        <exclude>vn/eledevo/vksbe/mapper/**</exclude>
+                        <exclude>vn/eledevo/vksbe/utils/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

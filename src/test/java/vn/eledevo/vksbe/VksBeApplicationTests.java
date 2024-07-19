@@ -1,5 +1,7 @@
 package vn.eledevo.vksbe;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -8,6 +10,6 @@ class VksBeApplicationTests {
 
     @Test
     void contextLoads() {
-        //        something test here
+        assertDoesNotThrow(() -> VksBeApplication.main(new String[] {}));
     }
 }
