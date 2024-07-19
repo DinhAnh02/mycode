@@ -8,7 +8,7 @@ FROM openjdk:21-jdk
 RUN unlink /etc/localtime;ln -s  /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 COPY --from=build src/target/vks-be-0.0.1-SNAPSHOT.jar /run/vks-be-0.0.1-SNAPSHOT.jar
 
-EXPOSE 8080
+EXPOSE 8081
 
 ENV JAVA_OPTIONS="-Xmx2048m -Xms256m"
 ENTRYPOINT java -jar $JAVA_OPTIONS /run/vks-be-0.0.1-SNAPSHOT.jar
