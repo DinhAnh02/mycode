@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.service.base;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static vn.eledevo.vksbe.constant.ErrorCode.EX_NOT_FOUND;
 
 import java.util.*;
 
@@ -51,9 +51,7 @@ public abstract class BaseServiceImpl<Rq, Rp, T, ID> implements BaseService<Rq, 
 
     @Override
     public Rp update(ID id, Rq rq) throws ValidationException, ApiException {
-        T t = repository
-                .findById(id)
-                .orElseThrow(() -> new ApiException(NOT_FOUND.value(), NOT_FOUND.getReasonPhrase()));
+        T t = repository.findById(id).orElseThrow(() -> new ApiException(EX_NOT_FOUND));
         Map<String, String> errors = toUpdateErrors(id, rq);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);

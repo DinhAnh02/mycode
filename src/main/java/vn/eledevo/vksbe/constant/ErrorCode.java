@@ -12,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(INTERNAL_SERVER_ERROR, 9999, "Lỗi Server, vui lòng thử lại sau!"),
     FIELD_INVALID(UNPROCESSABLE_ENTITY, 1001, "Các trường không hợp lệ!"),
-    METHOD_ERROR(METHOD_NOT_ALLOWED, 1002, "Phương thức không hợp lệ!");
+    METHOD_ERROR(METHOD_NOT_ALLOWED, 1002, "Phương thức không hợp lệ!"),
+    EX_NOT_FOUND(NOT_FOUND, 1008, "Không tìm thấy bản ghi");
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;
