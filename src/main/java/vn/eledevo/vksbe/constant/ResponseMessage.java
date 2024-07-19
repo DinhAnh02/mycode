@@ -15,4 +15,7 @@ public class ResponseMessage {
     public static final String DEVICE_INFO_BLANK = "Tên thiết bị không được để trống";
 
     public static final String DEVICE_INFO_UUID_BLANK = "Mã UUID thiết bị không được để trống";
+
+    public static final String DEVICE_NOT_FOUND =
+            "Thiết bị không tồn tại hoặc đã bị xóa trước đó. Vui lòng kiểm tra lại";
 }

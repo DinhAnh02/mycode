@@ -49,7 +49,7 @@ public class GlobalExceptionHandler extends Throwable {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Object> handlerAccessServiceException(ApiException ex) {
-        return generateExceptionResponse(ex.getCode(), ex.getMessage(), ex);
+        return generateExceptionResponse(ex.getErrorCode(), ex);
     }
 
     @ExceptionHandler(ValidationException.class)
