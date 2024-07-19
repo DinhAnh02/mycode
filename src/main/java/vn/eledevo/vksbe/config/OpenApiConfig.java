@@ -9,9 +9,9 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
-        info = @Info(description = "OpenApi documentation for LongNH VKS", title = "LongNH VKS", version = "1.0"),
+        info = @Info(description = "OpenApi documentation for VKS", title = "VKS", version = "1.0"),
         servers = {
-            @Server(description = "Local ENV", url = "http://localhost:8080"),
+            @Server(description = "Local ENV", url = "http://localhost:8081"),
             @Server(description = "Develop ENV", url = "https://vks-be.eledev.site")
         },
         security = {@SecurityRequirement(name = "bearerAuth")})
