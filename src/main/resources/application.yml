@@ -6,7 +6,7 @@ spring:
     username: eledev
     password: eledevodev
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@192.168.1.7:1521:FREE
+    url: jdbc:oracle:thin:@100.67.168.11:1521:FREE
   jackson:
     default-property-inclusion: non_null
   mvc:

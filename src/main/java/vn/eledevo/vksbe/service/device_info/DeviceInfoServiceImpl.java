@@ -1,23 +1,24 @@
 package vn.eledevo.vksbe.service.device_info;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.EX_NOT_FOUND;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import vn.eledevo.vksbe.constant.ResponseMessage;
+import vn.eledevo.vksbe.config.DynamicSpecification;
 import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
 import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
 import vn.eledevo.vksbe.entity.DeviceInfo;
 import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.DeviceInfoMapper;
 import vn.eledevo.vksbe.repository.DeviceInfoRepository;
-import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -27,15 +28,16 @@ public class DeviceInfoServiceImpl implements DeviceInfoService {
     DeviceInfoMapper deviceInfoMapper;
 
     @Override
-    public DeviceInfoResponse createDevice(DeviceInfoRequest deviceInfoRequest) throws ValidationException {
-        if (deviceInfoRepository.existsByName(deviceInfoRequest.getName())) {
-            throw new ValidationException("name", ResponseMessage.DEVICE_EXIST);
+    public DeviceInfoResponse createDevice(DeviceInfoRequest deviceInfoRequest) {
+        Optional<DeviceInfo> deviceInfo = deviceInfoRepository.findByDeviceUuid(deviceInfoRequest.getDeviceUuid());
+        if (deviceInfo.isPresent()) {
+            DeviceInfo deviceInfoEntity = deviceInfoMapper.toEntityUpdate(deviceInfoRequest, deviceInfo.get());
+            DeviceInfo deviceInfoUpdate = deviceInfoRepository.save(deviceInfoEntity);
+            return deviceInfoMapper.toResponse(deviceInfoUpdate);
         }
-        DeviceInfo deviceInfo = deviceInfoMapper.toEntity(deviceInfoRequest);
-        deviceInfo.setCreatedBy(SecurityUtils.getUserId());
-        deviceInfo.setUpdatedBy(SecurityUtils.getUserId());
-        DeviceInfo deviceInfoResult = deviceInfoRepository.save(deviceInfo);
-        return deviceInfoMapper.toResponse(deviceInfoResult);
+        DeviceInfo deviceInfoEntity = deviceInfoMapper.toEntity(deviceInfoRequest);
+        DeviceInfo deviceInfoCreate = deviceInfoRepository.save(deviceInfoEntity);
+        return deviceInfoMapper.toResponse(deviceInfoCreate);
     }
 
     @Override
@@ -48,4 +50,11 @@ public class DeviceInfoServiceImpl implements DeviceInfoService {
         deviceInfoRepository.save(deviceInfo.get());
         return deviceInfoMapper.toResponse(deviceInfo.get());
     }
+
+    @Override
+    public List<DeviceInfo> searchDevice(Map<String, Object> filters) {
+        Specification<DeviceInfo> spec = new DynamicSpecification(filters);
+        return deviceInfoRepository.findAll(spec);
+    }
+
 }
