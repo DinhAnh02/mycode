@@ -17,7 +17,7 @@ public enum ErrorCode {
     RECORD_EXIST(CONFLICT, 1010, "Bản ghi đã tồn tại"),
     USER_EXIST(CONFLICT, 1010, "Tài khoản đã tồn tại"),
     USER_NOT_EXIST(NOT_FOUND, 1008, "Tài khoản không tồn tại"),
-    PASSWORD_FAILURE(OK,8000,"Sai tài khoản hoặc mật khẩu");
+    PASSWORD_FAILURE(OK, 8000, "Sai tài khoản hoặc mật khẩu");
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;
