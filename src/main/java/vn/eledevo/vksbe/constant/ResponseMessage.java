@@ -10,6 +10,9 @@ public class ResponseMessage {
 
     public static final String USER_SIZE = "Tên đăng nhập phải có độ dài từ 3 đến 50 ký tự";
 
+    public static final String USER_NOT_FOUND =
+            "Người dùng không tồn tại hoặc đã bị xoá trước đó. Vui lòng kiểm tra lại";
+
     public static final String DEVICE_EXIST = "Thiết bị đã tồn tại";
 
     public static final String DEVICE_INFO_BLANK = "Tên thiết bị không được để trống";

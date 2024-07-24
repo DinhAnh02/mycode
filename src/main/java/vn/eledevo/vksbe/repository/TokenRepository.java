@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.Query;
 
 import vn.eledevo.vksbe.entity.Token;
+import vn.eledevo.vksbe.entity.User;
 
 public interface TokenRepository extends BaseRepository<Token, Long> {
     @Query(
@@ -19,4 +20,13 @@ public interface TokenRepository extends BaseRepository<Token, Long> {
     List<Token> findAllValidTokenByUser(UUID id);
 
     Optional<Token> findByAccessToken(String token);
+
+	@Query(
+			value =
+					"""
+            select t from Token t inner join User u\s
+            on t.user.id = u.id\s
+            where u.id = :id \s
+            """)
+	List<Token> findAllTokenByUser(UUID id);
 }

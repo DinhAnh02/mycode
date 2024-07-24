@@ -11,4 +11,6 @@ public interface UserRepository extends BaseRepository<User, UUID>, JpaSpecifica
     Optional<User> findByUsernameAndIsDeletedFalse(String username);
 
     Boolean existsByUsername(String username);
+
+    Optional<User> findByIdAndIsDeletedFalse(UUID id);
 }
