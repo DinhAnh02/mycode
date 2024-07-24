@@ -23,14 +23,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
 import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
 import vn.eledevo.vksbe.entity.DeviceInfo;
 import vn.eledevo.vksbe.entity.User;
 import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.repository.DeviceInfoRepository;
 import vn.eledevo.vksbe.service.device_info.DeviceInfoService;
 

@@ -9,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +78,8 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws ApiException {
         // Xác thực thông tin đăng nhập của người dùng
         try {
-            var user = repository.findByUsername(request.getUsername())
+            var user = repository
+                    .findByUsername(request.getUsername())
                     .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(

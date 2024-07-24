@@ -23,7 +23,19 @@ public class DynamicSpecification<T> implements Specification<T> {
         List<Predicate> predicates = new ArrayList<>();
         filters.forEach((field, value) -> {
             if (value != null) {
-                predicates.add(criteriaBuilder.equal(root.get(field), value));
+                // Lấy kiểu dữ liệu của field từ root
+                Class<?> fieldType = root.get(field).getJavaType();
+
+                if (fieldType == Boolean.class || fieldType == boolean.class) {
+                    // Chuyển đổi value sang Boolean
+                    boolean booleanValue = Boolean.parseBoolean(value.toString());
+                    predicates.add(
+                            booleanValue
+                                    ? criteriaBuilder.isTrue(root.get(field))
+                                    : criteriaBuilder.isFalse(root.get(field)));
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get(field), value));
+                }
             }
         });
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
