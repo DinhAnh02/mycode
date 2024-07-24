@@ -2,6 +2,9 @@ package vn.eledevo.vksbe.service.user;
 
 import static vn.eledevo.vksbe.constant.ResponseMessage.USER_EXIST;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,12 +15,17 @@ import org.springframework.stereotype.Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.ErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.config.DynamicSpecification;
 import vn.eledevo.vksbe.dto.request.UserRequest;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.UserResponse;
 import vn.eledevo.vksbe.entity.User;
+import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.UserMapper;
+import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UserRepository;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
@@ -27,6 +35,8 @@ import vn.eledevo.vksbe.utils.SecurityUtils;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
+
+    TokenRepository tokenRepository;
 
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -49,8 +59,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchUser(Map<String, Object> filters) {
-        Specification<User> spec = new DynamicSpecification(filters);
-        return userRepository.findAll(spec);
+    public List<UserResponse> searchUser(Map<String, Object> filters) {
+        Specification<User> spec = new DynamicSpecification<>(filters);
+        return mapper.toListResponse(userRepository.findAll(spec));
     }
+
+    @Override
+    public UserResponse deleteUser(UUID idUser) throws ApiException {
+        Optional<User> userInfo = userRepository.findByIdAndIsDeletedFalse(idUser);
+        if (userInfo.isEmpty()) {
+            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+        }
+        userInfo.get().setIsDeleted(true);
+        var validUserTokens = tokenRepository.findAllTokenByUser(idUser);
+        if (!validUserTokens.isEmpty()) {
+            validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
+        }
+        userRepository.save(userInfo.get());
+        return mapper.toResponse(userInfo.get());
+    }
+
+    @Override
+    public ApiResponse removeUser(UUID idUser) throws ApiException {
+        var validUserTokens = tokenRepository.findAllTokenByUser(idUser);
+        if (!validUserTokens.isEmpty()) {
+            validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
+        }
+        userRepository.deleteById(idUser);
+        return new ApiResponse<>(200,"Xoá thành công");
+    }
+
 }
