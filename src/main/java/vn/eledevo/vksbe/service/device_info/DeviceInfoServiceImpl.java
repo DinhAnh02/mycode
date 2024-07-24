@@ -56,5 +56,4 @@ public class DeviceInfoServiceImpl implements DeviceInfoService {
         Specification<DeviceInfo> spec = new DynamicSpecification(filters);
         return deviceInfoRepository.findAll(spec);
     }
-
 }

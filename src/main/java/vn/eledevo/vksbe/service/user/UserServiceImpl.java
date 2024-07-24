@@ -2,6 +2,9 @@ package vn.eledevo.vksbe.service.user;
 
 import static vn.eledevo.vksbe.constant.ResponseMessage.USER_EXIST;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,9 +20,6 @@ import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.UserMapper;
 import vn.eledevo.vksbe.repository.UserRepository;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
