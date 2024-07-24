@@ -1,4 +1,4 @@
-package vn.eledevo.vksbe.dto.response;
+package vn.eledevo.vksbe.dto.model;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -9,11 +9,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Getter
 @Setter
+@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class UserResponse {
+public class UserQuery {
     UUID id;
     String username;
     String fullName;
