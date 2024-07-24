@@ -31,7 +31,7 @@ public class DeviceInfo {
     UUID updatedBy;
     Boolean isDeleted;
 
-    @OneToMany(mappedBy = "deviceInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "deviceInfo")
     List<UserDeviceInfoKey> userDeviceInfoKeys;
 
     @PrePersist

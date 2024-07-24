@@ -40,10 +40,10 @@ public class User implements UserDetails {
     UUID updatedBy;
     Boolean isDeleted;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     List<UserDeviceInfoKey> userDeviceInfoKeys;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     List<Token> Tokens;
 
     @Override

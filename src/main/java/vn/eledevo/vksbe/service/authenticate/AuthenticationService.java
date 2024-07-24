@@ -7,7 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +19,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
+import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.TokenType;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.RegisterRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.entity.Token;
 import vn.eledevo.vksbe.entity.User;
+import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UserRepository;
 
@@ -42,8 +46,10 @@ public class AuthenticationService {
      * @param request Đối tượng RegisterRequest chứa thông tin đăng ký
      * @return Đối tượng AuthenticationResponse chứa token truy cập và token làm mới
      */
-    public AuthenticationResponse register(RegisterRequest request) {
-
+    public AuthenticationResponse register(RegisterRequest request) throws ApiException {
+        if (Boolean.TRUE.equals(repository.existsByUsername(request.getUsername()))) {
+            throw new ApiException(ErrorCode.USER_EXIST);
+        }
         // Tạo đối tượng User mới từ thông tin đăng ký
         var user = User.builder()
                 .fullName(request.getFullName())
@@ -51,56 +57,48 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
-
         // Lưu đối tượng User vào cơ sở dữ liệu
         var savedUser = repository.save(user);
-
         // Tạo token truy cập và token làm mới cho người dùng
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
-
         // Lưu token truy cập vào cơ sở dữ liệu
         saveUserToken(savedUser, jwtToken);
-
         // Trả về đối tượng AuthenticationResponse chứa các token
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
     }
-
     /**
      * Xác thực người dùng vào hệ thống.
      *
      * @param request Đối tượng AuthenticationRequest chứa thông tin xác thực
      * @return Đối tượng AuthenticationResponse chứa token truy cập và token làm mới
      */
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws ApiException {
         // Xác thực thông tin đăng nhập của người dùng
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-
-        // Tìm đối tượng User tương ứng với email
-        var user = repository.findByUsername(request.getUsername()).orElseThrow();
-
-        // Tạo token truy cập và token làm mới cho người dùng
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-
-        // Hủy tất cả các token hiện có của người dùng
-        revokeAllUserTokens(user);
-
-        // Lưu token truy cập mới vào cơ sở dữ liệu
-        saveUserToken(user, jwtToken);
-
-        // Trả về đối tượng AuthenticationResponse chứa các token
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
+        try {
+            var user = repository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
+            // Xác thực thông tin đăng nhập của người dùng
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            var jwtToken = jwtService.generateToken(user);
+            var refreshToken = jwtService.generateRefreshToken(user);
+            // Hủy tất cả các token hiện có của người dùng
+            revokeAllUserTokens(user);
+            // Lưu token truy cập mới vào cơ sở dữ liệu
+            saveUserToken(user, jwtToken);
+            // Trả về đối tượng AuthenticationResponse chứa các token
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        } catch (BadCredentialsException e) {
+            throw new ApiException(ErrorCode.PASSWORD_FAILURE);
+        }
     }
-
     /**
      * Lưu token truy cập cho người dùng vào cơ sở dữ liệu.
      *
