@@ -56,19 +56,24 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
+
         // Lưu đối tượng User vào cơ sở dữ liệu
         var savedUser = repository.save(user);
+
         // Tạo token truy cập và token làm mới cho người dùng
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
+
         // Lưu token truy cập vào cơ sở dữ liệu
         saveUserToken(savedUser, jwtToken);
+
         // Trả về đối tượng AuthenticationResponse chứa các token
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
     }
+
     /**
      * Xác thực người dùng vào hệ thống.
      *
@@ -78,8 +83,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws ApiException {
         // Xác thực thông tin đăng nhập của người dùng
         try {
-            var user = repository
-                    .findByUsername(request.getUsername())
+            var user = repository.findByUsernameAndIsDeletedFalse(request.getUsername())
                     .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
@@ -99,6 +103,7 @@ public class AuthenticationService {
             throw new ApiException(ErrorCode.PASSWORD_FAILURE);
         }
     }
+
     /**
      * Lưu token truy cập cho người dùng vào cơ sở dữ liệu.
      *
@@ -162,7 +167,7 @@ public class AuthenticationService {
         // Trích xuất email người dùng từ token làm mới
         username = jwtService.extractUsername(refreshToken);
         if (username != null) {
-            var user = this.repository.findByUsername(username).orElseThrow();
+            var user = this.repository.findByUsernameAndIsDeletedFalse(username).orElseThrow();
             // Kiểm tra tính hợp lệ của token làm mới
             if (jwtService.isTokenValid(refreshToken, user)) {
                 // Nếu token làm mới hợp lệ:

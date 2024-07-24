@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import vn.eledevo.vksbe.entity.User;
 
 public interface UserRepository extends BaseRepository<User, UUID>, JpaSpecificationExecutor<User> {
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsernameAndIsDeletedFalse(String username);
 
     Boolean existsByUsername(String username);
 }
