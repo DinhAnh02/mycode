@@ -20,7 +20,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database: oracle
+    database: mysql
 
 application:
   security:

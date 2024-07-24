@@ -46,11 +46,11 @@ public class UserControllerTest {
 
     @BeforeEach
     void initData() {
-        userRequest = UserRequest.builder()
-                .username("long")
-                .fullName("Nguyen Hoang Long")
-                .password("123456")
-                .build();
+            userRequest = UserRequest.builder()
+                    .username("long")
+                    .fullName("Nguyen Hoang Long")
+                    .password("123456")
+                    .build();
 
         userResponse = UserResponse.builder()
                 .id(UUID.fromString("88100e6d-99fe-44cd-aa44-1d2aa5c04d52"))
