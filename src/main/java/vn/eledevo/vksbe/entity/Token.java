@@ -28,6 +28,6 @@ public class Token {
     Boolean isRevoked;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     User user;
 }
