@@ -16,7 +16,8 @@ public enum ErrorCode {
     EX_NOT_FOUND(NOT_FOUND, 1008, "Không tìm thấy bản ghi"),
     RECORD_EXIST(CONFLICT, 1010, "Bản ghi đã tồn tại"),
     USER_EXIST(CONFLICT, 1010, "Tài khoản đã tồn tại"),
-    USER_NOT_EXIST(NOT_FOUND, 1008, "Tài khoản không tồn tại"),
+    USER_NOT_EXIST(NOT_FOUND, 1008, "Tài khoản không tồn tại hoặc đã bị xóa trước đó"),
+    DEVICE_NOT_EXIST(NOT_FOUND, 1008, "Thiết bị không tồn tại hoặc đã bị xóa trước đó"),
     PASSWORD_FAILURE(OK, 8000, "Sai tài khoản hoặc mật khẩu");
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {

@@ -21,4 +21,6 @@ public class ResponseMessage {
 
     public static final String DEVICE_NOT_FOUND =
             "Thiết bị không tồn tại hoặc đã bị xóa trước đó. Vui lòng kiểm tra lại";
+    public static final String USER_ID_BLANK = "Vui lòng chọn tài khoản muốn kết nối";
+    public static final String DEVICE_ID_BLANK = "Vui lòng chọn thiết bị muốn kết nối";
 }
