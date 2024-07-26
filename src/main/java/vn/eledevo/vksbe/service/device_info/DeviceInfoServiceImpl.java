@@ -52,8 +52,8 @@ public class DeviceInfoServiceImpl implements DeviceInfoService {
     }
 
     @Override
-    public List<DeviceInfo> searchDevice(Map<String, Object> filters) {
+    public List<DeviceInfoResponse> searchDevice(Map<String, Object> filters) {
         Specification<DeviceInfo> spec = new DynamicSpecification(filters);
-        return deviceInfoRepository.findAll(spec);
+        return deviceInfoMapper.toListResponse(deviceInfoRepository.findAll(spec));
     }
 }
