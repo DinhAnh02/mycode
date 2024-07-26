@@ -1,10 +1,8 @@
 package vn.eledevo.vksbe.controller;
 
+import org.springframework.web.bind.annotation.*;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import vn.eledevo.vksbe.dto.request.UserDeviceInfoKeyRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.UserDeviceInfoKeyResponse;
@@ -18,7 +16,13 @@ public class UserDeviceInfoKeyController {
     private final UserDeviceInfoKeyService userDeviceInfoKeyService;
 
     @PostMapping("/private/user-device-info-key")
-    public ApiResponse<UserDeviceInfoKeyResponse> addConnection (@RequestBody UserDeviceInfoKeyRequest userDeviceInfoKeyRequest) throws ApiException {
+    public ApiResponse<UserDeviceInfoKeyResponse> addConnection(
+            @RequestBody UserDeviceInfoKeyRequest userDeviceInfoKeyRequest) throws ApiException {
         return ApiResponse.ok(userDeviceInfoKeyService.addConnection(userDeviceInfoKeyRequest));
+    }
+
+    @PatchMapping("/private/user-device-info-key/delete/{id}")
+    public ApiResponse removeConnection(@PathVariable Long id) throws ApiException {
+        return ApiResponse.ok(userDeviceInfoKeyService.removeConnection(id));
     }
 }
