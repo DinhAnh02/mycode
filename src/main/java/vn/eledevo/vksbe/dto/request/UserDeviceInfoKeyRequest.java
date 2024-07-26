@@ -1,14 +1,15 @@
 package vn.eledevo.vksbe.dto.request;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ResponseMessage;
-
-import java.util.UUID;
 
 @Setter
 @Getter
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class UserDeviceInfoKeyRequest {
     @NotBlank(message = ResponseMessage.USER_ID_BLANK)
     UUID userId;
+
     @NotBlank(message = ResponseMessage.DEVICE_ID_BLANK)
     Long deviceInfoId;
 }
