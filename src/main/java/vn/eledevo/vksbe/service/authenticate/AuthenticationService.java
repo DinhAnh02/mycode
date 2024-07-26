@@ -83,7 +83,8 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws ApiException {
         // Xác thực thông tin đăng nhập của người dùng
         try {
-            var user = repository.findByUsernameAndIsDeletedFalse(request.getUsername())
+            var user = repository
+                    .findByUsernameAndIsDeletedFalse(request.getUsername())
                     .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(

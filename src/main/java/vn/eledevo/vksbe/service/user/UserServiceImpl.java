@@ -2,11 +2,10 @@ package vn.eledevo.vksbe.service.user;
 
 import static vn.eledevo.vksbe.constant.ResponseMessage.USER_EXIST;
 
-import java.util.Optional;
-import java.util.UUID;
-
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,9 +14,8 @@ import org.springframework.stereotype.Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.config.DynamicSpecification;
+import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.dto.request.UserRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.UserResponse;
@@ -86,7 +84,6 @@ public class UserServiceImpl implements UserService {
             validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
         }
         userRepository.deleteById(idUser);
-        return new ApiResponse<>(200,"Xoá thành công");
+        return new ApiResponse<>(200, "Xoá thành công");
     }
-
 }

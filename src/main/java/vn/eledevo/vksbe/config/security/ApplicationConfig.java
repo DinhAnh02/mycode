@@ -31,8 +31,9 @@ public class ApplicationConfig {
      */
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> (UserDetails)
-                repository.findByUsernameAndIsDeletedFalse(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> (UserDetails) repository
+                .findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
     /**
      * Cấu hình bean AuthenticationProvider để xác thực người dùng.
