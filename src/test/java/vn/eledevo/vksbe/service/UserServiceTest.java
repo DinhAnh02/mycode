@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.UUID;
+import java.util.*;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +16,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.dto.request.UserRequest;
+import vn.eledevo.vksbe.dto.response.UserResponse;
 import vn.eledevo.vksbe.entity.User;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.repository.UserRepository;
@@ -29,7 +31,7 @@ import vn.eledevo.vksbe.service.user.UserService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserServiceTest {
+class UserServiceTest {
     @Autowired
     private UserService userService;
 
@@ -37,6 +39,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     private UserRequest userRequest;
+
     private User user;
 
     @BeforeEach
@@ -81,5 +84,23 @@ public class UserServiceTest {
         when(userRepository.existsByUsername(anyString())).thenReturn(true);
         var exception = assertThrows(ValidationException.class, () -> userService.createUser(userRequest));
         Assertions.assertThat(exception.getErrors().get("username")).isEqualTo(ResponseMessage.USER_EXIST);
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    // Kiểm tra kết quả tìm kiếm theo fullName
+    void searchUser_withFullNameFilter_returnsMatchingUsers() {
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("fullName", "John Doe");
+        User user1 = User.builder()
+                .id(UUID.randomUUID())
+                .username("john")
+                .fullName("John Doe")
+                .build();
+        List<User> matchingUsers = Collections.singletonList(user1);
+        when(userRepository.findAll(any(Specification.class))).thenReturn(matchingUsers);
+        List<UserResponse> result = userService.searchUser(filters);
+        Assertions.assertThat(result).hasSize(1);
+        Assertions.assertThat(result.get(0).getUsername()).isEqualTo("john");
     }
 }

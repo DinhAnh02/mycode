@@ -2,7 +2,7 @@ package vn.eledevo.vksbe.controller;
 
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
+import java.util.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,14 +23,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
 import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
 import vn.eledevo.vksbe.entity.DeviceInfo;
 import vn.eledevo.vksbe.entity.User;
 import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.repository.DeviceInfoRepository;
 import vn.eledevo.vksbe.service.device_info.DeviceInfoService;
 
@@ -135,7 +133,7 @@ class DeviceInfoControllerTest {
     @Test
     @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
     void createDevice_validRequest_failure() throws Exception {
-        createDeviceInfoRequest.setName("uc");
+        createDeviceInfoRequest.setName("");
         when(deviceInfoService.deleteDevice(ArgumentMatchers.any())).thenReturn(deviceInfoResponse);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/public/device-info")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -158,8 +156,7 @@ class DeviceInfoControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("OK"))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.id").value(21))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.name").value("ASUS-TuanVQ"))
-                .andExpect(MockMvcResultMatchers.jsonPath("result.deviceUuid")
-                        .value("Mã UUID thiết bị không được để trống"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.deviceUuid").value("0987654321"))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.status").value("Not Connect"))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.isDeleted").value(true));
     }

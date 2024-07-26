@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import vn.eledevo.vksbe.dto.request.UserRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.UserResponse;
-import vn.eledevo.vksbe.entity.User;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.user.UserService;
@@ -38,6 +37,7 @@ public class UserController {
     public ApiResponse<UserResponse> deleteUser(@PathVariable UUID id) throws ApiException {
         return ApiResponse.ok(userService.deleteUser(id));
     }
+
     @DeleteMapping("/private/user/delete/{id}")
     public ApiResponse removeUser(@PathVariable UUID id) throws ApiException {
         return ApiResponse.ok(userService.removeUser(id));
