@@ -29,12 +29,18 @@ public class UserDeviceInfoKey {
     Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "device_info_id")
+    @JoinColumn(name = "device_info_id", insertable = false, updatable = false)
     DeviceInfo deviceInfo;
 
+    @Column(name = "device_info_id")
+    Long deviceInfoId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     User user;
+
+    @Column(name = "user_id")
+    UUID userId;
 
     @PrePersist
     void prePersist() {

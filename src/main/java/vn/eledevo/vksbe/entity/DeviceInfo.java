@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -32,6 +33,9 @@ public class DeviceInfo {
     Boolean isDeleted;
 
     @OneToMany(mappedBy = "deviceInfo")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
     List<UserDeviceInfoKey> userDeviceInfoKeys;
 
     @PrePersist
