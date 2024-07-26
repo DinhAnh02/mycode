@@ -174,4 +174,41 @@ class DeviceInfoControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1008))
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("Không tìm thấy bản ghi"));
     }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    // Kiểm tra kết quả sau khi tìm kiếm
+    void searchDevice_withNameFilter_success() throws Exception {
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("name", "ASUS");
+        String content = objectMapper.writeValueAsString(filters);
+        DeviceInfoResponse device1 = DeviceInfoResponse.builder().name("ASUS").build();
+        DeviceInfoResponse device2 = DeviceInfoResponse.builder().name("VIVO").build();
+        when(deviceInfoService.searchDevice(any())).thenReturn(List.of(device1, device2));
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/search")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.length()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("result[0].name").value("ASUS"));
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    // Kiểm tra kết quả sau khi tìm kiếm không có trong db
+    void searchDevice_withNameFilter_fail() throws Exception {
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("name", "ASUS");
+        String content = objectMapper.writeValueAsString(filters);
+        when(deviceInfoService.searchDevice(any())).thenReturn(Collections.emptyList());
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/search")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("result").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("result").isEmpty());
+    }
 }
