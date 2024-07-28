@@ -42,4 +42,9 @@ public class UserController {
     public ApiResponse removeUser(@PathVariable UUID id) throws ApiException {
         return ApiResponse.ok(userService.removeUser(id));
     }
+
+    @PatchMapping("/private/user/update/{id}")
+    public ApiResponse updateUser(@PathVariable UUID id, @RequestBody UserRequest userRequest) throws ApiException {
+        return ApiResponse.ok(userService.updateUser(id, userRequest));
+    }
 }

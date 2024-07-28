@@ -18,4 +18,6 @@ public interface UserService {
     UserResponse deleteUser(UUID idUser) throws ApiException;
 
     ApiResponse removeUser(UUID idUser) throws ApiException;
+
+    ApiResponse updateUser(UUID idUser, UserRequest userRequest) throws ApiException;
 }
