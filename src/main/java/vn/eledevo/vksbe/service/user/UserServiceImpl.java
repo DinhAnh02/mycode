@@ -86,4 +86,17 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(idUser);
         return new ApiResponse<>(200, "Xoá thành công");
     }
+
+    @Override
+    public ApiResponse updateUser(UUID idUser, UserRequest userRequest) throws ApiException {
+        Optional<User> userInfo = userRepository.findById(idUser);
+        if (userInfo.isEmpty()) {
+            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+        }
+        userInfo.get().setId(idUser);
+        userInfo.get().setFullName(userRequest.getFullName());
+        userInfo.get().setPassword(userRequest.getPassword());
+        userRepository.save(userInfo.get());
+        return new ApiResponse<>(200, "Cập nhật thành công");
+    }
 }
