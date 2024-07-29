@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.dto.request.UserRequest;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.UserResponse;
 import vn.eledevo.vksbe.entity.User;
 import vn.eledevo.vksbe.service.user.UserService;
@@ -132,5 +133,19 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("result").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("result").isEmpty());
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    void updateUser_WhenValidRequest_ShouldReturnOkResponse() throws Exception {
+        UUID userId = UUID.randomUUID();
+        ApiResponse expectedResponse = ApiResponse.ok("Cập nhật thành công");
+        when(userService.updateUser(userId, userRequest)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/private/user/update/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("OK"));
     }
 }
