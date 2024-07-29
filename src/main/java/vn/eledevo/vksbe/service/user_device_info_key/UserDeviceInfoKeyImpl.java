@@ -3,17 +3,17 @@ package vn.eledevo.vksbe.service.user_device_info_key;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.config.DynamicSpecification;
 import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.dto.request.UserDeviceInfoKeyRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -37,6 +37,33 @@ public class UserDeviceInfoKeyImpl implements UserDeviceInfoKeyService {
     static final String ALGORITHM = "AES";
     static final String PADDING = "PKCS5Padding";
     static final String keyBase64 = "cjFUazVkUHF0dXJRb1BhYmVnY0h5QnFnNFRBRVpDTm0=";
+
+    public static String decrypt(String encryptedText) {
+        try {
+            byte[] keys = generateKey(keyBase64);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keys, ALGORITHM);
+
+            Cipher cipher = Cipher.getInstance(ALGORITHM + "/ECB/" + PADDING);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static byte[] generateKey(String keyBase64) throws NoSuchAlgorithmException {
+        MessageDigest sha = MessageDigest.getInstance("SHA-256");
+        return sha.digest(keyBase64.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public List<UserDeviceInfoKeyResponse> getListConnection(Map<String, Object> filters) {
+        Specification<UserDeviceInfoKey> spec = new DynamicSpecification<>(filters);
+        return userDeviceInfoKeyMapper.toListResponse(userDeviceInfoKeyRepository.findAll(spec));
+    }
 
     @Override
     public UserDeviceInfoKeyResponse addConnection(UserDeviceInfoKeyRequest userDeviceInfoKeyRequest)
@@ -92,28 +119,6 @@ public class UserDeviceInfoKeyImpl implements UserDeviceInfoKeyService {
         return uuid.toString();
     }
 
-    public static String decrypt(String encryptedText) {
-        try {
-            byte[] keys = generateKey(keyBase64);
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keys, ALGORITHM);
-
-            Cipher cipher = Cipher.getInstance(ALGORITHM + "/ECB/" + PADDING);
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
-            return new String(decryptedBytes, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static byte[] generateKey(String keyBase64) throws NoSuchAlgorithmException {
-        MessageDigest sha = MessageDigest.getInstance("SHA-256");
-        byte[] digest = sha.digest(keyBase64.getBytes(StandardCharsets.UTF_8));
-        return digest;
-    }
-
     @Override
     public ApiResponse revokeUsbKey(Long id) throws ApiException {
         Optional<UserDeviceInfoKey> userDeviceInfoKey =
@@ -129,4 +134,6 @@ public class UserDeviceInfoKeyImpl implements UserDeviceInfoKeyService {
         userDeviceInfoKeyRepository.save(userDeviceInfoKey.get());
         return new ApiResponse(200,"Thu hồi thành công");
     }
+
+
 }

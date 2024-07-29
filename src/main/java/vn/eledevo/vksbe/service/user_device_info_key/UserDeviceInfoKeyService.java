@@ -5,6 +5,9 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.UserDeviceInfoKeyResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 
+import java.util.List;
+import java.util.Map;
+
 public interface UserDeviceInfoKeyService {
     UserDeviceInfoKeyResponse addConnection(UserDeviceInfoKeyRequest userDeviceInfoKeyRequest) throws ApiException;
 
@@ -13,4 +16,6 @@ public interface UserDeviceInfoKeyService {
     String createKeyUsb(Long id) throws ApiException;
 
     ApiResponse revokeUsbKey(Long id) throws ApiException;
+
+    List<UserDeviceInfoKeyResponse> getListConnection(Map<String,Object> filters);
 }
