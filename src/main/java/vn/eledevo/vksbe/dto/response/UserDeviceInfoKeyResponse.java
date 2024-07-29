@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.AccessLevel;
@@ -18,4 +19,8 @@ public class UserDeviceInfoKeyResponse {
     UUID userId;
     String keyUsb;
     Boolean isDeleted;
+    LocalDateTime createdAt;
+    UUID createdBy;
+    LocalDateTime updatedAt;
+    UUID updatedBy;
 }

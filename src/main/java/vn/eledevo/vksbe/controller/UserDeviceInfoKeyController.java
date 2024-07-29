@@ -9,11 +9,19 @@ import vn.eledevo.vksbe.dto.response.UserDeviceInfoKeyResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.user_device_info_key.UserDeviceInfoKeyService;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserDeviceInfoKeyController {
     private final UserDeviceInfoKeyService userDeviceInfoKeyService;
+
+    @GetMapping("/private/user-device-info-key")
+    public ApiResponse<List<UserDeviceInfoKeyResponse>> getListConnection(@RequestParam Map<String,Object> filters){
+        return ApiResponse.ok(userDeviceInfoKeyService.getListConnection(filters));
+    }
 
     @PostMapping("/private/user-device-info-key")
     public ApiResponse<UserDeviceInfoKeyResponse> addConnection(
