@@ -109,8 +109,9 @@ class UserServiceTest {
     @Test
     @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
     void updateUser_WhenUserDoesNotExist_ShouldThrowApiException() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> userService.updateUser(user.getId(), userRequest))
+        UUID idUser = UUID.randomUUID();
+        when(userRepository.findById(idUser)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.updateUser(idUser, userRequest))
                 .isInstanceOf(ApiException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_EXIST)
                 .hasMessage("Tài khoản không tồn tại hoặc đã bị xóa trước đó");
@@ -143,5 +144,25 @@ class UserServiceTest {
                 .isInstanceOf(ApiException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_EXIST)
                 .hasMessage("Tài khoản không tồn tại hoặc đã bị xóa trước đó");
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    void removeUser_WhenUserExists_ShouldDeleteSuccessfully() throws Exception {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        var response = userService.removeUser(user.getId());
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.getCode()).isEqualTo(200);
+        Assertions.assertThat(response.getMessage()).isEqualTo("Xoá thành công");
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    void removeUser_WhenUserDoesNotExist_ShouldStillReturnSuccessResponse() throws Exception {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        var response = userService.removeUser(user.getId());
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.getCode()).isEqualTo(200);
+        Assertions.assertThat(response.getMessage()).isEqualTo("Xoá thành công");
     }
 }
