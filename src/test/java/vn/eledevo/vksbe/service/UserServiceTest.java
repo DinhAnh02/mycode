@@ -109,9 +109,8 @@ class UserServiceTest {
     @Test
     @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
     void updateUser_WhenUserDoesNotExist_ShouldThrowApiException() {
-        UUID idUser = UUID.randomUUID();
-        when(userRepository.findById(idUser)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> userService.updateUser(idUser, userRequest))
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.updateUser(user.getId(), userRequest))
                 .isInstanceOf(ApiException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_EXIST)
                 .hasMessage("Tài khoản không tồn tại hoặc đã bị xóa trước đó");
@@ -123,5 +122,26 @@ class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         var response = userService.updateUser(user.getId(), userRequest);
         Assertions.assertThat(response.getMessage()).isEqualTo("Cập nhật thành công");
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    void deleteUser_WhenUserExists_ShouldDeleteSuccessfully() throws Exception {
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findByIdAndIsDeletedFalse(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        UserResponse response = userService.deleteUser(userId);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(user.getIsDeleted()).isTrue();
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    void deleteUser_WhenUserDoesNotExist_ShouldThrowApiException() {
+        when(userRepository.findByIdAndIsDeletedFalse(user.getId())).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.deleteUser(user.getId()))
+                .isInstanceOf(ApiException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_EXIST)
+                .hasMessage("Tài khoản không tồn tại hoặc đã bị xóa trước đó");
     }
 }

@@ -108,9 +108,8 @@ public class UserDeviceInfoKeyImpl implements UserDeviceInfoKeyService {
 
     @Override
     public String createKeyUsb(Long id) throws ApiException {
-        Optional<UserDeviceInfoKey> userDeviceInfoKey =
-                userDeviceInfoKeyRepository.findById(id);
-        if(userDeviceInfoKey.isEmpty()){
+        Optional<UserDeviceInfoKey> userDeviceInfoKey = userDeviceInfoKeyRepository.findById(id);
+        if (userDeviceInfoKey.isEmpty()) {
             throw new ApiException(ErrorCode.EX_NOT_FOUND);
         }
         UUID uuid = UUID.randomUUID();
@@ -121,19 +120,16 @@ public class UserDeviceInfoKeyImpl implements UserDeviceInfoKeyService {
 
     @Override
     public ApiResponse revokeUsbKey(Long id) throws ApiException {
-        Optional<UserDeviceInfoKey> userDeviceInfoKey =
-                userDeviceInfoKeyRepository.findById(id);
-        if(userDeviceInfoKey.isEmpty()){
+        Optional<UserDeviceInfoKey> userDeviceInfoKey = userDeviceInfoKeyRepository.findById(id);
+        if (userDeviceInfoKey.isEmpty()) {
             throw new ApiException(ErrorCode.EX_NOT_FOUND);
         }
         String keyUsb = userDeviceInfoKey.get().getKeyUsb();
-        if(keyUsb == null || keyUsb.isBlank()){
+        if (keyUsb == null || keyUsb.isBlank()) {
             throw new ApiException(ErrorCode.KEY_USB_NOT_FOUND);
         }
         userDeviceInfoKey.get().setKeyUsb(null);
         userDeviceInfoKeyRepository.save(userDeviceInfoKey.get());
-        return new ApiResponse(200,"Thu hồi thành công");
+        return new ApiResponse(200, "Thu hồi thành công");
     }
-
-
 }
