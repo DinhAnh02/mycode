@@ -18,7 +18,8 @@ public enum ErrorCode {
     USER_EXIST(CONFLICT, 1010, "Tài khoản đã tồn tại"),
     USER_NOT_EXIST(NOT_FOUND, 1008, "Tài khoản không tồn tại hoặc đã bị xóa trước đó"),
     DEVICE_NOT_EXIST(NOT_FOUND, 1008, "Thiết bị không tồn tại hoặc đã bị xóa trước đó"),
-    PASSWORD_FAILURE(OK, 8000, "Sai tài khoản hoặc mật khẩu");
+    PASSWORD_FAILURE(OK, 8000, "Sai tài khoản hoặc mật khẩu"),
+    KEY_USB_NOT_FOUND(OK, 7000, "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kểm tra lại");
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;

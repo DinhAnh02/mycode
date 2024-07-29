@@ -25,4 +25,14 @@ public class UserDeviceInfoKeyController {
     public ApiResponse removeConnection(@PathVariable Long id) throws ApiException {
         return ApiResponse.ok(userDeviceInfoKeyService.removeConnection(id));
     }
+
+    @PatchMapping("/private/user-device-info-key/generate-key-usb/{id}")
+    public ApiResponse<String> createKeyUsb(@PathVariable Long id) throws ApiException{
+        return ApiResponse.ok(userDeviceInfoKeyService.createKeyUsb(id));
+    }
+
+    @PatchMapping("/private/user-device-info-key/remove-key-usb/{id}")
+    public ApiResponse revokeKeyUsb (@PathVariable Long id) throws ApiException{
+        return ApiResponse.ok(userDeviceInfoKeyService.revokeUsbKey(id));
+    }
 }
