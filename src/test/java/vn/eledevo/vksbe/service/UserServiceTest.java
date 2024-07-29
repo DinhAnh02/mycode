@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,11 +21,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.dto.request.UserRequest;
 import vn.eledevo.vksbe.dto.response.UserResponse;
 import vn.eledevo.vksbe.entity.User;
+import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.repository.UserRepository;
 import vn.eledevo.vksbe.service.user.UserService;
@@ -39,7 +42,6 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     private UserRequest userRequest;
-
     private User user;
 
     @BeforeEach
@@ -102,5 +104,24 @@ class UserServiceTest {
         List<UserResponse> result = userService.searchUser(filters);
         Assertions.assertThat(result).hasSize(1);
         Assertions.assertThat(result.get(0).getUsername()).isEqualTo("john");
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    void updateUser_WhenUserDoesNotExist_ShouldThrowApiException() {
+        UUID idUser = UUID.randomUUID();
+        when(userRepository.findById(idUser)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.updateUser(idUser, userRequest))
+                .isInstanceOf(ApiException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_EXIST)
+                .hasMessage("Tài khoản không tồn tại hoặc đã bị xóa trước đó");
+    }
+
+    @Test
+    @WithUserDetails(value = "john", userDetailsServiceBeanName = "testUserDetailsService")
+    void updateUser_WhenUserExists_ShouldUpdateAndReturnSuccessResponse() throws ApiException {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        var response = userService.updateUser(user.getId(), userRequest);
+        Assertions.assertThat(response.getMessage()).isEqualTo("Cập nhật thành công");
     }
 }
