@@ -48,7 +48,7 @@ pipeline {
 
     stage('Build image') {
       steps {
-        sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
+        sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ." 
       }
     }
     stage('Save image') {
