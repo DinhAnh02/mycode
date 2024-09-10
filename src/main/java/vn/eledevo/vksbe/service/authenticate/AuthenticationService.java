@@ -1,6 +1,13 @@
 package vn.eledevo.vksbe.service.authenticate;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Optional;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AccessLevel;
@@ -20,13 +28,17 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.TokenType;
+import vn.eledevo.vksbe.dto.model.UserDeviceInfoKeyQuery;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.RegisterRequest;
+import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
+import vn.eledevo.vksbe.dto.response.TwoFactorAuthenticationResponse;
 import vn.eledevo.vksbe.entity.Token;
 import vn.eledevo.vksbe.entity.User;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.TokenRepository;
+import vn.eledevo.vksbe.repository.UserDeviceInfoKeyRepository;
 import vn.eledevo.vksbe.repository.UserRepository;
 
 @Service
@@ -35,10 +47,13 @@ import vn.eledevo.vksbe.repository.UserRepository;
 public class AuthenticationService {
     final UserRepository repository;
     final TokenRepository tokenRepository;
+    final UserDeviceInfoKeyRepository userDeviceInfoKeyRepository;
     final PasswordEncoder passwordEncoder;
     final JwtService jwtService;
     final AuthenticationManager authenticationManager;
-
+    static final String ALGORITHM = "AES";
+    static final String PADDING = "PKCS5Padding";
+    static final String keyBase64 = "cjFUazVkUHF0dXJRb1BhYmVnY0h5QnFnNFRBRVpDTm0=";
     /**
      * Đăng ký người dùng mới vào hệ thống.
      *
@@ -186,5 +201,63 @@ public class AuthenticationService {
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+    }
+
+    public static String decrypt(String keyUsb) {
+        try {
+            byte[] keys = generateKey(keyBase64); // Sử dụng khoá base64 thực tế của bạn
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keys, ALGORITHM);
+
+            Cipher cipher = Cipher.getInstance(ALGORITHM + "/ECB/" + PADDING);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(keyUsb));
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static byte[] generateKey(String keyBase64) throws NoSuchAlgorithmException {
+        MessageDigest sha = MessageDigest.getInstance("SHA-256");
+        byte[] digest = sha.digest(keyBase64.getBytes(StandardCharsets.UTF_8));
+        return digest;
+    }
+
+    public AuthenticationResponse twoFactorAuthentication(TwoFactorAuthenticationRequest request)
+            throws ApiException, JsonProcessingException {
+        String username = jwtService.extractUsername(request.getTokenUsb());
+        Optional<User> userInfo = repository.findByUsernameAndIsDeletedFalse(username);
+        if (userInfo.isEmpty()) {
+            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+        }
+        if (!username.equals(userInfo.get().getUsername())) {
+            throw new ApiException(ErrorCode.CHECK_USB);
+        }
+        String data = decrypt(request.getKeyUsb());
+        ObjectMapper objectMapper = new ObjectMapper();
+        TwoFactorAuthenticationResponse responseUsb =
+                objectMapper.readValue(data, TwoFactorAuthenticationResponse.class);
+        Optional<UserDeviceInfoKeyQuery> userDeviceInfoKey = userDeviceInfoKeyRepository.findUserDeviceInfoKeyByUserId(
+                userInfo.get().getId());
+        if (userDeviceInfoKey.isEmpty()) {
+            throw new ApiException(ErrorCode.EX_NOT_FOUND);
+        }
+        if (!responseUsb.getDeviceUuid().equals(request.getCurrentDeviceUuid())
+                || !request.getCurrentDeviceUuid()
+                        .equals(userDeviceInfoKey.get().getDeviceUuid())) {
+            throw new ApiException(ErrorCode.CHECK_USB);
+        }
+        if (!responseUsb.getKeyUsb().equals(userDeviceInfoKey.get().getKeyUsb())) {
+            throw new ApiException(ErrorCode.CHECK_USB);
+        }
+        var jwtToken = jwtService.generateToken(userInfo.get());
+        // Hủy tất cả các token hiện có của người dùng
+        revokeAllUserTokens(userInfo.get());
+        // Lưu token truy cập mới vào cơ sở dữ liệu
+        saveUserToken(userInfo.get(), jwtToken);
+        // Trả về đối tượng AuthenticationResponse chứa các token
+        return AuthenticationResponse.builder().accessToken(jwtToken).build();
     }
 }

@@ -120,8 +120,9 @@ public class UserDeviceInfoKeyImpl implements UserDeviceInfoKeyService {
 
     @Override
     public ApiResponse revokeUsbKey(Long id) throws ApiException {
-        Optional<UserDeviceInfoKey> userDeviceInfoKey = userDeviceInfoKeyRepository.findById(id);
-        if (userDeviceInfoKey.isEmpty()) {
+        Optional<UserDeviceInfoKey> userDeviceInfoKey =
+                userDeviceInfoKeyRepository.findById(id);
+        if(userDeviceInfoKey.isEmpty()){
             throw new ApiException(ErrorCode.EX_NOT_FOUND);
         }
         String keyUsb = userDeviceInfoKey.get().getKeyUsb();

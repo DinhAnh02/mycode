@@ -1,8 +1,10 @@
 package vn.eledevo.vksbe.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
+import vn.eledevo.vksbe.entity.DeviceInfo;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.device_info.DeviceInfoService;
 
@@ -31,7 +34,9 @@ public class DeviceInfoController {
     }
 
     @PatchMapping("/search")
-    public ApiResponse<List<DeviceInfoResponse>> searchDevice(@RequestParam Map<String, Object> allParams) {
+    public ApiResponse<List<DeviceInfoResponse>> searchDevice(@RequestBody DeviceInfo searchRequest) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> allParams = objectMapper.convertValue(searchRequest, Map.class);
         return ApiResponse.ok(deviceInfoService.searchDevice(allParams));
     }
 }
