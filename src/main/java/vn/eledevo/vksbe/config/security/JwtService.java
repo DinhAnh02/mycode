@@ -1,9 +1,7 @@
 package vn.eledevo.vksbe.config.security;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +47,6 @@ public class JwtService {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-
     /**
      * Trích xuất một claim cụ thể từ JWT token.
      *

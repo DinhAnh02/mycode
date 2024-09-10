@@ -25,7 +25,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
-        "/api/v1/auth/**",
+        "/api/v1/auth/authenticate",
+        "/api/v1/auth/register",
         "/v2/api-docs",
         "/v3/api-docs",
         "/v3/api-docs/**",
@@ -46,8 +47,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL)
                         .permitAll()
-                        .requestMatchers("/api/v1/private/**", "/api/v1/public/**")
-                        .hasAnyRole(ADMIN.name())
+                        .requestMatchers("/api/v1/private/users/search")
+                        .hasRole("ADMIN")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

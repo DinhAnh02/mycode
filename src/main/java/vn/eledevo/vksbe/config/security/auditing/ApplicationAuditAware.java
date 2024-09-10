@@ -28,10 +28,8 @@ public class ApplicationAuditAware implements AuditorAware<UUID> {
                 || authentication instanceof AnonymousAuthenticationToken) {
             return Optional.empty();
         }
-
         // Chuyển đổi thông tin xác thực về đối tượng User
         User userPrincipal = (User) authentication.getPrincipal();
-
         // Trả về mã nhận dạng (ID) của người dùng
         return Optional.ofNullable(userPrincipal.getId());
     }
