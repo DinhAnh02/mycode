@@ -31,6 +31,21 @@ pipeline {
         }
       }
     }
+    
+    // Kiểm tra SonarQube Quality Gate
+    stage('Check SonarQube Quality Gate') {
+      steps {
+        timeout(time: 2, unit: 'MINUTES') { // Đợi kết quả Quality Gate trong 2 phút
+          script {
+            def qg = waitForQualityGate() // Kiểm tra kết quả Quality Gate
+            if (qg.status != 'OK') {
+              error "Pipeline aborted due to SonarQube Quality Gate failure: ${qg.status}"
+            }
+          }
+        }
+      }
+    }
+
     stage('Build image') {
       steps {
         sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
@@ -46,25 +61,25 @@ pipeline {
       steps {
           sshagent(credentials: ['jenkins-ssh-key']) {
             sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
-          }
+        }
       }
     }
-      stage('Deploy to develop') {
-        steps {
-          script {
-            def deployFile = "deploy-${NAME_BACKEND}.sh"
-            def deploying = '#!/bin/bash\n' +
-              "docker rm -f ${NAME_BACKEND}\n" +
-              'cd /home/docker-image\n' +
-              "docker load -i ${NAME_BACKEND}.tar.gz\n" +
-              "docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG"
-            sshagent(credentials: ['jenkins-ssh-key']) {
-              sh """
-                  ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-              """
-            }
+    stage('Deploy to develop') {
+      steps {
+        script {
+          def deployFile = "deploy-${NAME_BACKEND}.sh"
+          def deploying = '#!/bin/bash\n' +
+            "docker rm -f ${NAME_BACKEND}\n" +
+            'cd /home/docker-image\n' +
+            "docker load -i ${NAME_BACKEND}.tar.gz\n" +
+            "docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG"
+          sshagent(credentials: ['jenkins-ssh-key']) {
+            sh """
+                ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+            """
           }
         }
       }
+    }
   }
 }
