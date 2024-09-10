@@ -7,6 +7,4 @@ import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
 import vn.eledevo.vksbe.entity.DeviceInfo;
 
 @Mapper(componentModel = "spring")
-public abstract class DeviceInfoMapper extends BaseMapper<DeviceInfoRequest, DeviceInfoResponse, DeviceInfo> {
-
-}
+public abstract class DeviceInfoMapper extends BaseMapper<DeviceInfoRequest, DeviceInfoResponse, DeviceInfo> {}

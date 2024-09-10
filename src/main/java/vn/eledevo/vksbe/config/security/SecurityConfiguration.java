@@ -1,7 +1,6 @@
 package vn.eledevo.vksbe.config.security;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-import static vn.eledevo.vksbe.constant.Role.ADMIN;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
