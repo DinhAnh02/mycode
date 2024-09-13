@@ -1,10 +1,11 @@
 package vn.eledevo.vksbe.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,6 +19,7 @@ public class Computers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     String name;
     String code;
     String status;
@@ -28,6 +30,7 @@ public class Computers {
     LocalDateTime updateAt;
     String createBy;
     String updateBy;
+
     @ManyToOne
     @JoinColumn(name = "accountId", nullable = false)
     Accounts accounts;
