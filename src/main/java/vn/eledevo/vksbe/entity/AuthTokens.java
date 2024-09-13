@@ -1,11 +1,11 @@
 package vn.eledevo.vksbe.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -15,15 +15,16 @@ import java.time.LocalDateTime;
 @Table(name = "authtokens")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class AuthTokens {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     String token;
     String tokenType;
     LocalDateTime expireTime;
     LocalDateTime createTime;
+
     @ManyToOne
     @JoinColumn(name = "accountId", nullable = false)
     Accounts accounts;

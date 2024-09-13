@@ -1,10 +1,12 @@
 package vn.eledevo.vksbe.entity;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.*;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter
@@ -18,6 +20,7 @@ public class Documents {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     String name;
     String path;
     String type;
@@ -28,12 +31,15 @@ public class Documents {
     LocalDateTime updateAt;
     String createBy;
     String updateBy;
+
     @ManyToOne
     @JoinColumn(name = "caseId", nullable = false)
     Cases cases;
+
     @ManyToOne
     @JoinColumn(name = "parentId", referencedColumnName = "id")
     Documents parentId;
-    @OneToMany(mappedBy = "parentId", cascade = CascadeType.MERGE, orphanRemoval = true,fetch = FetchType.EAGER)
+
+    @OneToMany(mappedBy = "parentId", cascade = CascadeType.MERGE, orphanRemoval = true, fetch = FetchType.EAGER)
     List<Documents> childDocuments;
 }
