@@ -12,12 +12,12 @@ pipeline {
   tools {
     maven 'maven-3.9.6'
   }
-  // stages {
-  //   stage('Executing the unit testing') {
-  //       steps {
-  //         sh "mvn clean dependency:copy-dependencies test jacoco:report"
-  //     }
-  //   }
+  stages {
+    // stage('Executing the unit testing') {
+    //     steps {
+    //       sh "mvn clean dependency:copy-dependencies test jacoco:report"
+    //   }
+    // }
     stage('Test with Sonarqube') {
       steps {
         withSonarQubeEnv('Sonarqube admin server') {
