@@ -1,15 +1,18 @@
 package vn.eledevo.vksbe.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import vn.eledevo.vksbe.entity.Accounts;
 
-
-@Repository
-public interface AccountRepository extends BaseRepository<Accounts, Long> {
+public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
+    @Query("SELECT a from Accounts a where a.username =: username and a.status = 'ACTIVE'")
+    Optional<Accounts> findByUsernameAndActive(String username);
 
     @Query(value = "SELECT a.username, p.fullName, a.roleId, r.roleName," +
             "a.departmentId, d.departmentName, a.status, a.createAt, a.updateAt " +

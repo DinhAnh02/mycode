@@ -7,10 +7,9 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import vn.eledevo.vksbe.entity.Accounts;
 
-import vn.eledevo.vksbe.entity.User;
-
-public class ApplicationAuditAware implements AuditorAware<UUID> {
+public class ApplicationAuditAware implements AuditorAware<Long> {
 
     /**
      * Lấy thông tin về người dùng hiện tại đang xác thực trong ứng dụng.
@@ -19,7 +18,7 @@ public class ApplicationAuditAware implements AuditorAware<UUID> {
      * ngược lại trả về Optional.empty().
      */
     @Override
-    public Optional<UUID> getCurrentAuditor() {
+    public Optional<Long> getCurrentAuditor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // Nếu không có thông tin xác thực hoặc là xác thực ẩn danh
@@ -29,7 +28,7 @@ public class ApplicationAuditAware implements AuditorAware<UUID> {
             return Optional.empty();
         }
         // Chuyển đổi thông tin xác thực về đối tượng User
-        User userPrincipal = (User) authentication.getPrincipal();
+        Accounts userPrincipal = (Accounts) authentication.getPrincipal();
         // Trả về mã nhận dạng (ID) của người dùng
         return Optional.ofNullable(userPrincipal.getId());
     }
