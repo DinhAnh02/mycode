@@ -27,4 +27,6 @@ public interface TokenRepository extends BaseRepository<AuthTokens, Long> {
 			where u.id = :id \s
 			""")
     List<AuthTokens> findAllTokenByUser(Long id);
+
+	void deleteByAccounts_Id(Long id);
 }
