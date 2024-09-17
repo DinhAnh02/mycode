@@ -13,7 +13,7 @@ public interface TokenRepository extends BaseRepository<AuthTokens, Long> {
                     """
 			select t from AuthTokens t inner join Accounts u\s
 			on t.accounts.id = u.id\s
-			where u.id = :id and (t.expireTime = false ) \s
+			where u.id = :id and (t.isExpireTime = false ) \s
 			""")
     List<AuthTokens> findAllValidTokenByUser(Long id);
 
