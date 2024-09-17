@@ -13,4 +13,10 @@ public class SecurityUtils {
         Accounts user = (Accounts) securityContext.getAuthentication().getPrincipal();
         return user.getId();
     }
+
+    public static String getUserName() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Accounts user = (Accounts) securityContext.getAuthentication().getPrincipal();
+        return user.getUsername();
+    }
 }

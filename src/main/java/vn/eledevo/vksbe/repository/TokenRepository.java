@@ -28,5 +28,5 @@ public interface TokenRepository extends BaseRepository<AuthTokens, Long> {
 			""")
     List<AuthTokens> findAllTokenByUser(Long id);
 
-	void deleteByAccounts_Id(Long id);
+    void deleteByAccounts_Id(Long accountId);
 }
