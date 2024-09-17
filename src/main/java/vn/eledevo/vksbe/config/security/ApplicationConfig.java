@@ -17,12 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.RequiredArgsConstructor;
 import vn.eledevo.vksbe.config.security.auditing.ApplicationAuditAware;
-import vn.eledevo.vksbe.repository.UserRepository;
+import vn.eledevo.vksbe.repository.AccountRepository;
 
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-    private final UserRepository repository;
+    private final AccountRepository repository;
 
     /**
      * Cấu hình bean UserDetailsService để lấy thông tin người dùng từ cơ sở dữ liệu.
@@ -32,7 +32,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> (UserDetails) repository
-                .findByUsernameAndIsDeletedFalse(username)
+                .findByUsernameAndActive(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
     /**
@@ -53,7 +53,7 @@ public class ApplicationConfig {
      * @return Đối tượng AuditorAware
      */
     @Bean
-    public AuditorAware<UUID> auditorAware() {
+    public AuditorAware<Long> auditorAware() {
         return new ApplicationAuditAware();
     }
     /**

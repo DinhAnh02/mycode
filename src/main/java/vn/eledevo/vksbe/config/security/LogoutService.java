@@ -35,12 +35,10 @@ public class LogoutService implements LogoutHandler {
         // Nếu header tồn tại và đúng định dạng, lấy chuỗi JWT từ sau cụm "Bearer "
         jwt = authHeader.substring(7);
         var storedToken = tokenRepository
-                .findByAccessToken(jwt) // Tìm token trong cơ sở dữ liệu dựa trên chuỗi JWT
+                .findByToken(jwt) // Tìm token trong cơ sở dữ liệu dựa trên chuỗi JWT
                 .orElse(null);
         if (storedToken != null) { // Nếu token tồn tại trong cơ sở dữ liệu
-            storedToken.setIsExpired(true); // Đánh dấu token đã hết hạn
-            storedToken.setIsRevoked(true); // Đánh dấu token đã bị thu hồi
-            tokenRepository.save(storedToken); // Lưu lại trạng thái mới của token vào cơ sở dữ liệu
+            tokenRepository.deleteById(storedToken.getId()); // Lưu lại trạng thái mới của token vào cơ sở dữ liệu
             SecurityContextHolder.clearContext(); // Xóa thông tin xác thực khỏi SecurityContext
         }
     }

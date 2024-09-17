@@ -19,9 +19,9 @@ public class Usbs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
     String usbCode;
     String usbVendorCode;
+    String name;
     String keyUSB;
     String status;
     LocalDateTime createAt;

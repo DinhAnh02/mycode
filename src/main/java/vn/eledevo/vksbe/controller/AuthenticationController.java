@@ -30,26 +30,21 @@ import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
 public class AuthenticationController {
     final AuthenticationService service;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) throws ApiException {
-        return ResponseEntity.ok(service.register(request));
-    }
-
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request)
             throws ApiException {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
-    @PostMapping("/refresh-token")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        service.refreshToken(request, response);
-    }
+//    @PostMapping("/refresh-token")
+//    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        service.refreshToken(request, response);
+//    }
 
-    @PostMapping("/public/2fa")
-    public ResponseEntity<AuthenticationResponse> twoFactorAuthentication(
-            @RequestBody TwoFactorAuthenticationRequest twoFactorAuthenticationRequest)
-            throws ApiException, JsonProcessingException {
-        return ResponseEntity.ok(service.twoFactorAuthentication(twoFactorAuthenticationRequest));
-    }
+//    @PostMapping("/public/2fa")
+//    public ResponseEntity<AuthenticationResponse> twoFactorAuthentication(
+//            @RequestBody TwoFactorAuthenticationRequest twoFactorAuthenticationRequest)
+//            throws ApiException, JsonProcessingException {
+//        return ResponseEntity.ok(service.twoFactorAuthentication(twoFactorAuthenticationRequest));
+//    }
 }

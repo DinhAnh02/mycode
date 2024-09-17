@@ -25,10 +25,10 @@ public class Accounts implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    String employeeCode;
+    String username;
     String password;
     String status;
-    Long pin;
+    String pin;
     Boolean isConditionLogin1;
     Boolean isConditionLogin2;
 
