@@ -81,7 +81,7 @@ public class AuthenticationService {
                 .accounts(account)
                 .token(jwtToken)
                 .tokenType(type)
-                .expireTime(false)
+                .isExpireTime(false)
                 .build();
 
         // Lưu đối tượng Token vào cơ sở dữ liệu

@@ -2,11 +2,13 @@ package vn.eledevo.vksbe.entity;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import jakarta.persistence.*;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.*;
@@ -44,7 +46,7 @@ public class Accounts implements UserDetails {
     String updateBy;
 
     @ManyToOne
-    @JoinColumn(name = "roleCode", nullable = false)
+    @JoinColumn(name = " role_id", nullable = false)
     Roles roles;
 
     @OneToOne(mappedBy = "accounts", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
@@ -64,12 +66,14 @@ public class Accounts implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return roles != null ?
+                Collections.singletonList(new SimpleGrantedAuthority(roles.getCode())) :
+                Collections.emptyList();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return username;
     }
 
     @Override

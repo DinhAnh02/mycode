@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import vn.eledevo.vksbe.entity.Accounts;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
-    @Query("SELECT a from Accounts a where a.username =: username and a.status = 'ACTIVE'")
+    @Query("SELECT a from Accounts a where a.username =:username and a.status = 'ACTIVE'")
     Optional<Accounts> findByUsernameAndActive(String username);
 
     @Query(value = "SELECT a.username, p.fullName, a.roleId, r.roleName," +
