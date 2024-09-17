@@ -43,10 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         //         Bỏ qua yêu cầu đến đường dẫn /api/v1/auth (đăng nhập, đăng ký, ...)
-        if (request.getServletPath().contains("/api/v1/auth")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (request.getServletPath().contains("/api/v1/auth")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         final String authHeader = request.getHeader("Authorization"); // Lấy ra header từ request
         final String jwt;
@@ -64,11 +64,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Kiểm tra chuỗi vừa lấy ra có bị null hoặc trong ContextHolder có bị null
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
-            var isTokenValid = tokenRepository
-                    .findByToken(jwt) // Tìm token trong database theo chuỗi jwt
-                    .map(t -> !t.getExpireTime())
-                    .orElse(false);
-
+            var tokenOptional = tokenRepository.findByToken(jwt);
+            boolean isTokenValid = tokenOptional.isPresent() && !tokenOptional.get().getIsExpireTime();
             // Kiểm tra xem token có hợp lệ không, nếu hợp lệ lưu vào ContextHolder
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken =
