@@ -14,8 +14,6 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     @Query("SELECT a from Accounts a where a.username =: username and a.status = 'ACTIVE'")
     Optional<Accounts> findByUsernameAndActive(String username);
 
-    Boolean existsByUsername(String username);
-
     @Query(value = "SELECT a.username, p.fullName, a.roleId, r.roleName," +
             "a.departmentId, d.departmentName, a.status, a.createAt, a.updateAt " +
             "FROM accounts a " +
