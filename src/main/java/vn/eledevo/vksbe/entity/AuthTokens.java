@@ -22,7 +22,7 @@ public class AuthTokens {
 
     String token;
     String tokenType;
-    LocalDateTime expireTime;
+    Boolean expireTime;
     LocalDateTime createTime;
 
     @ManyToOne

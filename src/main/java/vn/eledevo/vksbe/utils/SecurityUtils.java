@@ -4,14 +4,13 @@ import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import vn.eledevo.vksbe.entity.User;
+import vn.eledevo.vksbe.entity.Accounts;
 
 public class SecurityUtils {
-    public static UUID getUserId() {
+    public static Long getUserId() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        User user = (User) securityContext.getAuthentication().getPrincipal();
+        Accounts user = (Accounts) securityContext.getAuthentication().getPrincipal();
         return user.getId();
     }
 }

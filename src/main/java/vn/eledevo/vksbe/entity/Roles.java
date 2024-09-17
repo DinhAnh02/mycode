@@ -21,6 +21,7 @@ public class Roles {
     Long id;
 
     String code;
+    String name;
 
     @OneToMany(mappedBy = "roles", orphanRemoval = true, fetch = FetchType.EAGER)
     List<Accounts> accounts;

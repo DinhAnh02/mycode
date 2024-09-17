@@ -1,26 +1,17 @@
 package vn.eledevo.vksbe.service.authenticate;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.Optional;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,26 +19,20 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.TokenType;
-import vn.eledevo.vksbe.dto.model.UserDeviceInfoKeyQuery;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
-import vn.eledevo.vksbe.dto.request.RegisterRequest;
-import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
-import vn.eledevo.vksbe.dto.response.TwoFactorAuthenticationResponse;
-import vn.eledevo.vksbe.entity.Token;
-import vn.eledevo.vksbe.entity.User;
+import vn.eledevo.vksbe.entity.Accounts;
+import vn.eledevo.vksbe.entity.AuthTokens;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.TokenRepository;
-import vn.eledevo.vksbe.repository.UserDeviceInfoKeyRepository;
-import vn.eledevo.vksbe.repository.UserRepository;
+import vn.eledevo.vksbe.repository.AccountRepository;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationService {
-    final UserRepository repository;
+    final AccountRepository accountRepository;
     final TokenRepository tokenRepository;
-    final UserDeviceInfoKeyRepository userDeviceInfoKeyRepository;
     final PasswordEncoder passwordEncoder;
     final JwtService jwtService;
     final AuthenticationManager authenticationManager;
@@ -60,60 +45,23 @@ public class AuthenticationService {
      * @param request Đối tượng RegisterRequest chứa thông tin đăng ký
      * @return Đối tượng AuthenticationResponse chứa token truy cập và token làm mới
      */
-    public AuthenticationResponse register(RegisterRequest request) throws ApiException {
-        if (Boolean.TRUE.equals(repository.existsByUsername(request.getUsername()))) {
-            throw new ApiException(ErrorCode.USER_EXIST);
-        }
-        // Tạo đối tượng User mới từ thông tin đăng ký
-        var user = User.builder()
-                .fullName(request.getFullName())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
-                .build();
-
-        // Lưu đối tượng User vào cơ sở dữ liệu
-        var savedUser = repository.save(user);
-
-        // Tạo token truy cập và token làm mới cho người dùng
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-
-        // Lưu token truy cập vào cơ sở dữ liệu
-        saveUserToken(savedUser, jwtToken);
-
-        // Trả về đối tượng AuthenticationResponse chứa các token
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-    /**
-     * Xác thực người dùng vào hệ thống.
-     *
-     * @param request Đối tượng AuthenticationRequest chứa thông tin xác thực
-     * @return Đối tượng AuthenticationResponse chứa token truy cập và token làm mới
-     */
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws ApiException {
         // Xác thực thông tin đăng nhập của người dùng
         try {
-            var user = repository
-                    .findByUsernameAndIsDeletedFalse(request.getUsername())
+            var account = accountRepository
+                    .findByUsernameAndActive(request.getUsername())
                     .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            var jwtToken = jwtService.generateToken(user);
-            var refreshToken = jwtService.generateRefreshToken(user);
+            var jwtToken = jwtService.generateToken(account);
             // Hủy tất cả các token hiện có của người dùng
-            revokeAllUserTokens(user);
+            revokeAllUserTokens(account);
             // Lưu token truy cập mới vào cơ sở dữ liệu
-            saveUserToken(user, jwtToken);
+            saveUserToken(account, jwtToken,TokenType.ACCESS.toString());
             // Trả về đối tượng AuthenticationResponse chứa các token
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
-                    .refreshToken(refreshToken)
                     .build();
         } catch (BadCredentialsException e) {
             throw new ApiException(ErrorCode.PASSWORD_FAILURE);
@@ -123,18 +71,17 @@ public class AuthenticationService {
     /**
      * Lưu token truy cập cho người dùng vào cơ sở dữ liệu.
      *
-     * @param user     Đối tượng User
+     * @param account     Đối tượng User
      * @param jwtToken Token truy cập JWT
      */
-    private void saveUserToken(User user, String jwtToken) {
+    private void saveUserToken(Accounts account, String jwtToken ,String type) {
 
         // Tạo đối tượng Token mới
-        var token = Token.builder()
-                .user(user)
-                .accessToken(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .isExpired(false)
-                .isRevoked(false)
+        var token = AuthTokens.builder()
+                .accounts(account)
+                .token(jwtToken)
+                .tokenType(type)
+                .expireTime(false)
                 .build();
 
         // Lưu đối tượng Token vào cơ sở dữ liệu
@@ -144,63 +91,16 @@ public class AuthenticationService {
     /**
      * Hủy tất cả các token hiện có của người dùng.
      *
-     * @param user Đối tượng User
+     * @param account Đối tượng User
      */
-    private void revokeAllUserTokens(User user) {
-
+    private void revokeAllUserTokens(Accounts account) {
         // Tìm tất cả các token hợp lệ của người dùng
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(account.getId());
         if (validUserTokens.isEmpty()) return;
-
         // Đánh dấu các token đó là hết hạn và bị hủy
         validUserTokens.forEach(token -> {
-            token.setIsExpired(true);
-            token.setIsRevoked(true);
+            tokenRepository.deleteById(token.getId());
         });
-
-        // Lưu các token đã cập nhật vào cơ sở dữ liệu
-        tokenRepository.saveAll(validUserTokens);
-    }
-
-    /**
-     * Làm mới token truy cập cho người dùng.
-     *
-     * @param request  Đối tượng HttpServletRequest
-     * @param response Đối tượng HttpServletResponse
-     * @throws IOException Ngoại lệ xảy ra khi ghi dữ liệu vào luồng đầu ra
-     */
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        // Lấy token làm mới từ header yêu cầu
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String refreshToken;
-        final String username;
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
-        }
-        refreshToken = authHeader.substring(7);
-
-        // Trích xuất email người dùng từ token làm mới
-        username = jwtService.extractUsername(refreshToken);
-        if (username != null) {
-            var user = this.repository.findByUsernameAndIsDeletedFalse(username).orElseThrow();
-            // Kiểm tra tính hợp lệ của token làm mới
-            if (jwtService.isTokenValid(refreshToken, user)) {
-                // Nếu token làm mới hợp lệ:
-                //   - Tạo token truy cập mới cho người dùng
-                //   - Hủy tất cả các token hiện có của người dùng
-                //   - Lưu token truy cập mới vào cơ sở dữ liệu
-                //   - Trả về đối tượng AuthenticationResponse chứa các token mới
-                var accessToken = jwtService.generateToken(user);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken);
-                var authResponse = AuthenticationResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
-            }
-        }
     }
 
     public static String decrypt(String keyUsb) {
@@ -225,39 +125,39 @@ public class AuthenticationService {
         return digest;
     }
 
-    public AuthenticationResponse twoFactorAuthentication(TwoFactorAuthenticationRequest request)
-            throws ApiException, JsonProcessingException {
-        String username = jwtService.extractUsername(request.getTokenUsb());
-        Optional<User> userInfo = repository.findByUsernameAndIsDeletedFalse(username);
-        if (userInfo.isEmpty()) {
-            throw new ApiException(ErrorCode.USER_NOT_EXIST);
-        }
-        if (!username.equals(userInfo.get().getUsername())) {
-            throw new ApiException(ErrorCode.CHECK_USB);
-        }
-        String data = decrypt(request.getKeyUsb());
-        ObjectMapper objectMapper = new ObjectMapper();
-        TwoFactorAuthenticationResponse responseUsb =
-                objectMapper.readValue(data, TwoFactorAuthenticationResponse.class);
-        Optional<UserDeviceInfoKeyQuery> userDeviceInfoKey = userDeviceInfoKeyRepository.findUserDeviceInfoKeyByUserId(
-                userInfo.get().getId());
-        if (userDeviceInfoKey.isEmpty()) {
-            throw new ApiException(ErrorCode.EX_NOT_FOUND);
-        }
-        if (!responseUsb.getDeviceUuid().equals(request.getCurrentDeviceUuid())
-                || !request.getCurrentDeviceUuid()
-                        .equals(userDeviceInfoKey.get().getDeviceUuid())) {
-            throw new ApiException(ErrorCode.CHECK_USB);
-        }
-        if (!responseUsb.getKeyUsb().equals(userDeviceInfoKey.get().getKeyUsb())) {
-            throw new ApiException(ErrorCode.CHECK_USB);
-        }
-        var jwtToken = jwtService.generateToken(userInfo.get());
-        // Hủy tất cả các token hiện có của người dùng
-        revokeAllUserTokens(userInfo.get());
-        // Lưu token truy cập mới vào cơ sở dữ liệu
-        saveUserToken(userInfo.get(), jwtToken);
-        // Trả về đối tượng AuthenticationResponse chứa các token
-        return AuthenticationResponse.builder().accessToken(jwtToken).build();
-    }
+//    public AuthenticationResponse twoFactorAuthentication(TwoFactorAuthenticationRequest request)
+//            throws ApiException, JsonProcessingException {
+//        String username = jwtService.extractUsername(request.getTokenUsb());
+//        Optional<User> userInfo = repository.findByUsernameAndIsDeletedFalse(username);
+//        if (userInfo.isEmpty()) {
+//            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+//        }
+//        if (!username.equals(userInfo.get().getUsername())) {
+//            throw new ApiException(ErrorCode.CHECK_USB);
+//        }
+//        String data = decrypt(request.getKeyUsb());
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        TwoFactorAuthenticationResponse responseUsb =
+//                objectMapper.readValue(data, TwoFactorAuthenticationResponse.class);
+//        Optional<UserDeviceInfoKeyQuery> userDeviceInfoKey = userDeviceInfoKeyRepository.findUserDeviceInfoKeyByUserId(
+//                userInfo.get().getId());
+//        if (userDeviceInfoKey.isEmpty()) {
+//            throw new ApiException(ErrorCode.EX_NOT_FOUND);
+//        }
+//        if (!responseUsb.getDeviceUuid().equals(request.getCurrentDeviceUuid())
+//                || !request.getCurrentDeviceUuid()
+//                        .equals(userDeviceInfoKey.get().getDeviceUuid())) {
+//            throw new ApiException(ErrorCode.CHECK_USB);
+//        }
+//        if (!responseUsb.getKeyUsb().equals(userDeviceInfoKey.get().getKeyUsb())) {
+//            throw new ApiException(ErrorCode.CHECK_USB);
+//        }
+//        var jwtToken = jwtService.generateToken(userInfo.get());
+//        // Hủy tất cả các token hiện có của người dùng
+//        revokeAllUserTokens(userInfo.get());
+//        // Lưu token truy cập mới vào cơ sở dữ liệu
+//        saveUserToken(userInfo.get(), jwtToken);
+//        // Trả về đối tượng AuthenticationResponse chứa các token
+//        return AuthenticationResponse.builder().accessToken(jwtToken).build();
+//    }
 }
