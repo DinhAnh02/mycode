@@ -1,11 +1,10 @@
 package vn.eledevo.vksbe.constant;
 
-import static org.springframework.http.HttpStatus.*;
-
-import org.springframework.http.HttpStatusCode;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
+
+import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,7 +19,9 @@ public enum ErrorCode {
     DEVICE_NOT_EXIST(NOT_FOUND, 1008, "Thiết bị không tồn tại hoặc đã bị xóa trước đó"),
     PASSWORD_FAILURE(OK, 8000, "Sai tài khoản hoặc mật khẩu"),
     KEY_USB_NOT_FOUND(OK, 7000, "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kểm tra lại"),
-    CHECK_USB(CONFLICT, 6000, "Usb không chính xác");
+    CHECK_USB(CONFLICT, 6000, "Usb không chính xác"),
+    ACCOUNT_NOT_FOUND(NOT_FOUND, 4040, " Acount không tồn tại trong hệ thống"),
+    ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;
