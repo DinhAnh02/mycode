@@ -9,9 +9,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.InformationResponse;
-import vn.eledevo.vksbe.entity.Departments;
-import vn.eledevo.vksbe.entity.Organizations;
-import vn.eledevo.vksbe.entity.Roles;
+import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
+import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
+import vn.eledevo.vksbe.dto.response.role.RoleResponse;
+import vn.eledevo.vksbe.mapper.DepartmentMapper;
+import vn.eledevo.vksbe.mapper.OrganizationMapper;
+import vn.eledevo.vksbe.mapper.RoleMapper;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
 import vn.eledevo.vksbe.repository.OrganizationRepository;
 import vn.eledevo.vksbe.repository.RoleRepository;
@@ -28,9 +31,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ApiResponse<InformationResponse> getAllInformation() {
-        List<Departments> departmentsList = departmentRepository.findAll();
-        List<Organizations> organizationsList = organizationRepository.findAll();
-        List<Roles> rolesList = roleRepository.findAll();
+        List<DepartmentResponse> departmentsList = departmentRepository.findAll().stream()
+                .map(DepartmentMapper::toResponse).toList();
+        List<OrganizationResponse> organizationsList = organizationRepository.findAll().stream()
+                .map(OrganizationMapper::toResponse).toList();
+        List<RoleResponse> rolesList = roleRepository.findAll().stream()
+                .map(RoleMapper::toResponse).toList();
 
         InformationResponse response = InformationResponse.builder()
                 .departments(departmentsList)
