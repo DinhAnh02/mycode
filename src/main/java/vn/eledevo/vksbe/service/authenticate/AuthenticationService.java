@@ -24,8 +24,8 @@ import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.AuthTokens;
 import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.AccountRepository;
+import vn.eledevo.vksbe.repository.TokenRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -58,11 +58,9 @@ public class AuthenticationService {
             // Hủy tất cả các token hiện có của người dùng
             revokeAllUserTokens(account);
             // Lưu token truy cập mới vào cơ sở dữ liệu
-            saveUserToken(account, jwtToken,TokenType.ACCESS.toString());
+            saveUserToken(account, jwtToken, TokenType.ACCESS.toString());
             // Trả về đối tượng AuthenticationResponse chứa các token
-            return AuthenticationResponse.builder()
-                    .accessToken(jwtToken)
-                    .build();
+            return AuthenticationResponse.builder().accessToken(jwtToken).build();
         } catch (BadCredentialsException e) {
             throw new ApiException(ErrorCode.PASSWORD_FAILURE);
         }
@@ -74,7 +72,7 @@ public class AuthenticationService {
      * @param account     Đối tượng User
      * @param jwtToken Token truy cập JWT
      */
-    private void saveUserToken(Accounts account, String jwtToken ,String type) {
+    private void saveUserToken(Accounts account, String jwtToken, String type) {
 
         // Tạo đối tượng Token mới
         var token = AuthTokens.builder()
@@ -125,39 +123,40 @@ public class AuthenticationService {
         return digest;
     }
 
-//    public AuthenticationResponse twoFactorAuthentication(TwoFactorAuthenticationRequest request)
-//            throws ApiException, JsonProcessingException {
-//        String username = jwtService.extractUsername(request.getTokenUsb());
-//        Optional<User> userInfo = repository.findByUsernameAndIsDeletedFalse(username);
-//        if (userInfo.isEmpty()) {
-//            throw new ApiException(ErrorCode.USER_NOT_EXIST);
-//        }
-//        if (!username.equals(userInfo.get().getUsername())) {
-//            throw new ApiException(ErrorCode.CHECK_USB);
-//        }
-//        String data = decrypt(request.getKeyUsb());
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        TwoFactorAuthenticationResponse responseUsb =
-//                objectMapper.readValue(data, TwoFactorAuthenticationResponse.class);
-//        Optional<UserDeviceInfoKeyQuery> userDeviceInfoKey = userDeviceInfoKeyRepository.findUserDeviceInfoKeyByUserId(
-//                userInfo.get().getId());
-//        if (userDeviceInfoKey.isEmpty()) {
-//            throw new ApiException(ErrorCode.EX_NOT_FOUND);
-//        }
-//        if (!responseUsb.getDeviceUuid().equals(request.getCurrentDeviceUuid())
-//                || !request.getCurrentDeviceUuid()
-//                        .equals(userDeviceInfoKey.get().getDeviceUuid())) {
-//            throw new ApiException(ErrorCode.CHECK_USB);
-//        }
-//        if (!responseUsb.getKeyUsb().equals(userDeviceInfoKey.get().getKeyUsb())) {
-//            throw new ApiException(ErrorCode.CHECK_USB);
-//        }
-//        var jwtToken = jwtService.generateToken(userInfo.get());
-//        // Hủy tất cả các token hiện có của người dùng
-//        revokeAllUserTokens(userInfo.get());
-//        // Lưu token truy cập mới vào cơ sở dữ liệu
-//        saveUserToken(userInfo.get(), jwtToken);
-//        // Trả về đối tượng AuthenticationResponse chứa các token
-//        return AuthenticationResponse.builder().accessToken(jwtToken).build();
-//    }
+    //    public AuthenticationResponse twoFactorAuthentication(TwoFactorAuthenticationRequest request)
+    //            throws ApiException, JsonProcessingException {
+    //        String username = jwtService.extractUsername(request.getTokenUsb());
+    //        Optional<User> userInfo = repository.findByUsernameAndIsDeletedFalse(username);
+    //        if (userInfo.isEmpty()) {
+    //            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+    //        }
+    //        if (!username.equals(userInfo.get().getUsername())) {
+    //            throw new ApiException(ErrorCode.CHECK_USB);
+    //        }
+    //        String data = decrypt(request.getKeyUsb());
+    //        ObjectMapper objectMapper = new ObjectMapper();
+    //        TwoFactorAuthenticationResponse responseUsb =
+    //                objectMapper.readValue(data, TwoFactorAuthenticationResponse.class);
+    //        Optional<UserDeviceInfoKeyQuery> userDeviceInfoKey =
+    // userDeviceInfoKeyRepository.findUserDeviceInfoKeyByUserId(
+    //                userInfo.get().getId());
+    //        if (userDeviceInfoKey.isEmpty()) {
+    //            throw new ApiException(ErrorCode.EX_NOT_FOUND);
+    //        }
+    //        if (!responseUsb.getDeviceUuid().equals(request.getCurrentDeviceUuid())
+    //                || !request.getCurrentDeviceUuid()
+    //                        .equals(userDeviceInfoKey.get().getDeviceUuid())) {
+    //            throw new ApiException(ErrorCode.CHECK_USB);
+    //        }
+    //        if (!responseUsb.getKeyUsb().equals(userDeviceInfoKey.get().getKeyUsb())) {
+    //            throw new ApiException(ErrorCode.CHECK_USB);
+    //        }
+    //        var jwtToken = jwtService.generateToken(userInfo.get());
+    //        // Hủy tất cả các token hiện có của người dùng
+    //        revokeAllUserTokens(userInfo.get());
+    //        // Lưu token truy cập mới vào cơ sở dữ liệu
+    //        saveUserToken(userInfo.get(), jwtToken);
+    //        // Trả về đối tượng AuthenticationResponse chứa các token
+    //        return AuthenticationResponse.builder().accessToken(jwtToken).build();
+    //    }
 }

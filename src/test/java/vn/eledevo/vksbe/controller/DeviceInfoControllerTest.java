@@ -1,40 +1,40 @@
-//package vn.eledevo.vksbe.controller;
+// package vn.eledevo.vksbe.controller;
 //
-//import static org.mockito.Mockito.*;
+// import static org.mockito.Mockito.*;
 //
-//import java.util.*;
+// import java.util.*;
 //
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.ArgumentMatchers;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.context.TestConfiguration;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.http.MediaType;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.test.context.support.WithUserDetails;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-//import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.mockito.ArgumentMatchers;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.context.TestConfiguration;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.http.MediaType;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.test.context.support.WithUserDetails;
+// import org.springframework.test.web.servlet.MockMvc;
+// import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+// import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 //
-//import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.fasterxml.jackson.databind.ObjectMapper;
 //
-//import vn.eledevo.vksbe.constant.ErrorCode;
-//import vn.eledevo.vksbe.constant.Role;
-//import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
-//import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
-//import vn.eledevo.vksbe.entity.DeviceInfo;
-//import vn.eledevo.vksbe.entity.User;
-//import vn.eledevo.vksbe.exception.ApiException;
-//import vn.eledevo.vksbe.repository.DeviceInfoRepository;
-//import vn.eledevo.vksbe.service.device_info.DeviceInfoService;
+// import vn.eledevo.vksbe.constant.ErrorCode;
+// import vn.eledevo.vksbe.constant.Role;
+// import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
+// import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
+// import vn.eledevo.vksbe.entity.DeviceInfo;
+// import vn.eledevo.vksbe.entity.User;
+// import vn.eledevo.vksbe.exception.ApiException;
+// import vn.eledevo.vksbe.repository.DeviceInfoRepository;
+// import vn.eledevo.vksbe.service.device_info.DeviceInfoService;
 //
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//class DeviceInfoControllerTest {
+// @SpringBootTest
+// @AutoConfigureMockMvc
+// class DeviceInfoControllerTest {
 //    @Autowired
 //    private MockMvc mockMvc;
 //
@@ -211,4 +211,4 @@
 //                .andExpect(MockMvcResultMatchers.jsonPath("result").isArray())
 //                .andExpect(MockMvcResultMatchers.jsonPath("result").isEmpty());
 //    }
-//}
+// }
