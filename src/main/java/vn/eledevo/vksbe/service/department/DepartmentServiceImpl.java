@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.service.department;
 
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
 
@@ -20,8 +21,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<Departments> getListDepartment() {
+    public ApiResponse<List<Departments>> getListDepartment() {
         List<Departments> departmentsList = departmentRepository.findAll();
-        return departmentsList;
+        return new ApiResponse<>(200, "Get a list of all successful departments", departmentsList);
     }
 }
