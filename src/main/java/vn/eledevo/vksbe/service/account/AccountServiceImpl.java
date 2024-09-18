@@ -1,14 +1,21 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -25,12 +32,6 @@ import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -157,14 +158,14 @@ public class AccountServiceImpl implements AccountService {
 
         return !("VIEN_TRUONG".equals(roleCodeLogin)
                 || ("VIEN_PHO".equals(roleCodeLogin)
-                && !"VIEN_TRUONG".equals(roleCodeDetail)
-                && !"VIEN_PHO".equals(roleCodeDetail))
+                        && !"VIEN_TRUONG".equals(roleCodeDetail)
+                        && !"VIEN_PHO".equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                && "TRUONG_PHONG".equals(roleCodeLogin)
-                && !"TRUONG_PHONG".equals(roleCodeDetail))
+                        && "TRUONG_PHONG".equals(roleCodeLogin)
+                        && !"TRUONG_PHONG".equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                && "PHO_PHONG".equals(roleCodeLogin)
-                && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
+                        && "PHO_PHONG".equals(roleCodeLogin)
+                        && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
     }
 
     /**
@@ -189,5 +190,4 @@ public class AccountServiceImpl implements AccountService {
         List<Computers> res = computerRepository.findByAccounts_Id(accountId);
         return computerMapper.toListResponse(res);
     }
-
 }

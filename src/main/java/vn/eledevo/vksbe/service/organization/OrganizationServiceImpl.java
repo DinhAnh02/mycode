@@ -2,10 +2,11 @@ package vn.eledevo.vksbe.service.organization;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.repository.OrganizationRepository;
 
