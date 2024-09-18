@@ -1,10 +1,14 @@
 package vn.eledevo.vksbe.service.account;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.ACCOUNT_NOT_FOUND;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.account.Result;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.AccountMapper;
@@ -59,5 +67,41 @@ public class AccountServiceImpl implements AccountService {
         Accounts res = accountRepository.save(accounts);
         tokenRepository.deleteByAccounts_Id(id);
         return accountMapper.toResponse(res);
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
+            throws ApiException {
+        try {
+            if (accountRequest.getFromDate() == null) {
+                accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
+            }
+            if (accountRequest.getToDate() == null) {
+                accountRequest.setToDate(LocalDateTime.now());
+            }
+            if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
+                throw new ApiException(CHECK_FROM_DATE);
+            }
+
+            if (currentPage == null || currentPage < 1) {
+                currentPage = 1;
+            }
+            if (limit == null) {
+                limit = 10;
+            }
+            Pageable pageable = PageRequest.of(currentPage - 1, limit);
+            Page<AccountResponseByFilter> page = accountRepository.getAccountList(accountRequest, pageable);
+            List<AccountResponseByFilter> accountResponseByFilterList = page.getContent().stream()
+                    .peek(ele -> {
+                        ele.setOrganizationId(accountRequest.getOrganizationId());
+                        ele.setOrganizationName(accountRequest.getOrganizationName());
+                    })
+                    .toList();
+            Result<AccountResponseByFilter> result = new Result<>(accountResponseByFilterList, page.getTotalElements());
+            return new ApiResponse<>(2000, "OK", result);
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
     }
 }
