@@ -1,6 +1,8 @@
 package vn.eledevo.vksbe.repository;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import vn.eledevo.vksbe.dto.model.computer.ComputersDto;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
@@ -24,4 +26,12 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
             "AND c.status = :#{#computerRequest.status}",
             nativeQuery = true)
     List<ListComputerResponse> getComputerList(ComputerRequest computerRequest);
+
+    @Query("SELECT new vn.eledevo.vksbe.dto.model.computer.ComputersDto( " +
+            "c.id, c.name, c.status, c.createAt) FROM Computers c " +
+            "WHERE ((COALESCE(:#{#textSearch}, NULL) IS NULL) " +
+            "OR LOWER(c.name) LIKE %:#{#textSearch}% " +
+            "OR LOWER(c.code) LIKE %:#{#textSearch}%) ")
+    List<ComputersDto> getByTextSearch(@Param("textSearch") String textSearch);
+
 }
