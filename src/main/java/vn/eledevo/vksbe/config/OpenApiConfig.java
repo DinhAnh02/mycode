@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         info = @Info(description = "OpenApi documentation for VKS", title = "VKS", version = "1.0"),
         servers = {
             @Server(description = "Local ENV", url = "http://localhost:8081"),
-            @Server(description = "Develop ENV", url = "https://vks-be.eledev.site")
+            @Server(description = "Develop ENV", url = "https://dev-vks.eledevo.com")
         },
         security = {@SecurityRequirement(name = "bearerAuth")})
 @SecurityScheme(
