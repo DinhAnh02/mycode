@@ -11,4 +11,9 @@ public class ApiException extends Exception {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
+
+    public ApiException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
 }

@@ -2,15 +2,18 @@ package vn.eledevo.vksbe.service.role;
 
 import java.util.Optional;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.entity.Roles;
 import vn.eledevo.vksbe.repository.RoleRepository;
 
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleServiceImpl implements RoleService {
-    private final RoleRepository roleRepository;
-
-    public RoleServiceImpl(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
+    RoleRepository roleRepository;
 
     @Override
     public Boolean roleNameChangeDetector(Long roleId, String roleName) {
