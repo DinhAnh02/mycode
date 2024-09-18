@@ -2,9 +2,10 @@ package vn.eledevo.vksbe.service.department;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
-
+@Service
 public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepository departmentRepository;
 
