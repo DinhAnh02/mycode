@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
+import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -111,7 +113,79 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<ComputerResponse> getComputersByIdAccount(Long accountId) {
+    public ApiResponse<AccountDetailResponse> getAccountDetail(Long accountId) throws ApiException {
+        try {
+            String username = getUserName();
+            AccountInfo acc = accountRepository.findByUsername(username);
+            Accounts account = validAccount(accountId);
+
+            AccountDetailResponse accountDetailResponse = AccountDetailResponse.builder()
+                    .username(account.getUsername())
+                    .fullName(account.getProfile().getFullName())
+                    .departmentName(account.getDepartments().getName())
+                    .roleName(account.getRoles().getName())
+                    .status(account.getStatus())
+                    .phoneNumber(account.getProfile().getPhoneNumber())
+                    .isDisplayAllButton("IT_ADMIN".equals(acc.getRoleCode()))
+                    .isActive("ACTIVE".equals(account.getStatus()))
+                    .isReadOnly(isReadOnly(acc, account))
+                    .isDisableActiveButton(isDisableActiveButton(account))
+                    .build();
+            return ApiResponse.ok(accountDetailResponse);
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
+        }
+    }
+
+    /**
+     * Kiểm tra điều kiện hiển thị nút kích hoạt/khoá với role khác IT_ADMIN
+     * Dieu kien hien thi la:
+     * Role đăng nhập là "VIEN_TRUONG"
+     * Role đăng nhập là "VIEN_PHO" và role xem chi tiết không phải "VIEN_TRUONG" hoặc "VIEN_PHO"
+     * Cùng phòng ban, role đăng nhập là "TRUONG_PHONG" và role xem chi tiết không phải "TRUONG_PHONG"
+     * Cùng phòng ban, role đăng nhập là "PHO_PHONG" và role xem chi tiết là "KIEM_SAT_VIEN"
+     *
+     * @param acc     Thông tin tài khoản đang đăng nhập
+     * @param account Thông tin tài khoản được xem chi tiết
+     * @return boolean true: không hiển thị nút nào, false: hiển thị nút kích hoạt/khoá
+     */
+    private static boolean isReadOnly(AccountInfo acc, Accounts account) {
+        String roleCodeLogin = acc.getRoleCode();
+        String roleCodeDetail = account.getRoles().getCode();
+        Long departmentLogin = acc.getDepartmentId();
+        Long departmentDetail = account.getDepartments().getId();
+
+        return !("VIEN_TRUONG".equals(roleCodeLogin)
+                || ("VIEN_PHO".equals(roleCodeLogin)
+                && !"VIEN_TRUONG".equals(roleCodeDetail)
+                && !"VIEN_PHO".equals(roleCodeDetail))
+                || (departmentLogin.equals(departmentDetail)
+                && "TRUONG_PHONG".equals(roleCodeLogin)
+                && !"TRUONG_PHONG".equals(roleCodeDetail))
+                || (departmentLogin.equals(departmentDetail)
+                && "PHO_PHONG".equals(roleCodeLogin)
+                && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
+    }
+
+    /**
+     * Kiểm tra điều kiện nút kích hoạt disable hay không?
+     * Điều kiện để nút kích hoạt không bị disable:
+     * - isActive = false
+     * - isConnectUsb = true
+     * - isConnectComputer = true
+     *
+     * @param acc Thông tin tài khoản được xem chi tiết
+     * @return boolean true: disable, false: active
+     */
+    private static boolean isDisableActiveButton(Accounts acc) {
+        return !("INACTIVE".equals(acc.getStatus()) && acc.getIsConnectComputer() && acc.getIsConnectUsb());
+    }
+
+    @Override
+    public List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException {
+        if (!accountRepository.existsById(accountId)) {
+            throw new ApiException(ACCOUNT_NOT_FOUND);
+        }
         List<Computers> res = computerRepository.findByAccountId(accountId);
         return computerMapper.toListResponse(res);
     }

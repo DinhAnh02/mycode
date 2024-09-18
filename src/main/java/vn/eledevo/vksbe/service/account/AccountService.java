@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.service.account;
 
+import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -14,5 +15,7 @@ public interface AccountService {
     ApiResponse getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
             throws ApiException;
 
-    List<ComputerResponse> getComputersByIdAccount(Long accountId);
+    ApiResponse<AccountDetailResponse> getAccountDetail(Long accountId) throws ApiException;
+
+    List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException;
 }
