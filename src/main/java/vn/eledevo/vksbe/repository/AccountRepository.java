@@ -12,7 +12,6 @@ import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Usbs;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
     @Query("SELECT a from Accounts a where a.username =:username and a.status = 'ACTIVE'")

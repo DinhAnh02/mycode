@@ -1,9 +1,9 @@
 package vn.eledevo.vksbe.dto.response.computer;
 
+import java.time.LocalDateTime;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

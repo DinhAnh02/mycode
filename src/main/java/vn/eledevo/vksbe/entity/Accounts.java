@@ -46,7 +46,7 @@ public class Accounts implements UserDetails {
     String updateBy;
 
     @ManyToOne
-    @JoinColumn(name = " role_id", nullable = false)
+    @JoinColumn(name = "role_id", nullable = false)
     Roles roles;
 
     @OneToOne(mappedBy = "accounts", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
