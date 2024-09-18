@@ -186,7 +186,7 @@ public class AccountServiceImpl implements AccountService {
         if (!accountRepository.existsById(accountId)) {
             throw new ApiException(ACCOUNT_NOT_FOUND);
         }
-        List<Computers> res = computerRepository.findByAccountId(accountId);
+        List<Computers> res = computerRepository.findByAccounts_Id(accountId);
         return computerMapper.toListResponse(res);
     }
 

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -16,8 +18,8 @@ public class AccountResponse {
     Boolean isConditionLogin2;
     Boolean isConnectComputer;
     Boolean isConnectUsb;
-    Long createAt;
-    Long updateAt;
+    LocalDateTime createAt;
+    LocalDateTime updateAt;
     String createBy;
     String updateBy;
 }
