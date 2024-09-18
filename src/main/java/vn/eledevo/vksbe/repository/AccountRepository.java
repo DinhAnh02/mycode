@@ -63,5 +63,5 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
 			""")
     Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Pageable pageable);
 
-	Usbs findbyAcountIdAndIsConnectUsb(Long acountId);
+//	Usbs findbyAcountIdAndIsConnectUsb(Long acountId);
 }
