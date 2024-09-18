@@ -22,7 +22,7 @@ public enum ErrorCode {
     KEY_USB_NOT_FOUND(OK, 7000, "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kểm tra lại"),
     CHECK_USB(CONFLICT, 6000, "Usb không chính xác"),
     ACCOUNT_NOT_FOUND(NOT_FOUND, 4040, " Acount không tồn tại trong hệ thống"),
-    ;
+    CHECK_FROM_DATE(UNPROCESSABLE_ENTITY, 4220, "Thời gian bắt đầu không được lớn hơn thời gian kết thúc.");
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;

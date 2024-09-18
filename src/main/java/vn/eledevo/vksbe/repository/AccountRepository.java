@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.entity.Accounts;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
@@ -43,4 +45,20 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
             @Param("departmentId") int departmentId,
             @Param("status") String status,
             Pageable pageable);
+
+    @Query(
+            """
+			SELECT a.username, p.fullName, a.roles.id, r.name, a.departments.id, d.name,
+					a.status, a.createAt, a.updateAt
+			FROM Accounts a
+			JOIN Profiles p
+			JOIN Roles r
+			JOIN Departments d
+			WHERE (:#{#filter.username} IS NULL OR a.username = :#{#filter.username})
+			AND (:#{#filter.fullName} IS NULL OR p.fullName = :#{#filter.fullName})
+			AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId})
+			AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId})
+			AND (:#{#filter.status} IS NULL OR a.status = :#{#filter.status})
+			""")
+    Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Pageable pageable);
 }
