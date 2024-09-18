@@ -1,32 +1,32 @@
-//package vn.eledevo.vksbe.service;
+// package vn.eledevo.vksbe.service;
 //
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyString;
-//import static org.mockito.Mockito.when;
+// import static org.mockito.ArgumentMatchers.any;
+// import static org.mockito.ArgumentMatchers.anyString;
+// import static org.mockito.Mockito.when;
 //
-//import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.context.TestConfiguration;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.test.context.support.WithUserDetails;
+// import org.assertj.core.api.Assertions;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.context.TestConfiguration;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.test.context.support.WithUserDetails;
 //
-//import vn.eledevo.vksbe.constant.Role;
-//import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
-//import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
-//import vn.eledevo.vksbe.entity.DeviceInfo;
-//import vn.eledevo.vksbe.entity.User;
-//import vn.eledevo.vksbe.repository.DeviceInfoRepository;
-//import vn.eledevo.vksbe.service.device_info.DeviceInfoService;
+// import vn.eledevo.vksbe.constant.Role;
+// import vn.eledevo.vksbe.dto.request.DeviceInfoRequest;
+// import vn.eledevo.vksbe.dto.response.DeviceInfoResponse;
+// import vn.eledevo.vksbe.entity.DeviceInfo;
+// import vn.eledevo.vksbe.entity.User;
+// import vn.eledevo.vksbe.repository.DeviceInfoRepository;
+// import vn.eledevo.vksbe.service.device_info.DeviceInfoService;
 //
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//class DeviceInfoServiceTest {
+// @SpringBootTest
+// @AutoConfigureMockMvc
+// class DeviceInfoServiceTest {
 //    @Autowired
 //    private DeviceInfoService deviceInfoService;
 //
@@ -74,4 +74,4 @@
 //        Assertions.assertThat(response.getName()).isEqualTo("Asus-Rog-Strix");
 //        Assertions.assertThat(response.getDeviceUuid()).isEqualTo("12345");
 //    }
-//}
+// }

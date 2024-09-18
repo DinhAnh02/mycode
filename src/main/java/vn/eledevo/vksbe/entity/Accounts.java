@@ -46,7 +46,7 @@ public class Accounts implements UserDetails {
     String updateBy;
 
     @ManyToOne
-    @JoinColumn(name = " role_id", nullable = false)
+    @JoinColumn(name = "roleCode", nullable = false)
     Roles roles;
 
     @OneToOne(mappedBy = "accounts", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
@@ -66,14 +66,14 @@ public class Accounts implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles != null ?
-                Collections.singletonList(new SimpleGrantedAuthority(roles.getCode())) :
-                Collections.emptyList();
+        return roles != null
+                ? Collections.singletonList(new SimpleGrantedAuthority(roles.getCode()))
+                : Collections.emptyList();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return null;
     }
 
     @Override

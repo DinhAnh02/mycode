@@ -1,9 +1,9 @@
 package vn.eledevo.vksbe.service.department;
 
+import java.util.Optional;
+
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
-
-import java.util.Optional;
 
 public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepository departmentRepository;

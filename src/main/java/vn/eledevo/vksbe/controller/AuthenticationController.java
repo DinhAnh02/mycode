@@ -1,21 +1,12 @@
 package vn.eledevo.vksbe.controller;
 
-import java.io.IOException;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
-import vn.eledevo.vksbe.dto.request.RegisterRequest;
-import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
@@ -33,10 +24,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
-//    @PostMapping("/refresh-token")
-//    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        service.refreshToken(request, response);
-//    }
+    //    @PostMapping("/refresh-token")
+    //    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    //        service.refreshToken(request, response);
+    //    }
 
     @GetMapping("/test")
     public ResponseEntity<String> twoFactorAuthentication() {
