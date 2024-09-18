@@ -1,40 +1,40 @@
-//package vn.eledevo.vksbe.service;
+// package vn.eledevo.vksbe.service;
 //
-//import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyString;
-//import static org.mockito.Mockito.when;
+// import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+// import static org.junit.jupiter.api.Assertions.assertThrows;
+// import static org.mockito.ArgumentMatchers.any;
+// import static org.mockito.ArgumentMatchers.anyString;
+// import static org.mockito.Mockito.when;
 //
-//import java.util.*;
+// import java.util.*;
 //
-//import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.context.TestConfiguration;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.data.jpa.domain.Specification;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.test.context.support.WithUserDetails;
+// import org.assertj.core.api.Assertions;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.context.TestConfiguration;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.data.jpa.domain.Specification;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.test.context.support.WithUserDetails;
 //
-//import vn.eledevo.vksbe.constant.ErrorCode;
-//import vn.eledevo.vksbe.constant.ResponseMessage;
-//import vn.eledevo.vksbe.constant.Role;
-//import vn.eledevo.vksbe.dto.request.UserRequest;
-//import vn.eledevo.vksbe.dto.response.UserResponse;
-//import vn.eledevo.vksbe.entity.User;
-//import vn.eledevo.vksbe.exception.ApiException;
-//import vn.eledevo.vksbe.exception.ValidationException;
-//import vn.eledevo.vksbe.repository.UserRepository;
-//import vn.eledevo.vksbe.service.user.UserService;
+// import vn.eledevo.vksbe.constant.ErrorCode;
+// import vn.eledevo.vksbe.constant.ResponseMessage;
+// import vn.eledevo.vksbe.constant.Role;
+// import vn.eledevo.vksbe.dto.request.UserRequest;
+// import vn.eledevo.vksbe.dto.response.UserResponse;
+// import vn.eledevo.vksbe.entity.User;
+// import vn.eledevo.vksbe.exception.ApiException;
+// import vn.eledevo.vksbe.exception.ValidationException;
+// import vn.eledevo.vksbe.repository.UserRepository;
+// import vn.eledevo.vksbe.service.user.UserService;
 //
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//class UserServiceTest {
+// @SpringBootTest
+// @AutoConfigureMockMvc
+// class UserServiceTest {
 //    @Autowired
 //    private UserService userService;
 //
@@ -165,4 +165,4 @@
 //        Assertions.assertThat(response.getCode()).isEqualTo(200);
 //        Assertions.assertThat(response.getMessage()).isEqualTo("Xoá thành công");
 //    }
-//}
+// }

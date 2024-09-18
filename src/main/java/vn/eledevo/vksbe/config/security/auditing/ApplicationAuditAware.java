@@ -1,12 +1,12 @@
 package vn.eledevo.vksbe.config.security.auditing;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import vn.eledevo.vksbe.entity.Accounts;
 
 public class ApplicationAuditAware implements AuditorAware<Long> {

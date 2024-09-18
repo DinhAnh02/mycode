@@ -1,10 +1,11 @@
 package vn.eledevo.vksbe.constant;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.http.HttpStatus.*;
+
 import org.springframework.http.HttpStatusCode;
 
-import static org.springframework.http.HttpStatus.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor

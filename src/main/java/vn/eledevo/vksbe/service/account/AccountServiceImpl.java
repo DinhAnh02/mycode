@@ -3,21 +3,21 @@ package vn.eledevo.vksbe.service.account;
 import static vn.eledevo.vksbe.constant.ErrorCode.ACCOUNT_NOT_FOUND;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.transaction.annotation.Transactional;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +46,6 @@ public class AccountServiceImpl implements AccountService {
      * @return AccountResponse chứa thông tin tài khoản sau khi cập nhật
      * @throws ApiException nếu có lỗi xảy ra trong quá trình xử lý
      */
-
     @Override
     @Transactional
     public AccountResponse resetPassword(Long id) throws ApiException {

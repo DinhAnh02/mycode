@@ -1,9 +1,9 @@
 package vn.eledevo.vksbe.service.organization;
 
+import java.util.Optional;
+
 import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.repository.OrganizationRepository;
-
-import java.util.Optional;
 
 public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
