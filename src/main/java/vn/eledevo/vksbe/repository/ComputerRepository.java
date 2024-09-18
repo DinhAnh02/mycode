@@ -1,16 +1,17 @@
 package vn.eledevo.vksbe.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.Query;
-
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 
+import java.util.List;
+
 public interface ComputerRepository extends BaseRepository<Computers, Long> {
     @Query(value = "Select c from computers c where c.accounts.id = :accountId", nativeQuery = true)
     List<Computers> findByAccountId(Long accountId);
+
+    List<Computers> findByAccounts_Id(Long accountId);
 
     @Query(value = "SELECT c.name, c.status, c.note, p.full_name " +
             "FROM computers c " +

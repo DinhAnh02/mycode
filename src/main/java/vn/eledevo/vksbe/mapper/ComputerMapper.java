@@ -5,8 +5,6 @@ import org.springframework.util.CollectionUtils;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,16 +27,12 @@ public class ComputerMapper {
         computerResponse.brand(e.getBrand());
         computerResponse.type(e.getType());
         computerResponse.note(e.getNote());
-        computerResponse.createAt(mapLocalDateTimeToEpochTimestamp(e.getCreateAt()));
-        computerResponse.updateAt(mapLocalDateTimeToEpochTimestamp(e.getUpdateAt()));
+        computerResponse.createAt(e.getCreateAt());
+        computerResponse.updateAt(e.getUpdateAt());
         computerResponse.createBy(e.getCreateBy());
         computerResponse.updateBy(e.getUpdateBy());
 
         return computerResponse.build();
-    }
-
-    private Long mapLocalDateTimeToEpochTimestamp(LocalDateTime dateTime) {
-        return dateTime != null ? dateTime.toEpochSecond(ZoneOffset.UTC) : null;
     }
 
     public List<ComputerResponse> toListResponse(List<Computers> eList) {

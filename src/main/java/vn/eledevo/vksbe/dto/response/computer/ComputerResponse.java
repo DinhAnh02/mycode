@@ -3,6 +3,8 @@ package vn.eledevo.vksbe.dto.response.computer;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,8 +19,8 @@ public class ComputerResponse {
     String brand;
     String type;
     String note;
-    Long createAt;
-    Long updateAt;
+    LocalDateTime createAt;
+    LocalDateTime updateAt;
     String createBy;
     String updateBy;
 }
