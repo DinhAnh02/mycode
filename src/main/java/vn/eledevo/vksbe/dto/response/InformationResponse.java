@@ -4,9 +4,9 @@ import java.util.List;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import vn.eledevo.vksbe.entity.Departments;
-import vn.eledevo.vksbe.entity.Organizations;
-import vn.eledevo.vksbe.entity.Roles;
+import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
+import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
+import vn.eledevo.vksbe.dto.response.role.RoleResponse;
 
 @Getter
 @Setter
@@ -14,7 +14,7 @@ import vn.eledevo.vksbe.entity.Roles;
 @AllArgsConstructor
 @Builder
 public class InformationResponse {
-    List<Departments> departments;
-    List<Organizations> organizations;
-    List<Roles> roles;
+    List<DepartmentResponse> departments;
+    List<OrganizationResponse> organizations;
+    List<RoleResponse> roles;
 }
