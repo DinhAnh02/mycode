@@ -14,8 +14,8 @@ import vn.eledevo.vksbe.exception.ApiException;
 public interface AccountService {
     AccountResponse resetPassword(Long id) throws ApiException;
 
-    ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
-            throws ApiException;
+    ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(
+            AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException;
 
     ApiResponse<AccountDetailResponse> getAccountDetail(Long accountId) throws ApiException;
 

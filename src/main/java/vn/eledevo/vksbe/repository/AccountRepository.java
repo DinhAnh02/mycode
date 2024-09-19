@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.entity.Accounts;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
@@ -65,10 +64,10 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     Page<Object[]> getAccountList(AccountRequest filter, Pageable pageable);
 
     @Query("SELECT new vn.eledevo.vksbe.dto.model.account.AccountInfo(a.roles.code, a.departments.id,"
-			+ "a.isConnectComputer, a.isConnectUsb) from Accounts a where a.username =:username")
+            + "a.isConnectComputer, a.isConnectUsb) from Accounts a where a.username =:username")
     AccountInfo findByUsername(String username);
 
-	@Query("SELECT new vn.eledevo.vksbe.dto.request.AccountInactive(a.id, a.roles.code,"
-			+ "a.status) from Accounts a where a.username =:username")
-	Optional<AccountInactive> findByUsernameActive(String username);
+    @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountInactive(a.id, a.roles.code,"
+            + "a.status) from Accounts a where a.username =:username")
+    Optional<AccountInactive> findByUsernameActive(String username);
 }
