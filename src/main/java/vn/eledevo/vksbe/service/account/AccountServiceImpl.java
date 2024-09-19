@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.RoleCodes;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
@@ -140,7 +141,8 @@ public class AccountServiceImpl implements AccountService {
                     .roleName(account.getRoles().getName())
                     .status(account.getStatus())
                     .phoneNumber(account.getProfile().getPhoneNumber())
-                    .isDisplayAllButton("IT_ADMIN".equals(acc.getRoleCode()))
+                    .avatar(account.getProfile().getAvatar())
+                    .isDisplayAllButton(RoleCodes.IT_ADMIN.equals(acc.getRoleCode()))
                     .isActive("ACTIVE".equals(account.getStatus()))
                     .isReadOnly(isReadOnly(acc, account))
                     .isDisableActiveButton(isDisableActiveButton(account))
@@ -152,14 +154,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * Kiểm tra điều kiện hiển thị nút kích hoạt/khoá với role khác IT_ADMIN
-     * Dieu kien hien thi la:
-     * Role đăng nhập là "VIEN_TRUONG"
-     * Role đăng nhập là "VIEN_PHO" và role xem chi tiết không phải "VIEN_TRUONG" hoặc "VIEN_PHO"
-     * Cùng phòng ban, role đăng nhập là "TRUONG_PHONG" và role xem chi tiết không phải "TRUONG_PHONG"
-     * Cùng phòng ban, role đăng nhập là "PHO_PHONG" và role xem chi tiết là "KIEM_SAT_VIEN"
-     *
-     * @param acc     Thông tin tài khoản đang đăng nhập
+     * Kiểm tra điều kiện hiển thị nút kích hoạt/khoá
+     * Điều kiện hiển thị la:
+     *  Role đăng nhập là "VIEN_TRUONG"
+     *  Role đăng nhập là "IT_ADMIN"
+     *  Role đăng nhập là "VIEN_PHO" và role xem chi tiết không phải "VIEN_TRUONG" hoặc "VIEN_PHO"
+     *  Cùng phòng ban, role đăng nhập là "TRUONG_PHONG" và role xem chi tiết không phải "TRUONG_PHONG"
+     *  Cùng phòng ban, role đăng nhập là "PHO_PHONG" và role xem chi tiết là "KIEM_SAT_VIEN"
+     * --> isReadOnly = false
+     * @param acc Thông tin tài khoản đang đăng nhập
      * @param account Thông tin tài khoản được xem chi tiết
      * @return boolean true: không hiển thị nút nào, false: hiển thị nút kích hoạt/khoá
      */
@@ -169,16 +172,17 @@ public class AccountServiceImpl implements AccountService {
         Long departmentLogin = acc.getDepartmentId();
         Long departmentDetail = account.getDepartments().getId();
 
-        return !("VIEN_TRUONG".equals(roleCodeLogin)
-                || ("VIEN_PHO".equals(roleCodeLogin)
-                        && !"VIEN_TRUONG".equals(roleCodeDetail)
-                        && !"VIEN_PHO".equals(roleCodeDetail))
+        return !(RoleCodes.VIEN_TRUONG.equals(roleCodeLogin)
+                || RoleCodes.IT_ADMIN.equals(roleCodeLogin)
+                || (RoleCodes.VIEN_PHO.equals(roleCodeLogin)
+                        && !RoleCodes.VIEN_TRUONG.equals(roleCodeDetail)
+                        && !RoleCodes.VIEN_PHO.equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                        && "TRUONG_PHONG".equals(roleCodeLogin)
-                        && !"TRUONG_PHONG".equals(roleCodeDetail))
+                        && RoleCodes.TRUONG_PHONG.equals(roleCodeLogin)
+                        && !RoleCodes.TRUONG_PHONG.equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                        && "PHO_PHONG".equals(roleCodeLogin)
-                        && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
+                        && RoleCodes.PHO_PHONG.equals(roleCodeLogin)
+                        && RoleCodes.KIEM_SAT_VIEN.equals(roleCodeDetail)));
     }
 
     /**
