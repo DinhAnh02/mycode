@@ -1,23 +1,23 @@
 package vn.eledevo.vksbe.dto.response.account;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter@Setter
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountResponse {
+    Long id;
     String username;
-    String fullName;
-    Long roleId;
-    String roleName;
-    Long departmentId;
-    String departmentName;
-    Long organizationId;
-    String organizationName;
     String status;
-    String fromeDate;
-    String toDate;
+    Boolean isConditionLogin1;
+    Boolean isConditionLogin2;
+    Boolean isConnectComputer;
+    Boolean isConnectUsb;
+    Long createAt;
+    Long updateAt;
+    String createBy;
+    String updateBy;
 }

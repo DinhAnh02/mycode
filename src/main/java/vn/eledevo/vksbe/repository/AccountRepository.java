@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Usbs;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
     @Query("SELECT a from Accounts a where a.username =:username and a.status = 'ACTIVE'")
@@ -63,5 +63,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
 			""")
     Page<Object[]> getAccountList(AccountRequest filter, Pageable pageable);
 
-    Usbs findbyAcountIdAndIsConnectUsb(Long acountId);
+    @Query("SELECT a.roles.code, a.departments.id, a.isConnectUsb, a.isConnectComputer "
+            + "from Accounts a where a.username =:username")
+    AccountInfo findByUsername(String username);
 }

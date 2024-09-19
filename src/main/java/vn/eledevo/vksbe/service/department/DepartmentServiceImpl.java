@@ -3,15 +3,18 @@ package vn.eledevo.vksbe.service.department;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
-@Service
-public class DepartmentServiceImpl implements DepartmentService {
-    private final DepartmentRepository departmentRepository;
 
-    public DepartmentServiceImpl(DepartmentRepository departmentRepository) {
-        this.departmentRepository = departmentRepository;
-    }
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class DepartmentServiceImpl implements DepartmentService {
+    DepartmentRepository departmentRepository;
 
     @Override
     public Boolean departmentNameChangeDetector(Long departmentId, String departmentName) {

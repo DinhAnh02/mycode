@@ -1,7 +1,5 @@
 package vn.eledevo.vksbe.mapper;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,16 +27,12 @@ public class AccountMapper {
         accountResponse.setIsConditionLogin2(e.getIsConditionLogin2());
         accountResponse.setIsConnectComputer(e.getIsConnectComputer());
         accountResponse.setIsConnectUsb(e.getIsConnectUsb());
-        accountResponse.setCreateAt(mapLocalDateTimeToEpochTimestamp(e.getCreateAt()));
-        accountResponse.setUpdateAt(mapLocalDateTimeToEpochTimestamp(e.getUpdateAt()));
+        accountResponse.setCreateAt(e.getCreateAt());
+        accountResponse.setUpdateAt(e.getUpdateAt());
         accountResponse.setCreateBy(e.getCreateBy());
         accountResponse.setUpdateBy(e.getUpdateBy());
 
         return accountResponse;
-    }
-
-    private Long mapLocalDateTimeToEpochTimestamp(LocalDateTime dateTime) {
-        return dateTime != null ? dateTime.toEpochSecond(ZoneOffset.UTC) : null;
     }
 
     public List<AccountResponse> toListResponse(List<Accounts> eList) {

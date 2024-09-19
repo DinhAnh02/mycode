@@ -1,5 +1,7 @@
 package vn.eledevo.vksbe.dto.response;
 
+import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +18,8 @@ public class AccountResponse {
     Boolean isConditionLogin2;
     Boolean isConnectComputer;
     Boolean isConnectUsb;
-    Long createAt;
-    Long updateAt;
+    LocalDateTime createAt;
+    LocalDateTime updateAt;
     String createBy;
     String updateBy;
 }
