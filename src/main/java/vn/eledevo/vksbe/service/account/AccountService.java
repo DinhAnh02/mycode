@@ -9,6 +9,7 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 
 public interface AccountService {
@@ -24,4 +25,6 @@ public interface AccountService {
     ApiResponse inactivateAccount(Long idAccount) throws ApiException;
 
     ApiResponse<String> removeConnectComputer(Long accountId, Long computerId) throws ApiException;
+
+    ApiResponse<UsbResponse> getUsbInfo(Long id) throws ApiException;
 }

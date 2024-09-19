@@ -28,7 +28,9 @@ public enum ErrorCode {
     CHECK_ORGANIZATIONAL_STRUCTURE(
             CONFLICT, 4090, "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất."),
     DUPLICATE_ACCOUNT(BAD_REQUEST, 5000, "Tài khoản cần khóa trùng với tài khoản đang đăng nhập"),
-    ACCOUNT_NOT_LOCK(FORBIDDEN, 4030, "Bạn không được phép cập nhật tài khoản này");
+    ACCOUNT_NOT_LOCK(FORBIDDEN, 4030, "Bạn không được phép cập nhật tài khoản này"),
+    ACCOUNT_NOT_CONNECT_USB(NOT_FOUND, 4041, "Tài khoản chưa được liên kết với USB"),
+    ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;
