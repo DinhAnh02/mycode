@@ -3,21 +3,24 @@ package vn.eledevo.vksbe.dto.response.account;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountResponseByFilter {
     String username;
     String fullName;
     Long roleId;
     String roleName;
-    Integer departmentId;
+    Long departmentId;
     String departmentName;
-    Integer organizationId;
+    Long organizationId;
     String organizationName;
     String status;
-    String createAt;
-    String updateAt;
+    LocalDateTime createAt;
+    LocalDateTime updateAt;
 }

@@ -51,6 +51,8 @@ public class SecurityConfiguration {
                         .hasAuthority("VIEN_TRUONG")
                         .requestMatchers("/api/v1/private/accounts/detail")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
+                        .requestMatchers("/api/v1/private/accounts")
+                        .hasAnyAuthority("VIEN_TRUONG","VIEN_PHO","TRUONG_PHONG","PHO_PHONG","IT_ADMIN")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

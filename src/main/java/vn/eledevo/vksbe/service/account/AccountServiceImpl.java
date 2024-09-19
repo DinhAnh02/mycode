@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -79,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public ApiResponse getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
+    public ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
             throws ApiException {
         try {
             if (accountRequest.getFromDate() == null) {
@@ -99,15 +98,26 @@ public class AccountServiceImpl implements AccountService {
                 limit = 10;
             }
             Pageable pageable = PageRequest.of(currentPage - 1, limit);
-            Page<AccountResponseByFilter> page = accountRepository.getAccountList(accountRequest, pageable);
-            List<AccountResponseByFilter> accountResponseByFilterList = page.getContent().stream()
-                    .peek(ele -> {
-                        ele.setOrganizationId(accountRequest.getOrganizationId());
-                        ele.setOrganizationName(accountRequest.getOrganizationName());
-                    })
-                    .toList();
-            Result<AccountResponseByFilter> result = new Result<>(accountResponseByFilterList, page.getTotalElements());
-            return new ApiResponse<>(2000, "OK", result);
+            Page<Object[]> page = accountRepository.getAccountList(accountRequest, pageable);
+            List<AccountResponseByFilter> responseByFilters = page.getContent()
+                    .stream()
+                    .map(
+                            ele ->
+                                    AccountResponseByFilter.builder()
+                                            .username((String) ele[0])
+                                            .fullName((String) ele[1])
+                                            .roleId((Long) ele[2])
+                                            .roleName((String) ele[3])
+                                            .departmentId((Long) ele[4])
+                                            .departmentName((String) ele[5])
+                                            .status((String) ele[6])
+                                            .createAt((LocalDateTime) ele[7])
+                                            .updateAt((LocalDateTime) ele[8])
+                                            .organizationId(accountRequest.getOrganizationId())
+                                            .organizationName(accountRequest.getOrganizationName())
+                                            .build()).toList();
+            Result<AccountResponseByFilter> result = new Result<>(responseByFilters, page.getTotalElements());
+            return ApiResponse.ok(result);
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }

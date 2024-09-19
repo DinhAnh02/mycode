@@ -13,11 +13,11 @@ import lombok.experimental.FieldDefaults;
 public class AccountRequest {
     String username;
     String fullName;
-    String roleId;
+    Long roleId;
     String roleName;
-    Integer departmentId;
+    Long departmentId;
     String departmentName;
-    Integer organizationId;
+    Long organizationId;
     String organizationName;
     String status;
     LocalDateTime fromDate;
