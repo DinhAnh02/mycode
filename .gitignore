@@ -18,7 +18,7 @@ target/
 *.iws
 *.iml
 *.ipr
-application.yml
+*.yml
 
 ### NetBeans ###
 /nbproject/private/
@@ -31,4 +31,11 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-.vscode/    
+.vscode/
+
+### file environments
+application.yml
+
+
+### folder test
+!**/src/test

@@ -9,10 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
+import vn.eledevo.vksbe.dto.request.AccountInactive;
+import vn.eledevo.vksbe.dto.request.AccountProfile;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Usbs;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
     @Query("SELECT a from Accounts a where a.username =:username and a.status = 'ACTIVE'")
@@ -53,18 +53,27 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
 			SELECT a.username, p.fullName, a.roles.id, r.name, a.departments.id, d.name,
 					a.status, a.createAt, a.updateAt
 			FROM Accounts a
-			JOIN Profiles p
-			JOIN Roles r
-			JOIN Departments d
-			WHERE (:#{#filter.username} IS NULL OR a.username = :#{#filter.username})
-			AND (:#{#filter.fullName} IS NULL OR p.fullName = :#{#filter.fullName})
+			JOIN a.profile p
+			JOIN a.roles r
+			JOIN a.departments d
+			WHERE (:#{#filter.username} IS NULL OR a.username like %:#{#filter.username}%)
+			AND (:#{#filter.fullName} IS NULL OR p.fullName like %:#{#filter.fullName}%)
 			AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId})
 			AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId})
 			AND (:#{#filter.status} IS NULL OR a.status = :#{#filter.status})
 			""")
-    Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Pageable pageable);
+    Page<Object[]> getAccountList(AccountRequest filter, Pageable pageable);
 
-    @Query("SELECT a.roles.code, a.departments.id, a.isConnectUsb, a.isConnectComputer "
-            + "from Accounts a where a.username =:username")
+    @Query("SELECT new vn.eledevo.vksbe.dto.model.account.AccountInfo(a.roles.code, a.departments.id,"
+            + "a.isConnectComputer, a.isConnectUsb) from Accounts a where a.username =:username")
     AccountInfo findByUsername(String username);
+
+    @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountInactive(a.id, a.roles.code,"
+            + "a.status) from Accounts a where a.username =:username")
+    Optional<AccountInactive> findByUsernameActive(String username);
+	@Query("SELECT new vn.eledevo.vksbe.dto.request.AccountProfile(a.id, a.roles.code,"
+			+ "p.fullName) from Accounts a " +
+			"join Profiles p on a.id = p.accounts.id where a.username =:username")
+	AccountProfile findByUsernameAndProfile(String username);
+
 }

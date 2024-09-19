@@ -32,11 +32,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ApiResponse<InformationResponse> getAllInformation() {
         List<DepartmentResponse> departmentsList = departmentRepository.findAll().stream()
-                .map(DepartmentMapper::toResponse).toList();
+                .map(DepartmentMapper::toResponse)
+                .toList();
         List<OrganizationResponse> organizationsList = organizationRepository.findAll().stream()
-                .map(OrganizationMapper::toResponse).toList();
-        List<RoleResponse> rolesList = roleRepository.findAll().stream()
-                .map(RoleMapper::toResponse).toList();
+                .map(OrganizationMapper::toResponse)
+                .toList();
+        List<RoleResponse> rolesList =
+                roleRepository.findAll().stream().map(RoleMapper::toResponse).toList();
 
         InformationResponse response = InformationResponse.builder()
                 .departments(departmentsList)

@@ -1,16 +1,26 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
+import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -25,12 +35,7 @@ import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -78,8 +83,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public ApiResponse getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
-            throws ApiException {
+    public ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(
+            AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
         try {
             if (accountRequest.getFromDate() == null) {
                 accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
@@ -98,15 +103,24 @@ public class AccountServiceImpl implements AccountService {
                 limit = 10;
             }
             Pageable pageable = PageRequest.of(currentPage - 1, limit);
-            Page<AccountResponseByFilter> page = accountRepository.getAccountList(accountRequest, pageable);
-            List<AccountResponseByFilter> accountResponseByFilterList = page.getContent().stream()
-                    .peek(ele -> {
-                        ele.setOrganizationId(accountRequest.getOrganizationId());
-                        ele.setOrganizationName(accountRequest.getOrganizationName());
-                    })
+            Page<Object[]> page = accountRepository.getAccountList(accountRequest, pageable);
+            List<AccountResponseByFilter> responseByFilters = page.getContent().stream()
+                    .map(ele -> AccountResponseByFilter.builder()
+                            .username((String) ele[0])
+                            .fullName((String) ele[1])
+                            .roleId((Long) ele[2])
+                            .roleName((String) ele[3])
+                            .departmentId((Long) ele[4])
+                            .departmentName((String) ele[5])
+                            .status((String) ele[6])
+                            .createAt((LocalDateTime) ele[7])
+                            .updateAt((LocalDateTime) ele[8])
+                            .organizationId(accountRequest.getOrganizationId())
+                            .organizationName(accountRequest.getOrganizationName())
+                            .build())
                     .toList();
-            Result<AccountResponseByFilter> result = new Result<>(accountResponseByFilterList, page.getTotalElements());
-            return new ApiResponse<>(2000, "OK", result);
+            Result<AccountResponseByFilter> result = new Result<>(responseByFilters, page.getTotalElements());
+            return ApiResponse.ok(result);
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }
@@ -157,14 +171,14 @@ public class AccountServiceImpl implements AccountService {
 
         return !("VIEN_TRUONG".equals(roleCodeLogin)
                 || ("VIEN_PHO".equals(roleCodeLogin)
-                && !"VIEN_TRUONG".equals(roleCodeDetail)
-                && !"VIEN_PHO".equals(roleCodeDetail))
+                        && !"VIEN_TRUONG".equals(roleCodeDetail)
+                        && !"VIEN_PHO".equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                && "TRUONG_PHONG".equals(roleCodeLogin)
-                && !"TRUONG_PHONG".equals(roleCodeDetail))
+                        && "TRUONG_PHONG".equals(roleCodeLogin)
+                        && !"TRUONG_PHONG".equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                && "PHO_PHONG".equals(roleCodeLogin)
-                && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
+                        && "PHO_PHONG".equals(roleCodeLogin)
+                        && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
     }
 
     /**
@@ -190,4 +204,93 @@ public class AccountServiceImpl implements AccountService {
         return computerMapper.toListResponse(res);
     }
 
+    @Override
+    public ApiResponse inactivateAccount(Long idAccount) throws ApiException {
+        try {
+
+            String userName = SecurityUtils.getUserName();
+            // Save account tìm được từ username
+            Optional<AccountInactive> accountRequest = accountRepository.findByUsernameActive(userName);
+            // Kiểm tra xem tài khoản có tồn tại không
+            if (accountRequest.isEmpty()) {
+                throw new ApiException(ACCOUNT_NOT_FOUND);
+            }
+            // Check account theo idAccount có tồn tại trong db không
+            Accounts exitsingAccounts =
+                    accountRepository.findById(idAccount).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+            // Check account được lấy từ username có trùng với account muốn khóa không
+            if (!exitsingAccounts.getId().equals(accountRequest.get().getId())) {
+                if (exitsingAccounts.getStatus().equals("ACTIVE")) {
+                    switch (accountRequest.get().getRoleCode()) {
+                        case "VIEN_TRUONG":
+                            if (exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")) {
+                                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện trưởng không thể khóa IT
+                            } else {
+                                exitsingAccounts.setStatus("INACTIVE");
+                            }
+                            break;
+                        case "VIEN_PHO":
+                            if (exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")
+                                    || exitsingAccounts.getRoles().getCode().equals("VIEN_TRUONG")) {
+                                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
+                            } else {
+                                exitsingAccounts.setStatus("INACTIVE");
+                            }
+                            break;
+                        case "TRUONG_PHONG":
+                        case "PHO_PHONG":
+                            // Trưởng phòng và phó phòng có thể khóa tài khoản có chức vụ thấp hơn
+                            if (exitsingAccounts.getRoles().getCode().equals("VIEN_TRUONG")
+                                    || exitsingAccounts.getRoles().getCode().equals("VIEN_PHO")
+                                    || exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")) {
+                                throw new ApiException(ACCOUNT_NOT_LOCK); // Không được khóa viện trưởng hoặc viện phó
+                            } else {
+                                // Cập nhật trạng thái tài khoản
+                                exitsingAccounts.setStatus("INACTIVE");
+                            }
+                            break;
+                        default:
+                            exitsingAccounts.setStatus("INACTIVE");
+                            break;
+                    }
+                } else {
+                    throw new ApiException(UNCATEGORIZED_EXCEPTION);
+                }
+            } else {
+                throw new ApiException(DUPLICATE_ACCOUNT);
+            }
+            accountRepository.save(exitsingAccounts);
+            return new ApiResponse<>(200, "Khóa tài khoản thành công");
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
+        try {
+            Accounts accounts =
+                    accountRepository.findById(accountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+            Computers computers =
+                    computerRepository.findById(computerId).orElseThrow(() -> new ApiException(COMPUTER_NOT_FOUND));
+            String STATUS_COMPUTER_DISCONNECTED = "DISCONNECTED";
+            if (!computers.getAccounts().getId().equals(accountId)) {
+                throw new ApiException(COMPUTER_NOT_CONNECT_TO_ACCOUNT);
+            }
+            computers.setAccounts(null);
+            computers.setStatus(STATUS_COMPUTER_DISCONNECTED);
+            computerRepository.save(computers);
+            int soThietBiKetNoi = accounts.getComputers().size();
+            if (Objects.equals(soThietBiKetNoi, 1)) {
+                accounts.setIsConnectComputer(false);
+                accounts.setStatus("INACTIVE");
+                accountRepository.save(accounts);
+            }
+            // Todo gỡ usb token
+            return ApiResponse.ok("Gỡ liên kết máy tính với tài khoản thành công");
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
+    }
 }
