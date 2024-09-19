@@ -30,10 +30,10 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<ListComputerResponse> getComputerList(ComputerRequest computerRequest);
 
     @Query("SELECT c FROM Computers c "
-            + "WHERE ((COALESCE(:#{#textSearch}, NULL) IS NULL) "
-            + "OR LOWER(c.name) LIKE %:#{#textSearch}% "
-            + "OR LOWER(c.code) LIKE %:#{#textSearch}% "
-            + "AND c.accounts IS NULL)")
+            + "WHERE (((COALESCE(:textSearch, NULL) IS NULL ) "
+            + "OR LOWER(c.name) LIKE %:textSearch% "
+            + "OR LOWER(c.code) LIKE %:textSearch% ) "
+            + "AND c.accounts IS NULL )")
     Page<Computers> getByTextSearchAndAccountsIsNull(@Param("textSearch") String textSearch, Pageable pageable);
 
     boolean existsByCode(String code);
