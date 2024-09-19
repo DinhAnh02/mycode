@@ -5,6 +5,7 @@ import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
+import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -31,6 +33,7 @@ import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -199,5 +202,67 @@ public class AccountServiceImpl implements AccountService {
         }
         List<Computers> res = computerRepository.findByAccounts_Id(accountId);
         return computerMapper.toListResponse(res);
+    }
+
+    @Override
+    public ApiResponse inactivateAccount(Long idAccount) throws ApiException {
+        try {
+
+            String userName = SecurityUtils.getUserName();
+            // Save account tìm được từ username
+            Optional<AccountInactive> accountRequest = accountRepository.findByUsernameActive(userName);
+            // Kiểm tra xem tài khoản có tồn tại không
+            if (accountRequest.isEmpty()) {
+                throw new ApiException(ACCOUNT_NOT_FOUND);
+            }
+            // Check account theo idAccount có tồn tại trong db không
+            Accounts exitsingAccounts =
+                    accountRepository.findById(idAccount).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+            // Check account được lấy từ username có trùng với account muốn khóa không
+            if (!exitsingAccounts.getId().equals(accountRequest.get().getId())) {
+                if (exitsingAccounts.getStatus().equals("ACTIVE")) {
+                    switch (accountRequest.get().getRoleCode()) {
+                        case "VIEN_TRUONG":
+                            if (exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")) {
+                                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện trưởng không thể khóa IT
+                            } else {
+                                exitsingAccounts.setStatus("INACTIVE");
+                            }
+                            break;
+                        case "VIEN_PHO":
+                            if (exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")
+                                    || exitsingAccounts.getRoles().getCode().equals("VIEN_TRUONG")) {
+                                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
+                            } else {
+                                exitsingAccounts.setStatus("INACTIVE");
+                            }
+                            break;
+                        case "TRUONG_PHONG":
+                        case "PHO_PHONG":
+                            // Trưởng phòng và phó phòng có thể khóa tài khoản có chức vụ thấp hơn
+                            if (exitsingAccounts.getRoles().getCode().equals("VIEN_TRUONG")
+                                    || exitsingAccounts.getRoles().getCode().equals("VIEN_PHO")
+                                    || exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")) {
+                                throw new ApiException(ACCOUNT_NOT_LOCK); // Không được khóa viện trưởng hoặc viện phó
+                            } else {
+                                // Cập nhật trạng thái tài khoản
+                                exitsingAccounts.setStatus("INACTIVE");
+                            }
+                            break;
+                        default:
+                            exitsingAccounts.setStatus("INACTIVE");
+                            break;
+                    }
+                } else {
+                    throw new ApiException(UNCATEGORIZED_EXCEPTION);
+                }
+            } else {
+                throw new ApiException(DUPLICATE_ACCOUNT);
+            }
+            accountRepository.save(exitsingAccounts);
+          return new ApiResponse<>(200, "Khóa tài khoản thành công");
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
     }
 }
