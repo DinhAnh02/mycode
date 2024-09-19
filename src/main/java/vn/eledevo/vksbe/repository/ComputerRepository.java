@@ -1,14 +1,15 @@
 package vn.eledevo.vksbe.repository;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import vn.eledevo.vksbe.dto.model.computer.ComputersDto;
+
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
-
-import java.awt.print.Pageable;
-import java.util.List;
 
 public interface ComputerRepository extends BaseRepository<Computers, Long> {
     @Query(value = "Select c from computers c where c.accounts.id = :accountId", nativeQuery = true)
@@ -28,12 +29,12 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
             nativeQuery = true)
     List<ListComputerResponse> getComputerList(ComputerRequest computerRequest);
 
-    @Query("SELECT new vn.eledevo.vksbe.dto.model.computer.ComputersDto( " +
-            "c.id, c.name, c.status, c.createAt) FROM Computers c " +
-            "WHERE ((COALESCE(:#{#textSearch}, NULL) IS NULL) " +
-            "OR LOWER(c.name) LIKE %:#{#textSearch}% " +
-            "OR LOWER(c.code) LIKE %:#{#textSearch}%) ")
-    List<ComputersDto> getByTextSearch(@Param("textSearch") String textSearch, Pageable pageable);
+    @Query("SELECT c FROM Computers c "
+            + "WHERE ((COALESCE(:#{#textSearch}, NULL) IS NULL) "
+            + "OR LOWER(c.name) LIKE %:#{#textSearch}% "
+            + "OR LOWER(c.code) LIKE %:#{#textSearch}% "
+            + "AND c.accounts IS NULL)")
+    Page<Computers> getByTextSearchAndAccountsIsNull(@Param("textSearch") String textSearch, Pageable pageable);
 
     boolean existsByCode(String code);
 

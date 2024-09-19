@@ -71,9 +71,8 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountInactive(a.id, a.roles.code,"
             + "a.status) from Accounts a where a.username =:username")
     Optional<AccountInactive> findByUsernameActive(String username);
-	@Query("SELECT new vn.eledevo.vksbe.dto.request.AccountProfile(a.id, a.roles.code,"
-			+ "p.fullName) from Accounts a " +
-			"join Profiles p on a.id = p.accounts.id where a.username =:username")
-	AccountProfile findByUsernameAndProfile(String username);
 
+    @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountProfile(a.id, a.roles.code," + "p.fullName) from Accounts a "
+            + "join Profiles p on a.id = p.accounts.id where a.username =:username")
+    AccountProfile findByUsernameAndProfile(String username);
 }
