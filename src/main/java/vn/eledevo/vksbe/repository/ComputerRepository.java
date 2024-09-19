@@ -34,4 +34,6 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
             + "OR LOWER(c.name) LIKE %:#{#textSearch}% "
             + "OR LOWER(c.code) LIKE %:#{#textSearch}%) ")
     List<ComputersDto> getByTextSearch(@Param("textSearch") String textSearch);
+
+    boolean existsByCode(String code);
 }
