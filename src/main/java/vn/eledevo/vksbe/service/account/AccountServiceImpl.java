@@ -6,6 +6,7 @@ import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -102,23 +103,21 @@ public class AccountServiceImpl implements AccountService {
             }
             Pageable pageable = PageRequest.of(currentPage - 1, limit);
             Page<Object[]> page = accountRepository.getAccountList(accountRequest, pageable);
-            List<AccountResponseByFilter> responseByFilters = page.getContent()
-                    .stream()
-                    .map(
-                            ele ->
-                                    AccountResponseByFilter.builder()
-                                            .username((String) ele[0])
-                                            .fullName((String) ele[1])
-                                            .roleId((Long) ele[2])
-                                            .roleName((String) ele[3])
-                                            .departmentId((Long) ele[4])
-                                            .departmentName((String) ele[5])
-                                            .status((String) ele[6])
-                                            .createAt((LocalDateTime) ele[7])
-                                            .updateAt((LocalDateTime) ele[8])
-                                            .organizationId(accountRequest.getOrganizationId())
-                                            .organizationName(accountRequest.getOrganizationName())
-                                            .build()).toList();
+            List<AccountResponseByFilter> responseByFilters = page.getContent().stream()
+                    .map(ele -> AccountResponseByFilter.builder()
+                            .username((String) ele[0])
+                            .fullName((String) ele[1])
+                            .roleId((Long) ele[2])
+                            .roleName((String) ele[3])
+                            .departmentId((Long) ele[4])
+                            .departmentName((String) ele[5])
+                            .status((String) ele[6])
+                            .createAt((LocalDateTime) ele[7])
+                            .updateAt((LocalDateTime) ele[8])
+                            .organizationId(accountRequest.getOrganizationId())
+                            .organizationName(accountRequest.getOrganizationName())
+                            .build())
+                    .toList();
             Result<AccountResponseByFilter> result = new Result<>(responseByFilters, page.getTotalElements());
             return ApiResponse.ok(result);
         } catch (Exception e) {
@@ -261,6 +260,34 @@ public class AccountServiceImpl implements AccountService {
             }
             accountRepository.save(exitsingAccounts);
           return new ApiResponse<>(200, "Khóa tài khoản thành công");
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
+        try {
+            Accounts accounts =
+                    accountRepository.findById(accountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+            Computers computers =
+                    computerRepository.findById(computerId).orElseThrow(() -> new ApiException(COMPUTER_NOT_FOUND));
+            String STATUS_COMPUTER_DISCONNECTED = "DISCONNECTED";
+            if (!computers.getAccounts().getId().equals(accountId)) {
+                throw new ApiException(COMPUTER_NOT_CONNECT_TO_ACCOUNT);
+            }
+            computers.setAccounts(null);
+            computers.setStatus(STATUS_COMPUTER_DISCONNECTED);
+            computerRepository.save(computers);
+            int soThietBiKetNoi = accounts.getComputers().size();
+            if (Objects.equals(soThietBiKetNoi, 1)) {
+                accounts.setIsConnectComputer(false);
+                accounts.setStatus("INACTIVE");
+                accountRepository.save(accounts);
+            }
+            // Todo gỡ usb token
+            return ApiResponse.ok("Gỡ liên kết máy tính với tài khoản thành công");
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }
