@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public ApiResponse getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
+    public ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
             throws ApiException {
         try {
             if (accountRequest.getFromDate() == null) {
@@ -117,7 +117,7 @@ public class AccountServiceImpl implements AccountService {
                                             .organizationName(accountRequest.getOrganizationName())
                                             .build()).toList();
             Result<AccountResponseByFilter> result = new Result<>(responseByFilters, page.getTotalElements());
-            return new ApiResponse<>(2000, "OK", result);
+            return ApiResponse.ok(result);
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }

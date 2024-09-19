@@ -1,11 +1,7 @@
 package vn.eledevo.vksbe.controller;
 
 import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +17,8 @@ import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.department.DepartmentService;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
 import vn.eledevo.vksbe.service.role.RoleService;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.CHECK_ORGANIZATIONAL_STRUCTURE;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -48,8 +46,9 @@ public class AccountController {
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getComputersByIdAccount(id));
     }
+
     @PostMapping()
-    public ResponseEntity<?> getAccountList(
+    public ApiResponse<?> getAccountList(
             @RequestBody AccountRequest req, @RequestParam Integer currentPage, @RequestParam Integer limit)
             throws ApiException {
         if (Boolean.FALSE.equals(roleService.roleNameChangeDetector(req.getRoleId(), req.getRoleName()))
@@ -57,10 +56,8 @@ public class AccountController {
                 departmentService.departmentNameChangeDetector(req.getDepartmentId(), req.getDepartmentName()))
                 || Boolean.FALSE.equals(organizationService.organizationNameChangeDetector(
                 req.getOrganizationId(), req.getOrganizationName()))) {
-            return ResponseEntity.status(409)
-                    .body(new ApiResponse<>(
-                            4090, "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất.", null));
+            throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
         }
-        return ResponseEntity.ok().body(accountService.getListAccountByFilter(req, currentPage, limit));
+        return ApiResponse.ok(accountService.getListAccountByFilter(req, currentPage, limit));
     }
 }
