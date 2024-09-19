@@ -1,6 +1,8 @@
 package vn.eledevo.vksbe.controller;
 
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +11,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
@@ -45,6 +52,11 @@ public class AccountController {
     public ApiResponse<List<ComputerResponse>> getComputerListByAccountId(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getComputersByIdAccount(id));
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ApiResponse<AccountDetailResponse>> getAccountDetail(@PathVariable Long id) throws ApiException {
+        return ResponseEntity.ok(accountService.getAccountDetail(id));
     }
 
     @PostMapping()

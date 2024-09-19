@@ -11,4 +11,11 @@ public class AccountInfo {
     Long departmentId;
     Boolean isConnectComputer;
     Boolean isConnectUsb;
+
+    public AccountInfo(String roleCode, Long departmentId, Boolean isConnectComputer, Boolean isConnectUsb) {
+        this.roleCode = roleCode;
+        this.departmentId = departmentId;
+        this.isConnectComputer = isConnectComputer;
+        this.isConnectUsb = isConnectUsb;
+    }
 }
