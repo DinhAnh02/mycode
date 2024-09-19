@@ -23,7 +23,9 @@ public enum ErrorCode {
     CHECK_USB(CONFLICT, 6000, "Usb không chính xác"),
     ACCOUNT_NOT_FOUND(NOT_FOUND, 4040, " Acount không tồn tại trong hệ thống"),
     CHECK_FROM_DATE(UNPROCESSABLE_ENTITY, 4220, "Thời gian bắt đầu không được lớn hơn thời gian kết thúc."),
-    CHECK_ORGANIZATIONAL_STRUCTURE(CONFLICT,4090,"Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất.");
+    CHECK_ORGANIZATIONAL_STRUCTURE(CONFLICT,4090,"Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất."),
+    DUPLICATE_ACCOUNT(BAD_REQUEST,5000, "Tài khoản cần khóa trùng với tài khoản đang đăng nhập"),
+    ACCOUNT_NOT_LOCK(FORBIDDEN, 4030, "Bạn không được phép cập nhật tài khoản này");
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;

@@ -20,4 +20,6 @@ public interface AccountService {
     ApiResponse<AccountDetailResponse> getAccountDetail(Long accountId) throws ApiException;
 
     List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException;
+
+    ApiResponse inactivateAccount(Long idAccount) throws ApiException;
 }
