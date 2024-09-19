@@ -63,7 +63,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
 			""")
     Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Pageable pageable);
 
-    @Query("SELECT a.roles.code, a.departments.id, a.isConnectUsb, a.isConnectComputer "
-            + "from Accounts a where a.username =:username")
+    @Query("SELECT new vn.eledevo.vksbe.dto.model.account.AccountInfo(a.roles.code, a.departments.id,"
+			+ "a.isConnectComputer, a.isConnectUsb) from Accounts a where a.username =:username")
     AccountInfo findByUsername(String username);
 }
