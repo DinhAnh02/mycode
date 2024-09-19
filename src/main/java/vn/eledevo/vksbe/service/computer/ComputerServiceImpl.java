@@ -3,8 +3,8 @@ package vn.eledevo.vksbe.service.computer;
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,10 +65,10 @@ public class ComputerServiceImpl implements ComputerService {
     @Override
     public PageResponse<ComputerResponse> getDisconnectedComputers(
             Integer currentPage, Integer limit, String textSearch) {
-        int pageNumber = Objects.isNull(currentPage) ? 1 : currentPage;
-        int pageSize = Objects.isNull(limit) ? 10 : limit;
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        Page<Computers> page = computerRepository.getByTextSearchAndAccountsIsNull(textSearch, pageable);
+        String keyword =
+                StringUtils.isBlank(textSearch) ? null : textSearch.trim().toLowerCase();
+        Pageable pageable = PageRequest.of(currentPage - 1, limit);
+        Page<Computers> page = computerRepository.getByTextSearchAndAccountsIsNull(keyword, pageable);
         return new PageResponse<>(page.getTotalElements(), computerMapper.toListResponse(page.getContent()));
     }
 }
