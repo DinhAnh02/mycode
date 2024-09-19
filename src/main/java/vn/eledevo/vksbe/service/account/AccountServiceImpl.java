@@ -5,8 +5,8 @@ import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -82,8 +83,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(AccountRequest accountRequest, Integer currentPage, Integer limit)
-            throws ApiException {
+    public ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(
+            AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
         try {
             if (accountRequest.getFromDate() == null) {
                 accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
@@ -259,7 +260,7 @@ public class AccountServiceImpl implements AccountService {
                 throw new ApiException(DUPLICATE_ACCOUNT);
             }
             accountRepository.save(exitsingAccounts);
-          return new ApiResponse<>(200, "Khóa tài khoản thành công");
+            return new ApiResponse<>(200, "Khóa tài khoản thành công");
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }

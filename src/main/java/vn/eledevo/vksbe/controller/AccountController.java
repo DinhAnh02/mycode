@@ -1,6 +1,7 @@
 package vn.eledevo.vksbe.controller;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.CHECK_ORGANIZATIONAL_STRUCTURE;
+import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
 
 import java.util.List;
 
@@ -75,9 +76,11 @@ public class AccountController {
         return ApiResponse.ok(accountService.getListAccountByFilter(req, currentPage, limit));
     }
 
-    @PatchMapping("/{accountId}/remove-computer/{computerId}")
-    public ApiResponse<?> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
-            throws ApiException {
-        return ApiResponse.ok(accountService.removeConnectComputer(accountId, computerId));
+    @PatchMapping("/{idAccount}/inactivate")
+    public ApiResponse<?> lockAccount(@PathVariable Long idAccount) throws ApiException {
+        if (idAccount == null) {
+            throw new ApiException(FIELD_INVALID);
+        }
+        return ApiResponse.ok(accountService.inactivateAccount(idAccount));
     }
 }
