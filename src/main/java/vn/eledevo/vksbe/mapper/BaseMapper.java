@@ -19,7 +19,7 @@ public abstract class BaseMapper<I, O, E> {
 
     public abstract List<O> toListResponse(List<E> eList);
 
-    public PageResponse<O> toPageResponse(List<E> eList, int total) {
+    public PageResponse<O> toPageResponse(List<E> eList, long total) {
         List<O> rpList = toListResponse(eList);
         return new PageResponse<>(total, rpList);
     }
