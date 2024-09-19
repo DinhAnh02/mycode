@@ -4,9 +4,7 @@ import static vn.eledevo.vksbe.constant.ErrorCode.*;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,14 +26,18 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.Computers;
+import vn.eledevo.vksbe.entity.Usbs;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
+import vn.eledevo.vksbe.mapper.UsbMapper;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
+import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
@@ -48,6 +50,8 @@ public class AccountServiceImpl implements AccountService {
     PasswordEncoder passwordEncoder;
     ComputerRepository computerRepository;
     ComputerMapper computerMapper;
+    UsbRepository usbRepository;
+    UsbMapper usbMapper;
 
     private Accounts validAccount(Long id) throws ApiException {
         return accountRepository.findById(id).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
@@ -295,6 +299,17 @@ public class AccountServiceImpl implements AccountService {
             return ApiResponse.ok("Gỡ liên kết máy tính với tài khoản thành công");
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
+    public ApiResponse<UsbResponse> getUsbInfo(Long id) throws ApiException {
+        validAccount(id);
+        Optional<Usbs> usbEntities = usbRepository.findByAccounts_Id(id);
+        if (usbEntities.isPresent()) {
+            return ApiResponse.ok(usbMapper.toTarget(usbEntities.get()));
+        } else {
+            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
         }
     }
 }
