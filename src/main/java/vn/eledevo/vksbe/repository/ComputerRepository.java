@@ -36,4 +36,6 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<ComputersDto> getByTextSearch(@Param("textSearch") String textSearch);
 
     boolean existsByCode(String code);
+
+    boolean existsByName(String name);
 }
