@@ -7,6 +7,7 @@ import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 public interface ComputerRepository extends BaseRepository<Computers, Long> {
@@ -32,6 +33,6 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
             "WHERE ((COALESCE(:#{#textSearch}, NULL) IS NULL) " +
             "OR LOWER(c.name) LIKE %:#{#textSearch}% " +
             "OR LOWER(c.code) LIKE %:#{#textSearch}%) ")
-    List<ComputersDto> getByTextSearch(@Param("textSearch") String textSearch);
+    List<ComputersDto> getByTextSearch(@Param("textSearch") String textSearch, Pageable pageable);
 
 }
