@@ -5,6 +5,7 @@ import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.Computers;
@@ -38,6 +41,7 @@ import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
@@ -311,5 +315,62 @@ public class AccountServiceImpl implements AccountService {
         } else {
             throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
         }
+    }
+
+    @Override
+    public ApiResponse<List<ConnectComputerResponse>> connectComputers(Long id, Set<Long> computerIds)
+            throws ApiException {
+        Accounts accounts = validAccount(id);
+        if (!accounts.getStatus().equals(Const.ACTIVE)) {
+            throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
+        }
+
+        List<ConnectComputerResponse> computerResponses = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(computerIds)) {
+            List<Computers> computers = computerRepository.findByIdIn(computerIds);
+            List<Computers> connectedComputers = new ArrayList<>();
+            Map<Long, Computers> computersMap = computers.stream().collect(Collectors.toMap(Computers::getId, c -> c));
+            if (CollectionUtils.isEmpty(computers)) {
+                throw new ApiException(COMPUTER_NOT_FOUND);
+            }
+            for (Long computerId : computerIds) {
+                if (computersMap.get(computerId) != null) {
+                    String nameUpdate = SecurityUtils.getUserName();
+                    var computer = computersMap.get(computerId);
+                    if (computer.getStatus().equals(Const.CONNECTED)) {
+                        computerResponses.add(ConnectComputerResponse.builder()
+                                .id(computer.getId())
+                                .name(computer.getName())
+                                .code(computer.getCode())
+                                .message("Thiết bị đã được kết nối với tài khoản khác")
+                                .build());
+                    } else {
+                        computerResponses.add(ConnectComputerResponse.builder()
+                                .id(computer.getId())
+                                .name(computer.getName())
+                                .code(computer.getCode())
+                                .message("Kế nối thiết bị thành công")
+                                .build());
+                        computer.setAccounts(accounts);
+                        computer.setStatus(Const.CONNECTED);
+                        computer.setUpdateAt(LocalDateTime.now());
+                        computer.setUpdateBy(nameUpdate);
+                        connectedComputers.add(computer);
+                    }
+                } else {
+                    computerResponses.add(ConnectComputerResponse.builder()
+                            .id(computerId)
+                            .name(null)
+                            .code(null)
+                            .message("Không tồn tại thiết bị")
+                            .build());
+                }
+            }
+            if (!connectedComputers.isEmpty()) {
+                computerRepository.saveAll(connectedComputers);
+            }
+        }
+
+        return ApiResponse.ok(computerResponses);
     }
 }
