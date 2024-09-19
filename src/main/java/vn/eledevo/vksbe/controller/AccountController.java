@@ -1,23 +1,13 @@
 package vn.eledevo.vksbe.controller;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.CHECK_ORGANIZATIONAL_STRUCTURE;
-import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
-
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
@@ -28,6 +18,11 @@ import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.department.DepartmentService;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
 import vn.eledevo.vksbe.service.role.RoleService;
+
+import java.util.List;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.CHECK_ORGANIZATIONAL_STRUCTURE;
+import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -47,7 +42,7 @@ public class AccountController {
         return ApiResponse.ok(accountService.resetPassword(id));
     }
 
-    @GetMapping("/api/v1/private/accounts/{id}/devices")
+    @GetMapping("/accounts/{id}/devices")
     @Operation(
             summary = "Get computer devices by account",
             description = "Retrieves a list of computer devices associated with a specific account")
@@ -68,9 +63,9 @@ public class AccountController {
             throws ApiException {
         if (Boolean.FALSE.equals(roleService.roleNameChangeDetector(req.getRoleId(), req.getRoleName()))
                 || Boolean.FALSE.equals(
-                        departmentService.departmentNameChangeDetector(req.getDepartmentId(), req.getDepartmentName()))
+                departmentService.departmentNameChangeDetector(req.getDepartmentId(), req.getDepartmentName()))
                 || Boolean.FALSE.equals(organizationService.organizationNameChangeDetector(
-                        req.getOrganizationId(), req.getOrganizationName()))) {
+                req.getOrganizationId(), req.getOrganizationName()))) {
             throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
         }
         return ApiResponse.ok(accountService.getListAccountByFilter(req, currentPage, limit));
