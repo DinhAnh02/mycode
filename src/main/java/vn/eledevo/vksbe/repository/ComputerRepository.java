@@ -1,6 +1,7 @@
 package vn.eledevo.vksbe.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,4 +40,6 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     boolean existsByCode(String code);
 
     boolean existsByName(String name);
+
+    List<Computers> findByIdIn(Set<Long> ids);
 }

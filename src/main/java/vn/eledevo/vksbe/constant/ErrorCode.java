@@ -30,6 +30,7 @@ public enum ErrorCode {
     DUPLICATE_ACCOUNT(BAD_REQUEST, 5000, "Tài khoản cần khóa trùng với tài khoản đang đăng nhập"),
     ACCOUNT_NOT_LOCK(FORBIDDEN, 4030, "Bạn không được phép cập nhật tài khoản này"),
     ACCOUNT_NOT_CONNECT_USB(NOT_FOUND, 4041, "Tài khoản chưa được liên kết với USB"),
+    ACCOUNT_NOT_STATUS_ACTIVE(CONFLICT, 4091, "Tài khoản không hoạt động"),
     ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {

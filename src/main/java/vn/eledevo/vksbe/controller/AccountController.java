@@ -4,6 +4,9 @@ import static vn.eledevo.vksbe.constant.ErrorCode.CHECK_ORGANIZATIONAL_STRUCTURE
 import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
 
 import java.util.List;
+import java.util.Set;
+
+import jakarta.validation.constraints.NotEmpty;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,7 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.account.AccountService;
@@ -86,5 +90,14 @@ public class AccountController {
     public ApiResponse<UsbResponse> getUsbInfo(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return accountService.getUsbInfo(id);
+    }
+
+    @PatchMapping("/connect-computer/{id}/computers")
+    @Operation(summary = "Kết nối tài khoản với thiết bị ", description = "Kết nối tài khoản với thiết bị")
+    public ApiResponse<List<ConnectComputerResponse>> connectComputers(
+            @PathVariable Long idAccount,
+            @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
+            throws ApiException {
+        return accountService.connectComputers(idAccount, computerIds);
     }
 }
