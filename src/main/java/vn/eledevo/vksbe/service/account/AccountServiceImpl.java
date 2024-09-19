@@ -168,14 +168,14 @@ public class AccountServiceImpl implements AccountService {
 
         return !("VIEN_TRUONG".equals(roleCodeLogin)
                 || ("VIEN_PHO".equals(roleCodeLogin)
-                        && !"VIEN_TRUONG".equals(roleCodeDetail)
-                        && !"VIEN_PHO".equals(roleCodeDetail))
+                && !"VIEN_TRUONG".equals(roleCodeDetail)
+                && !"VIEN_PHO".equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                        && "TRUONG_PHONG".equals(roleCodeLogin)
-                        && !"TRUONG_PHONG".equals(roleCodeDetail))
+                && "TRUONG_PHONG".equals(roleCodeLogin)
+                && !"TRUONG_PHONG".equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
-                        && "PHO_PHONG".equals(roleCodeLogin)
-                        && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
+                && "PHO_PHONG".equals(roleCodeLogin)
+                && "KIEM_SAT_VIEN".equals(roleCodeDetail)));
     }
 
     /**
@@ -199,5 +199,29 @@ public class AccountServiceImpl implements AccountService {
         }
         List<Computers> res = computerRepository.findByAccounts_Id(accountId);
         return computerMapper.toListResponse(res);
+    }
+
+    @Override
+    public ApiResponse<String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
+        try {
+            Accounts accounts = accountRepository.findById(accountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+            Computers computers = computerRepository.findById(computerId).orElseThrow(() -> new ApiException(COMPUTER_NOT_FOUND));
+            String STATUS_ACCOUNT_INACTIVE = "INACTIVE";
+            if (accounts.getStatus().equals(STATUS_ACCOUNT_INACTIVE)) {
+                throw new ApiException(ACCOUNT_INACTIVE);
+            }
+            String STATUS_COMPUTER_DISCONNECTED = "DISCONNECTED";
+            if (computers.getStatus().equals(STATUS_COMPUTER_DISCONNECTED)) {
+                throw new ApiException(COMPUTER_NOT_EXIST);
+            }
+            if (!computers.getAccounts().getId().equals(accountId)) {
+                throw new ApiException(COMPUTER_NOT_CONNECT_TO_ACCOUNT);
+            }
+            computers.setAccounts(null);
+            computerRepository.save(computers);
+            return ApiResponse.ok("Gỡ liên kết máy tính với tài khoản thành công");
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
     }
 }
