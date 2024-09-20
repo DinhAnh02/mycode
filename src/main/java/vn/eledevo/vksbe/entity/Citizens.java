@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Entity
 @Getter
@@ -38,4 +39,15 @@ public class Citizens {
 
     @OneToMany(mappedBy = "citizens", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
     List<CasePerson> casePersons;
+
+    @PrePersist
+    public void prePersist() {
+        this.createAt = LocalDateTime.now();
+        this.createBy = SecurityUtils.getUserName();
+    }
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+        this.updateBy = SecurityUtils.getUserName();
+    }
 }

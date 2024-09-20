@@ -15,7 +15,7 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.entity.Accounts;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
-    @Query("SELECT a from Accounts a where a.username =:username and a.status = 'ACTIVE'")
+    @Query("SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username and a.status = 'ACTIVE'")
     Optional<Accounts> findByUsernameAndActive(String username);
 
     @Query(
