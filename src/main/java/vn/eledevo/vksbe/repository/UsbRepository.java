@@ -10,10 +10,7 @@ import vn.eledevo.vksbe.dto.response.ListUsbResponse;
 import vn.eledevo.vksbe.entity.Usbs;
 
 public interface UsbRepository extends BaseRepository<Usbs, Long> {
-    @Query("SELECT u FROM Usbs u WHERE u.accounts.id = :accountId")
     Optional<Usbs> findByAccounts_Id(Long accountId);
-
-    Usbs findByAccountsId(Long accountId);
 
     @Query(
             value = "SELECT u.id, u.status, u.name, p.full_name, u.createadAt " +"FROM usb u "
