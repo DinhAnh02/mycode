@@ -58,6 +58,8 @@ public class SecurityConfiguration {
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
                         .requestMatchers("/api/v1/private/devices/disconnected")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
+                        .requestMatchers("/api/v1/private/devices/computer-info/{id}")
+                        .hasAuthority("IT_ADMIN")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
