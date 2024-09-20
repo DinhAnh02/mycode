@@ -31,10 +31,9 @@ public class Usbs {
     String createBy;
     String updateBy;
 
-    @ManyToOne
-    @JoinColumn(name = "accountId", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "accountId", referencedColumnName = "id")
     Accounts accounts;
-
     @PrePersist
     public void prePersist() {
         this.createAt = LocalDateTime.now();

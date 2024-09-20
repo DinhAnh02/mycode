@@ -59,8 +59,8 @@ public class Accounts implements UserDetails {
     @OneToMany(mappedBy = "accounts", orphanRemoval = true, fetch = FetchType.EAGER)
     List<Computers> computers;
 
-    @OneToMany(mappedBy = "accounts", orphanRemoval = true, fetch = FetchType.EAGER)
-    List<Usbs> usbs;
+    @OneToOne(mappedBy = "accounts", orphanRemoval = true, fetch = FetchType.EAGER)
+    Usbs usb;
 
     @OneToMany(mappedBy = "accounts", orphanRemoval = true)
     List<AccountCase> accountCases;
