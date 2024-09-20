@@ -2,7 +2,6 @@ package vn.eledevo.vksbe.controller;
 
 import jakarta.validation.Valid;
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.PageResponse;
@@ -39,7 +37,7 @@ public class ComputerController {
         return ApiResponse.ok(computerService.getDisconnectedComputers(currentPage, limit, textSearch));
     }
     @PatchMapping("/computer-info/{id}")
-    public ApiResponse updateComputer(
+    public ApiResponse<?> updateComputer(
             @Valid @PathVariable("id") Long id,
             @RequestBody ComputersModel computerRequest,
             BindingResult result) throws ApiException {
