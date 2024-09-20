@@ -164,13 +164,14 @@ public class AccountServiceImpl implements AccountService {
     /**
      * Kiểm tra điều kiện hiển thị nút kích hoạt/khoá
      * Điều kiện hiển thị la:
-     *  Role đăng nhập là "VIEN_TRUONG"
-     *  Role đăng nhập là "IT_ADMIN"
-     *  Role đăng nhập là "VIEN_PHO" và role xem chi tiết không phải "VIEN_TRUONG" hoặc "VIEN_PHO"
-     *  Cùng phòng ban, role đăng nhập là "TRUONG_PHONG" và role xem chi tiết không phải "TRUONG_PHONG"
-     *  Cùng phòng ban, role đăng nhập là "PHO_PHONG" và role xem chi tiết là "KIEM_SAT_VIEN"
+     * Role đăng nhập là "VIEN_TRUONG"
+     * Role đăng nhập là "IT_ADMIN"
+     * Role đăng nhập là "VIEN_PHO" và role xem chi tiết không phải "VIEN_TRUONG" hoặc "VIEN_PHO"
+     * Cùng phòng ban, role đăng nhập là "TRUONG_PHONG" và role xem chi tiết không phải "TRUONG_PHONG"
+     * Cùng phòng ban, role đăng nhập là "PHO_PHONG" và role xem chi tiết là "KIEM_SAT_VIEN"
      * --> isReadOnly = false
-     * @param acc Thông tin tài khoản đang đăng nhập
+     *
+     * @param acc     Thông tin tài khoản đang đăng nhập
      * @param account Thông tin tài khoản được xem chi tiết
      * @return boolean true: không hiển thị nút nào, false: hiển thị nút kích hoạt/khoá
      */
@@ -372,5 +373,21 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return ApiResponse.ok(computerResponses);
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<?> removeUSB(Long accountID, Long usbID) throws ApiException {
+            Accounts accounts =
+                    accountRepository.findById(accountID).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+
+            if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
+                throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+            }
+            accounts.setUsb(null);
+            accounts.setIsConnectUsb(false);
+            Accounts accRemove = accountRepository.save(accounts);
+            AccountResponse accountResponse = accountMapper.toResponse(accRemove);
+            return ApiResponse.ok(accountResponse);
     }
 }

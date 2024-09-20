@@ -3,6 +3,7 @@ package vn.eledevo.vksbe.service.account;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.transaction.annotation.Transactional;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
@@ -31,4 +32,6 @@ public interface AccountService {
     ApiResponse<UsbResponse> getUsbInfo(Long id) throws ApiException;
 
     ApiResponse<List<ConnectComputerResponse>> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
+
+    ApiResponse<?> removeUSB(Long idAccount, Long idUsb) throws ApiException;
 }
