@@ -13,7 +13,7 @@ public class UsbResponse {
     String usbCode;
     String usbVendorCode;
     String name;
-    String keyUSB;
+    String keyUsb;
     String status;
     Long createAt;
     Long updateAt;
