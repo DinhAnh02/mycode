@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.RoleCodes;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
@@ -77,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional
-    public AccountResponse resetPassword(Long id) throws ApiException {
+    public String resetPassword(Long id) throws ApiException {
         Accounts accounts = validAccount(id);
         accounts.setPassword(passwordEncoder.encode(accounts.getUsername()));
         accounts.setPin(null);
@@ -85,9 +86,9 @@ public class AccountServiceImpl implements AccountService {
         accounts.setIsConditionLogin2(false);
         accounts.setUpdateBy(getUserName());
         accounts.setUpdateAt(LocalDateTime.now());
-        Accounts res = accountRepository.save(accounts);
+        accountRepository.save(accounts);
         tokenRepository.deleteByAccounts_Id(id);
-        return accountMapper.toResponse(res);
+        return ResponseMessage.RESET_PASSWORD_SUCCESS;
     }
 
     @Override

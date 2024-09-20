@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
-import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
@@ -43,7 +42,7 @@ public class AccountController {
 
     @PatchMapping("/reset-password/{id}")
     @Operation(summary = "Reset mật khẩu")
-    public ApiResponse<AccountResponse> resetPassword(
+    public ApiResponse<String> resetPassword(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.resetPassword(id));
     }
