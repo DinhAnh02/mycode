@@ -76,7 +76,7 @@ public class AuthenticationService {
                     throw new ApiException(ErrorCode.COMPUTER_NOT_CONNECT_TO_ACCOUNT);
                 }
             }
-            Optional<Usbs> usbs = usbRepository.findByAccountsId(account.getId());
+            Optional<Usbs> usbs = usbRepository.findByAccounts_Id(account.getId());
             if (usbs.isEmpty()) {
                 throw new ApiException(ErrorCode.EX_NOT_FOUND);
             }
