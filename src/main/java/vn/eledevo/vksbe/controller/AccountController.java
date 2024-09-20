@@ -102,4 +102,10 @@ public class AccountController {
             throws ApiException {
         return accountService.connectComputers(idAccount, computerIds);
     }
+
+    @PatchMapping("/remove-usb/{accountId}/usb/{usbId}")
+    public ApiResponse<?> removeUsb(
+            @PathVariable Long accountId, @PathVariable Long usbId) throws ApiException {
+        return ApiResponse.ok(accountService.removeUSB(accountId, usbId));
+    }
 }
