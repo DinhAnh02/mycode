@@ -24,6 +24,8 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(NOT_FOUND, 4040, " Acount không tồn tại trong hệ thống"),
     COMPUTER_NOT_FOUND(NOT_FOUND, 4040, "Computer không tồn tại trong hệ thống"),
     COMPUTER_NOT_CONNECT_TO_ACCOUNT(NOT_FOUND, 404, "Máy tính chưa được liên kết với tài khoản"),
+    COMPUTER_HAS_EXISTED(NOT_FOUND, 4000, " Thiết bị đã tồn tại trong hệ thống"),
+    NAME_COMPUTER_HAS_EXISTED(NOT_FOUND, 4000, "Tên Thiết bị đã tồn tại trong hệ thống"),
     CHECK_FROM_DATE(UNPROCESSABLE_ENTITY, 4220, "Thời gian bắt đầu không được lớn hơn thời gian kết thúc."),
     CHECK_ORGANIZATIONAL_STRUCTURE(
             CONFLICT, 4090, "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất."),

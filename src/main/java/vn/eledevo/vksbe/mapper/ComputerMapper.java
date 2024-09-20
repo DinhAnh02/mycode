@@ -8,11 +8,25 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 
 @Component
 public class ComputerMapper {
+
+    public Computers toResource(ComputerRequestForCreate request) {
+        if (Objects.isNull(request)) {
+            return null;
+        }
+        Computers computers = new Computers();
+        computers.setName(request.getName());
+        computers.setCode(request.getCode());
+        computers.setBrand(request.getBrand());
+        computers.setType(request.getType());
+        computers.setNote(request.getNote());
+        return computers;
+    }
 
     public ComputerResponse toResponse(Computers e) {
         if (Objects.isNull(e)) {

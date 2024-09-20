@@ -4,6 +4,7 @@ import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -14,9 +15,11 @@ import org.springframework.stereotype.Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.AccountProfile;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
+import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.dto.response.PageResponse;
@@ -85,5 +88,25 @@ public class ComputerServiceImpl implements ComputerService {
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<Computers> page = computerRepository.getByTextSearchAndAccountsIsNull(keyword, pageable);
         return new PageResponse<>(page.getTotalElements(), computerMapper.toListResponse(page.getContent()));
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<?> createComputer(ComputerRequestForCreate request) throws ApiException {
+        try {
+            Boolean computerExist = computerRepository.existsByCode(request.getCode());
+            if (Objects.equals(computerExist, Boolean.TRUE)) {
+                throw new ApiException(COMPUTER_HAS_EXISTED);
+            }
+            Boolean nameExist = computerRepository.existsByName(request.getName());
+            if (Objects.equals(nameExist, Boolean.TRUE)) {
+                throw new ApiException(NAME_COMPUTER_HAS_EXISTED);
+            }
+            Computers computersCreate = computerRepository.save(computerMapper.toResource(request));
+            ComputerResponse computerResponse = computerMapper.toResponse(computersCreate);
+            return ApiResponse.ok(computerResponse);
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
     }
 }
