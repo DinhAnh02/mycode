@@ -28,7 +28,7 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
                     + "AND c.status <> '' "
                     + "AND c.status = :#{#computerRequest.status}",
             nativeQuery = true)
-    List<ListComputerResponse> getComputerList(ComputerRequest computerRequest);
+    Page<ListComputerResponse> getComputerList(ComputerRequest computerRequest, Pageable pageable);
 
     @Query("SELECT c FROM Computers c "
             + "WHERE (((COALESCE(:textSearch, NULL) IS NULL ) "

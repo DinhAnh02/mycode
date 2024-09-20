@@ -3,6 +3,7 @@ package vn.eledevo.vksbe.service.computer;
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.AccountProfile;
+import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.dto.response.PageResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.entity.Accounts;
@@ -33,6 +36,18 @@ public class ComputerServiceImpl implements ComputerService {
     ComputerRepository computerRepository;
     AccountRepository accountRepository;
     ComputerMapper computerMapper;
+
+    @Override
+    public ApiResponse<List<ListComputerResponse>> getComputerList(ComputerRequest computerRequest, Long currentPage, Long limit) throws ApiException{
+        try {
+            Pageable pageable = PageRequest.of(currentPage.intValue(), limit.intValue());
+            Page<ListComputerResponse> responsePage = computerRepository.getComputerList(computerRequest, pageable);
+            List<ListComputerResponse> listComputerResponses = responsePage.getContent().stream().toList();
+            return ApiResponse.ok(listComputerResponses);
+        } catch (Exception e) {
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
+    }
 
     @Override
     public ApiResponse updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException {
