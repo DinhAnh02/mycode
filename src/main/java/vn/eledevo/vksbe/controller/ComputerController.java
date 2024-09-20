@@ -60,12 +60,14 @@ public class ComputerController {
         }
     }
 
-    @PostMapping("/computer-info")
+    @PostMapping("/create/computer-info")
+    @Operation(summary = "Tạo mới thiết bị máy tính")
     public ApiResponse<?> createComputer(@Valid @RequestBody ComputerRequestForCreate request) throws ApiException {
         return ApiResponse.ok(computerService.createComputer(request));
     }
 
-    @GetMapping("")
+    @PostMapping("")
+    @Operation(summary = "Xem danh sách thiết bị máy tính")
     public ApiResponse<?> getComputerList(
             @RequestParam(required = false, defaultValue = "1") Long currentPage,
             @RequestParam(required = false, defaultValue = "10") Long limit,

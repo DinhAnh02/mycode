@@ -65,6 +65,7 @@ public class AccountController {
     }
 
     @PostMapping()
+    @Operation(summary = "Xem danh sách tài khoản")
     public ApiResponse<?> getAccountList(
             @RequestBody AccountRequest req, @RequestParam Integer currentPage, @RequestParam Integer limit)
             throws ApiException {
@@ -104,6 +105,7 @@ public class AccountController {
     }
 
     @PatchMapping("/remove-usb/{accountId}/usb/{usbId}")
+    @Operation(summary = "Gỡ USB kết nối với tài khoản")
     public ApiResponse<?> removeUsb(
             @PathVariable Long accountId, @PathVariable Long usbId) throws ApiException {
         return ApiResponse.ok(accountService.removeUSB(accountId, usbId));
