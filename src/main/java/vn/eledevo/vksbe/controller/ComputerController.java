@@ -21,22 +21,23 @@ import vn.eledevo.vksbe.service.computer.ComputerService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/private/devices")
+@RequestMapping("/api/v1/private/computers")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Device Management", description = "Endpoints for managing devices")
+@Tag(name = "Quản lý thiết bị máy tính")
 public class ComputerController {
     ComputerService computerService;
 
-    @GetMapping("disconnected")
-    @Operation(summary = "Get device not link with user")
+    @GetMapping("/disconnected")
+    @Operation(summary = "Lấy danh sách máy tính không liên kết với tài khoản")
     public ApiResponse<PageResponse<ComputerResponse>> getComputerDisconnectedList(
             @RequestParam(required = false, defaultValue = "1") Integer currentPage,
             @RequestParam(required = false, defaultValue = "10") Integer limit,
             @RequestParam(required = false) String textSearch) {
         return ApiResponse.ok(computerService.getDisconnectedComputers(currentPage, limit, textSearch));
     }
-    @PatchMapping("/computer-info/{id}")
+    @PatchMapping("/update/computer-info/{id}")
+    @Operation(summary = "Chỉnh sửa thông tin máy tính")
     public ApiResponse<?> updateComputer(
             @Valid @PathVariable("id") Long id,
             @RequestBody ComputersModel computerRequest,

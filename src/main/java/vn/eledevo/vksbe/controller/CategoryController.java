@@ -16,10 +16,12 @@ import vn.eledevo.vksbe.service.category.CategoryService;
 @RequestMapping("/api/v1/public/categories")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Tag(name = "Categories")
 public class CategoryController {
     final CategoryService service;
 
     @GetMapping("/getAll")
+    @Operation(summary = "Category")
     public ResponseEntity<ApiResponse<InformationResponse>> getAllInformation() {
         return ResponseEntity.ok(service.getAllInformation());
     }

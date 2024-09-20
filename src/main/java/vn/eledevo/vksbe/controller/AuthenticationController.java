@@ -17,10 +17,12 @@ import vn.eledevo.vksbe.utils.SecurityUtils;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Tag(name = "Xác thực tài khoản")
 public class AuthenticationController {
     final AuthenticationService service;
 
     @PostMapping("/authenticate")
+    @Operation(summary = "Đăng nhập")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request)
             throws ApiException {
         return ResponseEntity.ok(service.authenticate(request));

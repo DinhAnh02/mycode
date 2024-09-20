@@ -34,7 +34,7 @@ import vn.eledevo.vksbe.service.role.RoleService;
 @RequestMapping("/api/v1/private/accounts")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Account Management", description = "Endpoints for managing user accounts")
+@Tag(name = "Quản lý tài khoản")
 public class AccountController {
     AccountService accountService;
     final RoleService roleService;
@@ -42,7 +42,7 @@ public class AccountController {
     final OrganizationService organizationService;
 
     @PatchMapping("/reset-password/{id}")
-    @Operation(summary = "Reset user password", description = "Resets the password for the user with the given ID")
+    @Operation(summary = "Reset mật khẩu")
     public ApiResponse<AccountResponse> resetPassword(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.resetPassword(id));
@@ -50,7 +50,7 @@ public class AccountController {
 
     @GetMapping("/accounts/{id}/devices")
     @Operation(
-            summary = "Get computer devices by account",
+            summary = "Lấy danh sách thiết bị đã liên kết với tài khoản",
             description = "Retrieves a list of computer devices associated with a specific account")
     public ApiResponse<List<ComputerResponse>> getComputerListByAccountId(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
@@ -58,6 +58,7 @@ public class AccountController {
     }
 
     @GetMapping("/detail/{id}")
+    @Operation(summary = "Xem chi tiết thông tin tài khoản")
     public ResponseEntity<ApiResponse<AccountDetailResponse>> getAccountDetail(@PathVariable Long id)
             throws ApiException {
         return ResponseEntity.ok(accountService.getAccountDetail(id));
@@ -78,6 +79,7 @@ public class AccountController {
     }
 
     @PatchMapping("/{accountId}/inactivate")
+    @Operation(summary = "Khóa tài khoản")
     public ApiResponse<?> lockAccount(@PathVariable Long accountId) throws ApiException {
         if (accountId == null) {
             throw new ApiException(FIELD_INVALID);
@@ -86,14 +88,14 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/usb")
-    @Operation(summary = "Get usb by account-id", description = "Get usb by account-id")
+    @Operation(summary = "Lấy thông tin USB liên kết với tài khoản", description = "Get usb by account-id")
     public ApiResponse<UsbResponse> getUsbInfo(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return accountService.getUsbInfo(id);
     }
 
     @PatchMapping("/connect-computer/{id}/computers")
-    @Operation(summary = "Kết nối tài khoản với thiết bị ", description = "Kết nối tài khoản với thiết bị")
+    @Operation(summary = "Kết nối tài khoản với thiết bị máy tính", description = "Kết nối tài khoản với thiết bị")
     public ApiResponse<List<ConnectComputerResponse>> connectComputers(
             @PathVariable Long idAccount,
             @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
