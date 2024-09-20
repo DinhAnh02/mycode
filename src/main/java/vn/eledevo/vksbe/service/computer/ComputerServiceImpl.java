@@ -2,7 +2,6 @@ package vn.eledevo.vksbe.service.computer;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,19 +14,16 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
-import vn.eledevo.vksbe.dto.request.AccountProfile;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.dto.response.PageResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
-import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
-import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +34,13 @@ public class ComputerServiceImpl implements ComputerService {
     ComputerMapper computerMapper;
 
     @Override
-    public ApiResponse<List<ListComputerResponse>> getComputerList(ComputerRequest computerRequest, Long currentPage, Long limit) throws ApiException{
+    public ApiResponse<List<ListComputerResponse>> getComputerList(
+            ComputerRequest computerRequest, Long currentPage, Long limit) throws ApiException {
         try {
             Pageable pageable = PageRequest.of(currentPage.intValue(), limit.intValue());
             Page<ListComputerResponse> responsePage = computerRepository.getComputerList(computerRequest, pageable);
-            List<ListComputerResponse> listComputerResponses = responsePage.getContent().stream().toList();
+            List<ListComputerResponse> listComputerResponses =
+                    responsePage.getContent().stream().toList();
             return ApiResponse.ok(listComputerResponses);
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
@@ -52,11 +50,6 @@ public class ComputerServiceImpl implements ComputerService {
     @Override
     public ApiResponse updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException {
         try {
-            String userName = SecurityUtils.getUserName();
-            AccountProfile accountRequest = accountRepository.findByUsernameAndProfile(userName);
-            Accounts exitstingAccount = accountRepository
-                    .findById(accountRequest.getId())
-                    .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
             Computers exitstingComputer =
                     computerRepository.findById(computerId).orElseThrow(() -> new ApiException(DEVICE_NOT_EXIST));
             if (computerRepository.existsByName(computerRequest.getName())) {
@@ -64,12 +57,9 @@ public class ComputerServiceImpl implements ComputerService {
             }
 
             exitstingComputer.setName(computerRequest.getName());
-            exitstingComputer.setStatus(computerRequest.getStatus());
             exitstingComputer.setBrand(computerRequest.getBrand());
             exitstingComputer.setType(computerRequest.getType());
             exitstingComputer.setNote(computerRequest.getNote());
-            exitstingComputer.setUpdateAt(LocalDateTime.now());
-            exitstingComputer.setUpdateBy(exitstingAccount.getProfile().getFullName());
             computerRepository.save(exitstingComputer);
             return new ApiResponse(200, "Cập nhật thành công");
         } catch (Exception e) {
