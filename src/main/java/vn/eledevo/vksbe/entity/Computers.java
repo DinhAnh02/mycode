@@ -33,7 +33,7 @@ public class Computers {
     String updateBy;
 
     @ManyToOne
-    @JoinColumn(name = "accountId", nullable = false)
+    @JoinColumn(name = "accountId")
     Accounts accounts;
 
     @PrePersist
