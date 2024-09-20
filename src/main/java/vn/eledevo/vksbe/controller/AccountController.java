@@ -77,12 +77,12 @@ public class AccountController {
         return ApiResponse.ok(accountService.getListAccountByFilter(req, currentPage, limit));
     }
 
-    @PatchMapping("/{idAccount}/inactivate")
-    public ApiResponse<?> lockAccount(@PathVariable Long idAccount) throws ApiException {
-        if (idAccount == null) {
+    @PatchMapping("/{accountId}/inactivate")
+    public ApiResponse<?> lockAccount(@PathVariable Long accountId) throws ApiException {
+        if (accountId == null) {
             throw new ApiException(FIELD_INVALID);
         }
-        return ApiResponse.ok(accountService.inactivateAccount(idAccount));
+        return ApiResponse.ok(accountService.inactivateAccount(accountId));
     }
 
     @GetMapping("/{id}/usb")

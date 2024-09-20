@@ -39,4 +39,5 @@ application.yml
 
 
 ### folder test
-!**/src/test
+!
+**/src/test
