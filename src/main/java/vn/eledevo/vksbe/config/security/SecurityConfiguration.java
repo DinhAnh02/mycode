@@ -60,6 +60,8 @@ public class SecurityConfiguration {
                         .hasAuthority("IT_ADMIN")
                         .requestMatchers("/api/v1/private/accounts/{accountId}/inactivate")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
+                        .requestMatchers("/api/v1/private/computers/computer-info")
+                        .hasAuthority("IT_ADMIN")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

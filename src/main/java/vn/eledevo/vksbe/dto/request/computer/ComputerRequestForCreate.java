@@ -27,5 +27,4 @@ public class ComputerRequestForCreate {
     String type;
     @Size(min = 0, max = 100)
     String note;
-    Long accountId;
 }

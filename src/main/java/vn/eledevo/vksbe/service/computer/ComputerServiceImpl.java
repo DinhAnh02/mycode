@@ -10,11 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.transaction.annotation.Transactional;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
@@ -83,20 +83,15 @@ public class ComputerServiceImpl implements ComputerService {
     @Override
     @Transactional
     public ApiResponse<?> createComputer(ComputerRequestForCreate request) throws ApiException {
-        try {
-            Boolean computerExist = computerRepository.existsByCode(request.getCode());
-            if (Objects.equals(computerExist, Boolean.TRUE)) {
-                throw new ApiException(COMPUTER_HAS_EXISTED);
-            }
-            Boolean nameExist = computerRepository.existsByName(request.getName());
-            if (Objects.equals(nameExist, Boolean.TRUE)) {
-                throw new ApiException(NAME_COMPUTER_HAS_EXISTED);
-            }
-            Computers computersCreate = computerRepository.save(computerMapper.toResource(request));
-            ComputerResponse computerResponse = computerMapper.toResponse(computersCreate);
-            return ApiResponse.ok(computerResponse);
-        } catch (Exception e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        Boolean computerExist = computerRepository.existsByCode(request.getCode());
+        if (Objects.equals(computerExist, Boolean.TRUE)) {
+            throw new ApiException(COMPUTER_HAS_EXISTED);
         }
+        if (computerRepository.existsByName(request.getName())) {
+            throw new ApiException(NAME_COMPUTER_HAS_EXISTED);
+        }
+        Computers computersCreate = computerRepository.save(computerMapper.toResource(request));
+        ComputerResponse computerResponse = computerMapper.toResponse(computersCreate);
+        return ApiResponse.ok(computerResponse);
     }
 }

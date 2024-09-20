@@ -2,6 +2,8 @@ package vn.eledevo.vksbe.controller;
 
 import jakarta.validation.Valid;
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
+import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.PageResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
@@ -55,5 +58,9 @@ public class ComputerController {
         }catch (ApiException e){
           throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }
+    }
+    @PostMapping("/computer-info")
+    public ApiResponse<?> createComputer(@Valid @RequestBody ComputerRequestForCreate request) throws ApiException {
+        return ApiResponse.ok(computerService.createComputer(request));
     }
 }
