@@ -51,7 +51,6 @@ public class ComputerController {
                         .toList();
                 throw new ApiException(UNCATEGORIZED_EXCEPTION ,String.join(", ", errorMessages));
             }
-//            return ResponseEntity.ok(ApiResponse.ok(computerService.updateComputer(id, computerRequest)));
             computerService.updateComputer(id, computerRequest);
             return ApiResponse.ok("Cập nhật thành công");
         }catch (ApiException e){
