@@ -12,5 +12,6 @@ public class ResponseMessage {
 
     public static final String PASSWD_BLANK = "Mật khẩu không được để trống";
 
+    public static final String RESET_PASSWORD_SUCCESS = "Reset mật khẩu thành công!";
 
 }

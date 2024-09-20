@@ -21,7 +21,7 @@ public enum ErrorCode {
     PASSWORD_FAILURE(OK, 8000, "Sai tài khoản hoặc mật khẩu"),
     KEY_USB_NOT_FOUND(OK, 7000, "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kểm tra lại"),
     CHECK_USB(CONFLICT, 6000, "Usb không chính xác"),
-    ACCOUNT_NOT_FOUND(NOT_FOUND, 4040, " Acount không tồn tại trong hệ thống"),
+    ACCOUNT_NOT_FOUND(NOT_FOUND, 4040, "Acount không tồn tại trong hệ thống"),
     COMPUTER_NOT_FOUND(NOT_FOUND, 4040, "Computer không tồn tại trong hệ thống"),
     COMPUTER_NOT_CONNECT_TO_ACCOUNT(NOT_FOUND, 404, "Máy tính chưa được liên kết với tài khoản"),
     COMPUTER_HAS_EXISTED(NOT_FOUND, 4000, " Thiết bị đã tồn tại trong hệ thống"),
