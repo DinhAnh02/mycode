@@ -66,8 +66,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Access token JWT
      */
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(UserDetails userDetails,UUID keyUsb) {
+        return generateToken(new HashMap<>(), userDetails,keyUsb);
     }
 
     /**
@@ -77,8 +77,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Access token JWT
      */
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtExpiration);
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails,UUID keyUsb) {
+        return buildToken(extraClaims, userDetails, jwtExpiration,keyUsb);
     }
 
     /**
@@ -87,8 +87,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Refresh token JWT
      */
-    public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+    public String generateRefreshToken(UserDetails userDetails, UUID keyUsb) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration, keyUsb);
     }
 
     /**
@@ -97,13 +97,15 @@ public class JwtService {
      * @param extraClaims Các claim bổ sung
      * @param userDetails Thông tin của người dùng
      * @param expiration  Thời gian hết hạn của token (tính bằng mili giây)
+     * @param keyUsb
      * @return JWT token
      */
     private String buildToken(
             Map<String, Object> extraClaims, // Đối tượng map
             UserDetails userDetails, // Đối tượng là userDetails
-            long expiration // Thời gian tồn tại của token
-            ) {
+            long expiration, // Thời gian tồn tại của token
+            UUID keyUsb) {
+         extraClaims.put("keyUsb",keyUsb);
         return Jwts.builder()
                 .setClaims(extraClaims) // Khởi tạo 1 object payload
                 // thêm các giá trị vào bên trong payload

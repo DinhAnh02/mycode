@@ -4,6 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -18,14 +21,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCode;
+import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.constant.TokenType;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.AuthTokens;
+import vn.eledevo.vksbe.entity.Computers;
+import vn.eledevo.vksbe.entity.Usbs;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.AccountRepository;
+import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
+import vn.eledevo.vksbe.repository.UsbRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +41,8 @@ import vn.eledevo.vksbe.repository.TokenRepository;
 public class AuthenticationService {
     final AccountRepository accountRepository;
     final TokenRepository tokenRepository;
+    final UsbRepository usbRepository;
+    final ComputerRepository computerRepository;
     final PasswordEncoder passwordEncoder;
     final JwtService jwtService;
     final AuthenticationManager authenticationManager;
@@ -54,13 +64,34 @@ public class AuthenticationService {
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            var jwtToken = jwtService.generateToken(account);
+            if (!account.getRoles().getCode().equals(Role.IT_ADMIN.toString())) {
+                Boolean isValid = computerRepository.existsByCode(request.getCurrentDeviceId());
+                if (Boolean.FALSE.equals(isValid)) {
+                    throw new ApiException(ErrorCode.COMPUTER_NOT_FOUND);
+                }
+                List<Computers> computersList = computerRepository.findByAccounts_Id(account.getId());
+                boolean deviceExists = computersList.stream()
+                        .anyMatch(computer -> computer.getCode().equals(request.getCurrentDeviceId()));
+                if (Boolean.FALSE.equals(deviceExists)) {
+                    throw new ApiException(ErrorCode.COMPUTER_NOT_CONNECT_TO_ACCOUNT);
+                }
+            }
+            Optional<Usbs> usbs = usbRepository.findByAccountsId(account.getId());
+            if (usbs.isEmpty()) {
+                throw new ApiException(ErrorCode.EX_NOT_FOUND);
+            }
+            var jwtToken =
+                    jwtService.generateToken(account, UUID.fromString(usbs.get().getKeyUsb()));
             // Hủy tất cả các token hiện có của người dùng
             revokeAllUserTokens(account);
             // Lưu token truy cập mới vào cơ sở dữ liệu
             saveUserToken(account, jwtToken, TokenType.ACCESS.toString());
             // Trả về đối tượng AuthenticationResponse chứa các token
-            return AuthenticationResponse.builder().accessToken(jwtToken).build();
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .usbCode(usbs.get().getUsbCode())
+                    .usbVendorCode(usbs.get().getUsbVendorCode())
+                    .build();
         } catch (BadCredentialsException e) {
             throw new ApiException(ErrorCode.PASSWORD_FAILURE);
         }
@@ -96,9 +127,7 @@ public class AuthenticationService {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(account.getId());
         if (validUserTokens.isEmpty()) return;
         // Đánh dấu các token đó là hết hạn và bị hủy
-        validUserTokens.forEach(token -> {
-            tokenRepository.deleteById(token.getId());
-        });
+        validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
     }
 
     public static String decrypt(String keyUsb) {

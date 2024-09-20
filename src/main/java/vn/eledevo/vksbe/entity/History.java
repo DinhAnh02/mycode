@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Entity
 @Getter
@@ -24,4 +25,10 @@ public class History {
     String impact;
     LocalDateTime createAt;
     String createBy;
+
+    @PrePersist
+    public void prePersist() {
+        this.createAt = LocalDateTime.now();
+        this.createBy = SecurityUtils.getUserName();
+    }
 }

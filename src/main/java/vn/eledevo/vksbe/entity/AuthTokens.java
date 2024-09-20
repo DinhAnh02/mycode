@@ -28,4 +28,9 @@ public class AuthTokens {
     @ManyToOne
     @JoinColumn(name = "accountId", nullable = false)
     Accounts accounts;
+
+    @PrePersist
+    public void prePersist() {
+        this.createTime = LocalDateTime.now();
+    }
 }

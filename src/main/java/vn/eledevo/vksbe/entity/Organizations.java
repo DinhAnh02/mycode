@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Entity
 @Getter
@@ -28,4 +29,15 @@ public class Organizations {
     LocalDateTime updateAt;
     String createBy;
     String updateBy;
+
+    @PrePersist
+    public void prePersist() {
+        this.createAt = LocalDateTime.now();
+        this.createBy = SecurityUtils.getUserName();
+    }
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+        this.updateBy = SecurityUtils.getUserName();
+    }
 }

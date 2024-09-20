@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Entity
 @Getter
@@ -94,5 +95,16 @@ public class Accounts implements UserDetails {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createAt = LocalDateTime.now();
+        this.createBy = SecurityUtils.getUserName();
+    }
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+        this.createBy = SecurityUtils.getUserName();
     }
 }
