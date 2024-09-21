@@ -15,7 +15,7 @@ import vn.eledevo.vksbe.dto.response.InformationResponse;
 import vn.eledevo.vksbe.service.category.CategoryService;
 
 @RestController
-@RequestMapping("/api/v1/public/categories")
+@RequestMapping("/api/v1/private/categories")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Tag(name = "Categories")

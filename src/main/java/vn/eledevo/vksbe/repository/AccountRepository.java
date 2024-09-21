@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
+import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountProfile;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -51,18 +52,18 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
 
     @Query(
             """
-			SELECT a.username, p.fullName, a.roles.id, r.name, a.departments.id, d.name,
-					a.status, a.createAt, a.updateAt
-			FROM Accounts a
-			JOIN a.profile p
-			JOIN a.roles r
-			JOIN a.departments d
-			WHERE (:#{#filter.username} IS NULL OR a.username like %:#{#filter.username}%)
-			AND (:#{#filter.fullName} IS NULL OR p.fullName like %:#{#filter.fullName}%)
-			AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId})
-			AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId})
-			AND (:#{#filter.status} IS NULL OR a.status = :#{#filter.status})
-			""")
+					SELECT a.username, p.fullName, a.roles.id, r.name, a.departments.id, d.name,
+							a.status, a.createAt, a.updateAt
+					FROM Accounts a
+					JOIN a.profile p
+					JOIN a.roles r
+					JOIN a.departments d
+					WHERE (:#{#filter.username} IS NULL OR a.username like %:#{#filter.username}%)
+					AND (:#{#filter.fullName} IS NULL OR p.fullName like %:#{#filter.fullName}%)
+					AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId})
+					AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId})
+					AND (:#{#filter.status} IS NULL OR a.status = :#{#filter.status})
+					""")
     Page<Object[]> getAccountList(AccountRequest filter, Pageable pageable);
 
     @Query("SELECT new vn.eledevo.vksbe.dto.model.account.AccountInfo(a.roles.code, a.departments.id,"
@@ -81,4 +82,13 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     Optional<Accounts> findByDepartment(Long departmentId);
 
     boolean existsByUsername(String username);
+
+    @Query(
+            "SELECT new vn.eledevo.vksbe.dto.model.account.UserInfo(p.avatar, p.fullName, p.gender, p.phoneNumber, a.isConditionLogin1, a.isConditionLogin2, r.code, d.code) "
+                    + "FROM Accounts a "
+                    + "JOIN a.roles r "
+                    + "JOIN a.departments d "
+                    + "JOIN a.profile p "
+                    + "WHERE a.id = :accountId")
+    UserInfo findAccountProfileById(@Param("accountId") Long accountId);
 }

@@ -23,4 +23,8 @@ public interface UsbRepository extends BaseRepository<Usbs, Long> {
                     + "AND (u.status like %:#{#usbRequest.status}% OR :#{#usbRequest.status} IS NULL) "
                     + "AND u.createAt BETWEEN :#{#usbRequest.fromDate} AND :#{#usbRequest.toDate}")
     Page<UsbResponseFilter> getUsbDeviceList(UsbRequest usbRequest, Pageable pageable);
+
+    @Query(
+            "select u from Usbs u inner join Accounts a on u.accounts.id = a.id where a.id =:accountId and u.status = 'CONNECTED'")
+    Optional<Usbs> usbByAccountAndConnect(Long accountId);
 }
