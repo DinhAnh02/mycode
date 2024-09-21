@@ -11,16 +11,16 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
-import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
+import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
-import vn.eledevo.vksbe.dto.response.account.ChangePasswordResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/public/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Tag(name = "Xác thực tài khoản")
@@ -44,9 +44,17 @@ public class AuthenticationController {
         return ResponseEntity.ok(SecurityUtils.getUserName());
     }
 
-    @PatchMapping("/changePassword")
+    @PatchMapping("/create-pin")
+    @Operation(summary = "Tạo mã PIN khi đăng nhật lần đầu")
+    public ApiResponse<String> createPin(
+            @RequestBody @Valid pinRequest pinRequest
+    ) throws ApiException{
+        return ApiResponse.ok(service.createPin(pinRequest));
+    }
+
+    @PatchMapping("/change-password")
     @Operation(summary = "Đổi mật khẩu thành tài khoản" )
-    public ApiResponse<ChangePasswordResponse> changePassword(@RequestBody @Valid ChangePasswordRequest request)
+    public ApiResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest request)
             throws ApiException {
         return ApiResponse.ok(service.changePassword(request));
     }

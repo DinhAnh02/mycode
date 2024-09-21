@@ -11,11 +11,9 @@ import vn.eledevo.vksbe.constant.ResponseMessage;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChangePasswordRequest {
-    @NotBlank(message = ResponseMessage.OLD_PASSWD_BLANK)
-    String oldPassword;
-    @NotBlank(message = ResponseMessage.NEW_PASSWD_BLANK)
-    @Size( min = 8, message = ResponseMessage.PASSWD_SIZE)
-    String newPassword;
-    String confirmPassword;
+public class pinRequest {
+    @NotBlank(message = ResponseMessage.EXITS_PIN)
+    @Size(min = 6, message = ResponseMessage.PASSWD_SIZE)
+    String pin;
+    String pin2;
 }
