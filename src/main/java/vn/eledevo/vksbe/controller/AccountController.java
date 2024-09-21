@@ -118,7 +118,7 @@ public class AccountController {
             throws ApiException {
         return ApiResponse.ok(accountService.activeAccount(idAccount));
     }
-    @PatchMapping("/swapAccountStatus/{employeeId}/{requesterId}")
+    @PatchMapping("/swap-account-status/{employeeId}/{requesterId}")
     @Operation(summary = "Hoán đổi vị trí trưởng phòng")
     public ApiResponse<?> swapAccountSattus(
             @PathVariable Long employeeId, @PathVariable Long requesterId) throws ApiException {

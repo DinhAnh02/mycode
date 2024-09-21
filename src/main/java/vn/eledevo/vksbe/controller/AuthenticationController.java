@@ -19,7 +19,7 @@ import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/public/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Tag(name = "Xác thực tài khoản")
