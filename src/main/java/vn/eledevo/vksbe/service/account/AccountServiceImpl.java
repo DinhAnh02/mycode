@@ -391,4 +391,30 @@ public class AccountServiceImpl implements AccountService {
             AccountResponse accountResponse = accountMapper.toResponse(accRemove);
             return ApiResponse.ok(accountResponse);
     }
+
+    @Override
+    public ApiResponse<String> swapStatus(Long employeeId, Long requesterId) throws ApiException {
+        try{
+            Accounts existingAccount = accountRepository.findById(requesterId)
+                    .orElseThrow(()-> new ApiException(ACCOUNT_NOT_FOUND));
+            // Lấy thông tin phòng ban của tài khoản
+            Long departmentId = existingAccount.getDepartments().getId();
+            Optional<Accounts> existingDepartmentHead = accountRepository.findByDepartment(departmentId);
+            Accounts departmentHead = existingDepartmentHead.get();
+            if(existingDepartmentHead.isEmpty()){
+                throw new ApiException(UNCATEGORIZED_EXCEPTION,
+                        "Đây không phải trưởng phòng, trưởng phòng có mã +"+departmentHead.getUsername()+"!");
+            }
+
+            if(!departmentHead.getId().equals(employeeId)){
+                throw new ApiException(UNCATEGORIZED_EXCEPTION,
+                        "Đây không phải trưởng phòng, trưởng phòng có mã +"+departmentHead.getUsername()+"!");
+            }
+            existingAccount.setRoles(departmentHead.getRoles());
+            departmentHead.setStatus("INACTIVE");
+            return ApiResponse.ok("Hoán đổi thành công");
+        }catch (Exception e){
+            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        }
+    }
 }

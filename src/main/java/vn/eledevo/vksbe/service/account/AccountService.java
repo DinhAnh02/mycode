@@ -32,4 +32,6 @@ public interface AccountService {
     ApiResponse<List<ConnectComputerResponse>> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 
     ApiResponse<?> removeUSB(Long idAccount, Long idUsb) throws ApiException;
+
+    ApiResponse<String> swapStatus(Long employeeId, Long requesterId) throws ApiException;
 }
