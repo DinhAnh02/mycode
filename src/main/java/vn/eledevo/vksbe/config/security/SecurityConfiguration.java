@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import lombok.RequiredArgsConstructor;
+import vn.eledevo.vksbe.constant.Role;
+import vn.eledevo.vksbe.constant.RoleCodes;
 
 @Configuration
 @EnableWebSecurity
@@ -64,6 +66,8 @@ public class SecurityConfiguration {
                         .hasAuthority("IT_ADMIN")
                         .requestMatchers("/api/v1/private/computers**")
                         .hasAnyAuthority("IT_ADMIN")
+                        .requestMatchers("/api/v1/private/usbs/all")
+                        .hasAuthority(Role.IT_ADMIN.name())
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

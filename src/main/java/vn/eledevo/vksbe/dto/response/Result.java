@@ -1,4 +1,4 @@
-package vn.eledevo.vksbe.dto.response.account;
+package vn.eledevo.vksbe.dto.response;
 
 import java.util.List;
 
