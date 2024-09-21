@@ -1,5 +1,7 @@
 package vn.eledevo.vksbe.service.authenticate;
 
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,10 +23,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.constant.TokenType;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
+import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
+import vn.eledevo.vksbe.dto.response.account.ChangePasswordResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.AuthTokens;
 import vn.eledevo.vksbe.entity.Computers;
@@ -34,6 +39,7 @@ import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -188,4 +194,33 @@ public class AuthenticationService {
     //        // Trả về đối tượng AuthenticationResponse chứa các token
     //        return AuthenticationResponse.builder().accessToken(jwtToken).build();
     //    }
+
+    public ChangePasswordResponse changePassword(ChangePasswordRequest request) throws ApiException {
+
+        String userName = SecurityUtils.getUserName();
+        Optional<Accounts> accountRequest = accountRepository.findByUsernameAndActive(userName);
+        if (accountRequest.isEmpty()) {
+            throw new ApiException(ACCOUNT_NOT_FOUND);
+        }
+        Accounts exitsingAccounts = accountRepository
+                .findById(accountRequest.get().getId())
+                .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        if (!exitsingAccounts.getStatus().equals("ACTIVE")) {
+            throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
+        }
+        if (!passwordEncoder.matches(request.getOldPassword(), exitsingAccounts.getPassword())) {
+            throw new ApiException(OLD_PASSWORD_FAILURE);
+        }
+        if (request.getOldPassword().equals(request.getNewPassword())) {
+            throw new ApiException(NEW_PASSWORD_FAILURE);
+        }
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new ApiException(CONFIRM_PASSWORD_FAILURE);
+        }
+        exitsingAccounts.setPassword(passwordEncoder.encode(request.getConfirmPassword()));
+        accountRepository.save(exitsingAccounts);
+        return ChangePasswordResponse.builder()
+                .message(ResponseMessage.CHANGE_PASSWORD_SUCCESS)
+                .build();
+    }
 }

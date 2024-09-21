@@ -33,6 +33,9 @@ public enum ErrorCode {
     ACCOUNT_NOT_LOCK(FORBIDDEN, 4030, "Bạn không được phép cập nhật tài khoản này"),
     ACCOUNT_NOT_CONNECT_USB(NOT_FOUND, 4041, "Tài khoản chưa được liên kết với USB"),
     ACCOUNT_NOT_STATUS_ACTIVE(CONFLICT, 4091, "Tài khoản không hoạt động"),
+    OLD_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu cũ không chính xác"),
+    NEW_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu mới không được giống mật khẩu cũ"),
+    CONFIRM_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu nhập lại không giống mật khẩu mới"),
     ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {

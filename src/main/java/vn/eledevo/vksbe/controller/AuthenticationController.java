@@ -1,16 +1,20 @@
 package vn.eledevo.vksbe.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
+import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
+import vn.eledevo.vksbe.dto.response.account.ChangePasswordResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
 import vn.eledevo.vksbe.utils.SecurityUtils;
@@ -40,4 +44,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(SecurityUtils.getUserName());
     }
 
+    @PatchMapping("/changePassword")
+    @Operation(summary = "Đổi mật khẩu thành tài khoản" )
+    public ApiResponse<ChangePasswordResponse> changePassword(@RequestBody @Valid ChangePasswordRequest request)
+            throws ApiException {
+        return ApiResponse.ok(service.changePassword(request));
+    }
 }
