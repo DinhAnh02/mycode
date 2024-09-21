@@ -4,18 +4,26 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import vn.eledevo.vksbe.entity.Accounts;
+import vn.eledevo.vksbe.entity.Roles;
 
 public class SecurityUtils {
-    public static Long getUserId() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        Accounts user = (Accounts) securityContext.getAuthentication().getPrincipal();
-        return user.getId();
+    private SecurityUtils() {}
+
+    public static Accounts getUser() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return (Accounts) securityContext.getAuthentication().getPrincipal();
+    }
+
+    public static Long getUserId() {
+        return getUser().getId();
     }
 
     public static String getUserName() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Accounts user = (Accounts) securityContext.getAuthentication().getPrincipal();
-        return user.getUsername();
+        return getUser().getUsername();
+    }
+
+    public static Roles getRole() {
+        return getUser().getRoles();
     }
 }

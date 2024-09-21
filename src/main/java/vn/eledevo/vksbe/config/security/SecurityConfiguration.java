@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import lombok.RequiredArgsConstructor;
 import vn.eledevo.vksbe.constant.Role;
-import vn.eledevo.vksbe.constant.RoleCodes;
 
 @Configuration
 @EnableWebSecurity

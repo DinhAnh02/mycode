@@ -1,12 +1,26 @@
 package vn.eledevo.vksbe.service.account;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_EXTENSION_INVALID;
+import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_MAX_SIZE;
+import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_PHO;
+import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_TRUONG;
+import static vn.eledevo.vksbe.utils.FileUtils.getFileExtension;
+import static vn.eledevo.vksbe.utils.FileUtils.isAllowedExtension;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +28,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import vn.eledevo.vksbe.constant.DepartmentCode;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.constant.RoleCodes;
@@ -25,30 +43,28 @@ import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
-import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Computers;
-import vn.eledevo.vksbe.entity.Usbs;
+import vn.eledevo.vksbe.entity.*;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.mapper.UsbMapper;
-import vn.eledevo.vksbe.repository.AccountRepository;
-import vn.eledevo.vksbe.repository.ComputerRepository;
-import vn.eledevo.vksbe.repository.TokenRepository;
-import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class AccountServiceImpl implements AccountService {
     AccountRepository accountRepository;
     TokenRepository tokenRepository;
@@ -58,6 +74,13 @@ public class AccountServiceImpl implements AccountService {
     ComputerMapper computerMapper;
     UsbRepository usbRepository;
     UsbMapper usbMapper;
+    RoleRepository roleRepository;
+    DepartmentRepository departmentRepository;
+    OrganizationRepository organizationRepository;
+
+    @Value("${file.upload-dir}")
+    @NonFinal
+    String uploadDir;
 
     private Accounts validAccount(Long id) throws ApiException {
         return accountRepository.findById(id).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
@@ -183,11 +206,11 @@ public class AccountServiceImpl implements AccountService {
         Long departmentLogin = acc.getDepartmentId();
         Long departmentDetail = account.getDepartments().getId();
 
-        return !(RoleCodes.VIEN_TRUONG.equals(roleCodeLogin)
+        return !(VIEN_TRUONG.equals(roleCodeLogin)
                 || RoleCodes.IT_ADMIN.equals(roleCodeLogin)
-                || (RoleCodes.VIEN_PHO.equals(roleCodeLogin)
-                        && !RoleCodes.VIEN_TRUONG.equals(roleCodeDetail)
-                        && !RoleCodes.VIEN_PHO.equals(roleCodeDetail))
+                || (VIEN_PHO.equals(roleCodeLogin)
+                        && !VIEN_TRUONG.equals(roleCodeDetail)
+                        && !VIEN_PHO.equals(roleCodeDetail))
                 || (departmentLogin.equals(departmentDetail)
                         && RoleCodes.TRUONG_PHONG.equals(roleCodeLogin)
                         && !RoleCodes.TRUONG_PHONG.equals(roleCodeDetail))
@@ -321,8 +344,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds)
-            throws ApiException {
+    public List<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
         Accounts accounts = validAccount(id);
         if (!accounts.getStatus().equals(Const.ACTIVE)) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
@@ -380,8 +402,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public ApiResponse<?> removeUSB(Long accountID, Long usbID) throws ApiException {
-            Accounts accounts =
-                    accountRepository.findById(accountID).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        Accounts accounts =
+                accountRepository.findById(accountID).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
 
         if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
             throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
@@ -443,29 +465,191 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public ApiResponse<String> swapStatus(Long employeeId, Long requesterId) throws ApiException {
-        try{
-            Accounts existingAccount = accountRepository.findById(requesterId)
-                    .orElseThrow(()-> new ApiException(ACCOUNT_NOT_FOUND));
+        try {
+            Accounts existingAccount =
+                    accountRepository.findById(requesterId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
             // Lấy thông tin phòng ban của tài khoản
             Long departmentId = existingAccount.getDepartments().getId();
             Optional<Accounts> existingDepartmentHead = accountRepository.findByDepartment(departmentId);
             Accounts departmentHead = existingDepartmentHead.get();
-            if(existingDepartmentHead.isEmpty()){
-                throw new ApiException(UNCATEGORIZED_EXCEPTION,
-                        "Đây không phải trưởng phòng, trưởng phòng có mã +"+departmentHead.getUsername()+"!");
+            if (existingDepartmentHead.isEmpty()) {
+                throw new ApiException(
+                        UNCATEGORIZED_EXCEPTION,
+                        "Đây không phải trưởng phòng, trưởng phòng có mã +" + departmentHead.getUsername() + "!");
             }
 
-            if(!departmentHead.getId().equals(employeeId)){
-                throw new ApiException(UNCATEGORIZED_EXCEPTION,
-                        "Đây không phải trưởng phòng, trưởng phòng có mã +"+departmentHead.getUsername()+"!");
+            if (!departmentHead.getId().equals(employeeId)) {
+                throw new ApiException(
+                        UNCATEGORIZED_EXCEPTION,
+                        "Đây không phải trưởng phòng, trưởng phòng có mã +" + departmentHead.getUsername() + "!");
             }
             existingAccount.setRoles(departmentHead.getRoles());
             departmentHead.setStatus("INACTIVE");
             accountRepository.save(existingAccount);
             accountRepository.save(departmentHead);
             return ApiResponse.ok("Hoán đổi thành công");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
         }
+    }
+
+    @Override
+    @Transactional
+    public AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException {
+        Accounts curLoginAcc = SecurityUtils.getUser();
+
+        if (!isAllowedToCreateAccount(curLoginAcc)) {
+            throw new ApiException(PERMISSION_DENIED);
+        }
+
+        Map<String, String> errors = validateAccountCreateRequest(request);
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
+
+        Profiles profile = createProfile(request);
+        Accounts account = createAccount(request, profile);
+
+        Accounts savedAccount = accountRepository.save(account);
+        return accountMapper.toResponse(savedAccount);
+    }
+
+    private boolean isAllowedToCreateAccount(Accounts curLoginAcc) {
+        List<String> roleAccepts = List.of(VIEN_TRUONG, VIEN_PHO);
+        if (roleAccepts.contains(curLoginAcc.getRoles().getCode())) {
+            return false;
+        }
+
+        Departments curLoginDepartment = departmentRepository.findByAccountId(curLoginAcc.getId());
+        return !Objects.equals(curLoginDepartment.getCode(), DepartmentCode.PB_KY_THUAT.name());
+    }
+
+    private Map<String, String> validateAccountCreateRequest(AccountCreateRequest request) {
+        Map<String, String> errors = new HashMap<>();
+
+        validateUsername(request.getUsername(), errors);
+        validateRole(request.getRoleId(), request.getRoleName(), errors);
+        validateDepartment(request.getDepartmentId(), request.getDepartmentName(), errors);
+        validateOrganization(request.getOrganizationId(), request.getOrganizationName(), errors);
+        errors.putAll(validateAvatarFile(request.getAvatar()));
+
+        return errors;
+    }
+
+    private void validateUsername(String username, Map<String, String> errors) {
+        if (accountRepository.existsByUsername(username)) {
+            errors.put("username", ResponseMessage.USERNAME_IS_EXIST);
+        }
+    }
+
+    private void validateRole(Long roleId, String roleName, Map<String, String> errors) {
+        Optional<Roles> rolesOptional = roleRepository.findById(roleId);
+
+        if (rolesOptional.isEmpty()) {
+            errors.put("roleId", ResponseMessage.ROLE_NOT_EXIST);
+        } else {
+            Roles role = rolesOptional.get();
+            if (!Objects.equals(role.getName(), roleName)) {
+                errors.put("roleName", ResponseMessage.OUTDATED_DATA);
+            }
+        }
+    }
+
+    private void validateDepartment(Long departmentId, String departmentName, Map<String, String> errors) {
+        Optional<Departments> departmentsOptional = departmentRepository.findById(departmentId);
+
+        if (departmentsOptional.isEmpty()) {
+            errors.put("departmentId", ResponseMessage.DEPARTMENT_NOT_EXIST);
+        } else {
+            Departments department = departmentsOptional.get();
+            if (!Objects.equals(department.getName(), departmentName)) {
+                errors.put("departmentName", ResponseMessage.OUTDATED_DATA);
+            }
+        }
+    }
+
+    private void validateOrganization(Long organizationId, String organizationName, Map<String, String> errors) {
+        Optional<Organizations> organizationsOptional = organizationRepository.findById(organizationId);
+
+        if (organizationsOptional.isEmpty()) {
+            errors.put("organizationId", ResponseMessage.ORGANIZATION_NOT_EXIST);
+        } else {
+            Organizations organization = organizationsOptional.get();
+            if (!Objects.equals(organization.getName(), organizationName)) {
+                errors.put("organizationName", ResponseMessage.OUTDATED_DATA);
+            }
+        }
+    }
+
+    private Profiles createProfile(AccountCreateRequest request) {
+        Profiles profile = Profiles.builder()
+                .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .build();
+
+        String avatarUrl = saveAvatar(request.getAvatar());
+        if (Objects.nonNull(avatarUrl)) {
+            profile.setAvatar(avatarUrl);
+        }
+
+        return profile;
+    }
+
+    private Accounts createAccount(AccountCreateRequest request, Profiles profile) {
+        return Accounts.builder()
+                .username(request.getUsername())
+                .roles(roleRepository.findById(request.getRoleId()).orElseThrow())
+                .departments(
+                        departmentRepository.findById(request.getDepartmentId()).orElseThrow())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .profile(profile)
+                .build();
+    }
+
+    private String saveAvatar(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        try {
+            Path uploadPath = Files.createDirectories(Paths.get(uploadDir));
+            String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
+            Path filePath = uploadPath.resolve(uniqueFileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            return AVATAR_URI + uniqueFileName;
+        } catch (IOException e) {
+            log.error("Could not save avatar", e);
+            return null;
+        }
+    }
+
+    private String generateUniqueFileName(String originalFileName) {
+        String fileExtension = getFileExtension(originalFileName);
+        return UUID.randomUUID() + fileExtension;
+    }
+
+    private Map<String, String> validateAvatarFile(MultipartFile file) {
+        Map<String, String> errors = new HashMap<>();
+        if (file == null || file.isEmpty()) {
+            return errors;
+        }
+
+        List<String> errorMessages = new ArrayList<>();
+
+        if (file.getSize() > MAX_AVATAR_SIZE * BYTES_IN_MB) {
+            errorMessages.add(MessageFormat.format(AVATAR_MAX_SIZE, MAX_AVATAR_SIZE));
+        }
+
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        if (!isAllowedExtension(fileExtension, AVATAR_ALLOWED_EXTENSIONS)) {
+            errorMessages.add(
+                    MessageFormat.format(AVATAR_EXTENSION_INVALID, String.join(", ", AVATAR_ALLOWED_EXTENSIONS)));
+        }
+
+        if (!errorMessages.isEmpty()) {
+            errors.put("avatar", String.join("\n", errorMessages));
+        }
+
+        return errors;
     }
 }
