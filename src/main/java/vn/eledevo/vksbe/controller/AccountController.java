@@ -109,4 +109,10 @@ public class AccountController {
             @PathVariable Long accountId, @PathVariable Long usbId) throws ApiException {
         return ApiResponse.ok(accountService.removeUSB(accountId, usbId));
     }
+    @PatchMapping("/swapAccountStatus/{employeeId}/{requesterId}")
+    @Operation(summary = "Hoán đổi vị trí trưởng phòng")
+    public ApiResponse<?> swapAccountSattus(
+            @PathVariable Long employeeId, @PathVariable Long requesterId) throws ApiException {
+        return ApiResponse.ok(accountService.swapStatus(employeeId, requesterId));
+    }
 }

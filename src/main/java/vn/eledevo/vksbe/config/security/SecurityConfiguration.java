@@ -67,6 +67,8 @@ public class SecurityConfiguration {
                         .hasAnyAuthority("IT_ADMIN")
                         .requestMatchers("/api/v1/private/usbs/all")
                         .hasAuthority(Role.IT_ADMIN.name())
+                        .requestMatchers("/swapAccountStatus/{employeeId}/{requesterId}")
+                        .hasAnyAuthority("IT_ADMIN", "VIEN_TRUONG", "VIEN_PHO")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
