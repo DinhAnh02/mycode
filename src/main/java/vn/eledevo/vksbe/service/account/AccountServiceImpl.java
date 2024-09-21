@@ -412,9 +412,11 @@ public class AccountServiceImpl implements AccountService {
             }
             existingAccount.setRoles(departmentHead.getRoles());
             departmentHead.setStatus("INACTIVE");
+            accountRepository.save(existingAccount);
+            accountRepository.save(departmentHead);
             return ApiResponse.ok("Hoán đổi thành công");
         }catch (Exception e){
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
         }
     }
 }
