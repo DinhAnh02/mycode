@@ -37,6 +37,7 @@ public class CaseStatus {
         this.createAt = LocalDateTime.now();
         this.createBy = SecurityUtils.getUserName();
     }
+
     @PreUpdate
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();

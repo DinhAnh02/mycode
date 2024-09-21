@@ -66,8 +66,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Access token JWT
      */
-    public String generateToken(UserDetails userDetails,UUID keyUsb) {
-        return generateToken(new HashMap<>(), userDetails,keyUsb);
+    public String generateToken(UserDetails userDetails, UUID keyUsb) {
+        return generateToken(new HashMap<>(), userDetails, keyUsb);
     }
 
     /**
@@ -77,8 +77,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Access token JWT
      */
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails,UUID keyUsb) {
-        return buildToken(extraClaims, userDetails, jwtExpiration,keyUsb);
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, UUID keyUsb) {
+        return buildToken(extraClaims, userDetails, jwtExpiration, keyUsb);
     }
 
     /**
@@ -105,7 +105,7 @@ public class JwtService {
             UserDetails userDetails, // Đối tượng là userDetails
             long expiration, // Thời gian tồn tại của token
             UUID keyUsb) {
-         extraClaims.put("keyUsb",keyUsb);
+        extraClaims.put("keyUsb", keyUsb);
         return Jwts.builder()
                 .setClaims(extraClaims) // Khởi tạo 1 object payload
                 // thêm các giá trị vào bên trong payload

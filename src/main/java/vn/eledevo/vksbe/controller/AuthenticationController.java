@@ -1,12 +1,11 @@
 package vn.eledevo.vksbe.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +19,7 @@ import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @RestController
-@RequestMapping("/api/v1/public/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Tag(name = "Xác thực tài khoản")

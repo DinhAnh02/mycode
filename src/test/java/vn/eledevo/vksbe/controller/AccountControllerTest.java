@@ -53,7 +53,8 @@
 //     //             roles = {"IT_ADMIN"})
 //     //     void testLockAccount_ServerError() throws Exception {
 //     //         // Simulate server error
-//     //         when(accountService.inactivateAccount(any())).thenThrow(new RuntimeException("Internal server error"));
+//     //         when(accountService.inactivateAccount(any())).thenThrow(new RuntimeException("Internal server
+// error"));
 
 //     //         // Perform the request and expect 500 error
 //     //         mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/private/accounts/1/inactivate"))

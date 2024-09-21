@@ -1,13 +1,13 @@
-//package vn.eledevo.vksbe.model;
+// package vn.eledevo.vksbe.model;
 //
-//import lombok.*;
+// import lombok.*;
 //
-//@Getter
-//@Setter
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
-//public class ErrorResponse {
+// @Getter
+// @Setter
+// @AllArgsConstructor
+// @NoArgsConstructor
+// @Builder
+// public class ErrorResponse {
 //    private int code;
 //    private String message;
-//}
+// }

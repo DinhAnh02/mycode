@@ -34,11 +34,13 @@ public class Usbs {
     @OneToOne
     @JoinColumn(name = "accountId", referencedColumnName = "id")
     Accounts accounts;
+
     @PrePersist
     public void prePersist() {
         this.createAt = LocalDateTime.now();
         this.createBy = SecurityUtils.getUserName();
     }
+
     @PreUpdate
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
