@@ -1,35 +1,25 @@
 package vn.eledevo.vksbe.service.authenticate;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.constant.TokenType;
+import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
+import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
+import vn.eledevo.vksbe.dto.response.Token2FAResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.AuthTokens;
 import vn.eledevo.vksbe.entity.Computers;
@@ -39,7 +29,14 @@ import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.service.ChangeData;
 import vn.eledevo.vksbe.utils.SecurityUtils;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -52,9 +49,6 @@ public class AuthenticationService {
     final PasswordEncoder passwordEncoder;
     final JwtService jwtService;
     final AuthenticationManager authenticationManager;
-    static final String ALGORITHM = "AES";
-    static final String PADDING = "PKCS5Padding";
-    static final String keyBase64 = "cjFUazVkUHF0dXJRb1BhYmVnY0h5QnFnNFRBRVpDTm0=";
     /**
      * Đăng ký người dùng mới vào hệ thống.
      *
@@ -70,24 +64,16 @@ public class AuthenticationService {
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            if (!account.getRoles().getCode().equals(Role.IT_ADMIN.toString())) {
-                Boolean isValid = computerRepository.existsByCode(request.getCurrentDeviceId());
-                if (Boolean.FALSE.equals(isValid)) {
-                    throw new ApiException(ErrorCode.COMPUTER_NOT_FOUND);
-                }
-                List<Computers> computersList = computerRepository.findByAccounts_Id(account.getId());
-                boolean deviceExists = computersList.stream()
-                        .anyMatch(computer -> computer.getCode().equals(request.getCurrentDeviceId()));
-                if (Boolean.FALSE.equals(deviceExists)) {
-                    throw new ApiException(ErrorCode.COMPUTER_NOT_CONNECT_TO_ACCOUNT);
-                }
+            Boolean isCheck = checkRoleItAdmin(account.getRoles().getCode());
+            if (Boolean.FALSE.equals(isCheck)) {
+                checkComputerForAccount(request.getCurrentDeviceId(), account.getId());
             }
-            Optional<Usbs> usbs = usbRepository.findByAccounts_Id(account.getId());
-            if (usbs.isEmpty()) {
+            Optional<Usbs> universalSerialBus = usbRepository.findByAccounts_Id(account.getId());
+            if (universalSerialBus.isEmpty()) {
                 throw new ApiException(ErrorCode.EX_NOT_FOUND);
             }
-            var jwtToken =
-                    jwtService.generateToken(account, UUID.fromString(usbs.get().getKeyUsb()));
+            var jwtToken = jwtService.generateToken(
+                    account, UUID.fromString(universalSerialBus.get().getKeyUsb()));
             // Hủy tất cả các token hiện có của người dùng
             revokeAllUserTokens(account);
             // Lưu token truy cập mới vào cơ sở dữ liệu
@@ -95,8 +81,8 @@ public class AuthenticationService {
             // Trả về đối tượng AuthenticationResponse chứa các token
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
-                    .usbCode(usbs.get().getUsbCode())
-                    .usbVendorCode(usbs.get().getUsbVendorCode())
+                    .usbCode(universalSerialBus.get().getUsbCode())
+                    .usbVendorCode(universalSerialBus.get().getUsbVendorCode())
                     .build();
         } catch (BadCredentialsException e) {
             throw new ApiException(ErrorCode.PASSWORD_FAILURE);
@@ -135,65 +121,6 @@ public class AuthenticationService {
         // Đánh dấu các token đó là hết hạn và bị hủy
         validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
     }
-
-    public static String decrypt(String keyUsb) {
-        try {
-            byte[] keys = generateKey(keyBase64); // Sử dụng khoá base64 thực tế của bạn
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keys, ALGORITHM);
-
-            Cipher cipher = Cipher.getInstance(ALGORITHM + "/ECB/" + PADDING);
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(keyUsb));
-            return new String(decryptedBytes, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static byte[] generateKey(String keyBase64) throws NoSuchAlgorithmException {
-        MessageDigest sha = MessageDigest.getInstance("SHA-256");
-        byte[] digest = sha.digest(keyBase64.getBytes(StandardCharsets.UTF_8));
-        return digest;
-    }
-
-    //    public AuthenticationResponse twoFactorAuthentication(TwoFactorAuthenticationRequest request)
-    //            throws ApiException, JsonProcessingException {
-    //        String username = jwtService.extractUsername(request.getTokenUsb());
-    //        Optional<User> userInfo = repository.findByUsernameAndIsDeletedFalse(username);
-    //        if (userInfo.isEmpty()) {
-    //            throw new ApiException(ErrorCode.USER_NOT_EXIST);
-    //        }
-    //        if (!username.equals(userInfo.get().getUsername())) {
-    //            throw new ApiException(ErrorCode.CHECK_USB);
-    //        }
-    //        String data = decrypt(request.getKeyUsb());
-    //        ObjectMapper objectMapper = new ObjectMapper();
-    //        TwoFactorAuthenticationResponse responseUsb =
-    //                objectMapper.readValue(data, TwoFactorAuthenticationResponse.class);
-    //        Optional<UserDeviceInfoKeyQuery> userDeviceInfoKey =
-    // userDeviceInfoKeyRepository.findUserDeviceInfoKeyByUserId(
-    //                userInfo.get().getId());
-    //        if (userDeviceInfoKey.isEmpty()) {
-    //            throw new ApiException(ErrorCode.EX_NOT_FOUND);
-    //        }
-    //        if (!responseUsb.getDeviceUuid().equals(request.getCurrentDeviceUuid())
-    //                || !request.getCurrentDeviceUuid()
-    //                        .equals(userDeviceInfoKey.get().getDeviceUuid())) {
-    //            throw new ApiException(ErrorCode.CHECK_USB);
-    //        }
-    //        if (!responseUsb.getKeyUsb().equals(userDeviceInfoKey.get().getKeyUsb())) {
-    //            throw new ApiException(ErrorCode.CHECK_USB);
-    //        }
-    //        var jwtToken = jwtService.generateToken(userInfo.get());
-    //        // Hủy tất cả các token hiện có của người dùng
-    //        revokeAllUserTokens(userInfo.get());
-    //        // Lưu token truy cập mới vào cơ sở dữ liệu
-    //        saveUserToken(userInfo.get(), jwtToken);
-    //        // Trả về đối tượng AuthenticationResponse chứa các token
-    //        return AuthenticationResponse.builder().accessToken(jwtToken).build();
-    //    }
 
     public String createPin(pinRequest pinRequest) throws ApiException {
         String username = SecurityUtils.getUserName();
@@ -241,5 +168,65 @@ public class AuthenticationService {
         accountRequest.setIsConditionLogin1(Boolean.TRUE);
         accountRepository.save(accountRequest);
         return ResponseMessage.CHANGE_PASSWORD_SUCCESS;
+    }
+    public AuthenticationResponse twoFactorAuthenticationRequest(TwoFactorAuthenticationRequest request)
+            throws Exception {
+        String employeeCode = SecurityUtils.getUserName();
+        Token2FAResponse responseTokenUsb = ChangeData.decrypt(request.getTokenUsb(), Token2FAResponse.class);
+        if (responseTokenUsb.getExpireTime() > System.currentTimeMillis()) {
+            throw new ApiException(ErrorCode.TOKEN_EXPIRE);
+        }
+        Optional<Accounts> accounts = accountRepository.findByUsernameAndActive(employeeCode);
+        if (accounts.isEmpty()) {
+            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+        }
+        Optional<Usbs> usbToken =
+                usbRepository.usbByAccountAndConnect(accounts.get().getId());
+        if (usbToken.isEmpty()) {
+            throw new ApiException(ErrorCode.CONFLICT_USB);
+        }
+        if (!request.getCurrentUsbCode().equals(responseTokenUsb.getHasString().getUsbCode())) {
+            throw new ApiException(ErrorCode.CHECK_USB);
+        }
+        if( !request.getCurrentUsbCode().equals(usbToken.get().getUsbCode())){
+            throw new ApiException(ErrorCode.CHECK_USB);
+        }
+        if (!request.getCurrentUsbVendorCode().equals(responseTokenUsb.getHasString().getUsbVendorCode())) {
+            throw new ApiException(ErrorCode.CHECK_USB);
+        }
+        if(!request.getCurrentUsbVendorCode().equals(usbToken.get().getUsbVendorCode())){
+            throw new ApiException(ErrorCode.CHECK_USB);
+        }
+        checkComputerForAccount(request.getCurrentDeviceId(), accounts.get().getId());
+        UserInfo userInfo =
+                accountRepository.findAccountProfileById(accounts.get().getId());
+        var jwtToken = jwtService.generateToken(
+                accounts.get(), UUID.fromString(usbToken.get().getKeyUsb()));
+        // Hủy tất cả các token hiện có của người dùng
+        revokeAllUserTokens(accounts.get());
+        // Lưu token truy cập mới vào cơ sở dữ liệu
+        saveUserToken(accounts.get(), jwtToken, TokenType.ACCESS.toString());
+        // Trả về đối tượng AuthenticationResponse chứa các token
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .userInfo(userInfo)
+                .build();
+    }
+
+    private Boolean checkRoleItAdmin(String role) {
+        return role.equals(Role.IT_ADMIN.toString());
+    }
+
+    private void checkComputerForAccount(String deviceCode, Long accountId) throws ApiException {
+        Boolean isValid = computerRepository.existsByCode(deviceCode);
+        if (Boolean.FALSE.equals(isValid)) {
+            throw new ApiException(ErrorCode.COMPUTER_NOT_FOUND);
+        }
+        List<Computers> computersList = computerRepository.findByAccounts_Id(accountId);
+        boolean deviceExists =
+                computersList.stream().anyMatch(computer -> computer.getCode().equals(deviceCode));
+        if (Boolean.FALSE.equals(deviceExists)) {
+            throw new ApiException(ErrorCode.COMPUTER_NOT_CONNECT_TO_ACCOUNT);
+        }
     }
 }

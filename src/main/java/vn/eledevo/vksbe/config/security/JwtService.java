@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -134,8 +135,17 @@ public class JwtService {
      * @param token JWT token
      * @return True nếu token đã hết hạn, false nếu còn hạn
      */
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public boolean isTokenExpired(String token) {
+        try {
+            Date expirationDate = extractExpiration(token);
+            return expirationDate.before(new Date()); // So sánh với thời gian hiện tại
+        } catch (ExpiredJwtException e) {
+            System.out.println("Token đã hết hạn: " + e.getMessage());
+            return true;
+        } catch (Exception e) {
+            System.out.println("Lỗi giải mã token: " + e.getMessage());
+            return true; // Nếu có lỗi khác, xem như token không hợp lệ
+        }
     }
 
     /**
@@ -169,5 +179,12 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String getHasStringFromToken(String token) {
+        Claims claims =
+                Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+
+        return claims.get("hasString", String.class);
     }
 }

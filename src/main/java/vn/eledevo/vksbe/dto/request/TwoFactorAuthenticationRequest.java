@@ -12,4 +12,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class TwoFactorAuthenticationRequest {
     String tokenUsb;
+    String currentUsbCode;
+    String currentUsbVendorCode;
+    String currentDeviceId;
 }

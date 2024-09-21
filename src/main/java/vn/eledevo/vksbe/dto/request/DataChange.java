@@ -1,20 +1,18 @@
-package vn.eledevo.vksbe.dto.response;
+package vn.eledevo.vksbe.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
-@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
+@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class TwoFactorAuthenticationResponse {
+public class DataChange {
     String maPin;
     String keyUsb;
-    List<String> listDevices;
+    String[] listDevices;
     String usbCode;
     String usbVendorCode;
 }

@@ -25,8 +25,8 @@ import vn.eledevo.vksbe.constant.Role;
 public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
-        "/api/v1/public/auth/**",
-        "/api/v1/public/categories/getAll",
+        "/api/v1/auth/authenticate",
+        "/api/v1/private/categories/getAll",
         "/v2/api-docs",
         "/v3/api-docs",
         "/v3/api-docs/**",
@@ -48,8 +48,14 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL)
                         .permitAll()
-                        .requestMatchers("/api/v1/public/auth/test")
-                        .hasAuthority("VIEN_TRUONG")
+                        .requestMatchers("/api/v1/auth/**")
+                        .hasAnyAuthority(
+                                Role.IT_ADMIN.toString(),
+                                Role.KIEM_SAT_VIEN.toString(),
+                                Role.VIEN_PHO.toString(),
+                                Role.VIEN_TRUONG.toString(),
+                                Role.TRUONG_PHONG.toString(),
+                                Role.PHO_PHONG.toString())
                         .requestMatchers("/api/v1/private/accounts/detail")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
                         .requestMatchers("/api/v1/private/accounts")
