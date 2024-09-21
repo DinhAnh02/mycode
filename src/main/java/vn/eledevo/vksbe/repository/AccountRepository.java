@@ -75,4 +75,6 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountProfile(a.id, a.roles.code," + "p.fullName) from Accounts a "
             + "join Profiles p on a.id = p.accounts.id where a.username =:username")
     AccountProfile findByUsernameAndProfile(String username);
+    @Query("SELECT a from Accounts  a where a.roles.id = 4 and a.departments.id =:departmentId")
+    Optional<Accounts> findByDepartment(Long departmentId);
 }
