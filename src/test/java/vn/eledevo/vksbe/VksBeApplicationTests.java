@@ -1,15 +1,15 @@
-//package vn.eledevo.vksbe;
+// package vn.eledevo.vksbe;
 //
-//import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+// import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 //
-//import org.junit.jupiter.api.Test;
-//import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 //
-//@SpringBootTest
-//class VksBeApplicationTests {
+// @SpringBootTest
+// class VksBeApplicationTests {
 //
 //    @Test
 //    void contextLoads() {
 //        assertDoesNotThrow(() -> VksBeApplication.main(new String[] {}));
 //    }
-//}
+// }

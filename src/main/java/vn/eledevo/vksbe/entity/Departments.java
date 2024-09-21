@@ -1,6 +1,5 @@
 package vn.eledevo.vksbe.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -44,6 +43,7 @@ public class Departments {
         this.createAt = LocalDateTime.now();
         this.createBy = SecurityUtils.getUserName();
     }
+
     @PreUpdate
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();

@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ResponseMessage;
+import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.constant.RoleCodes;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
@@ -309,18 +310,18 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ApiResponse<UsbResponse> getUsbInfo(Long id) throws ApiException {
+    public UsbResponse getUsbInfo(Long id) throws ApiException {
         validAccount(id);
         Optional<Usbs> usbEntities = usbRepository.findByAccounts_Id(id);
         if (usbEntities.isPresent()) {
-            return ApiResponse.ok(usbMapper.toTarget(usbEntities.get()));
+            return usbMapper.toTarget(usbEntities.get());
         } else {
             throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
         }
     }
 
     @Override
-    public ApiResponse<List<ConnectComputerResponse>> connectComputers(Long id, Set<Long> computerIds)
+    public List<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds)
             throws ApiException {
         Accounts accounts = validAccount(id);
         if (!accounts.getStatus().equals(Const.ACTIVE)) {
@@ -373,7 +374,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        return ApiResponse.ok(computerResponses);
+        return computerResponses;
     }
 
     @Override
@@ -382,14 +383,62 @@ public class AccountServiceImpl implements AccountService {
             Accounts accounts =
                     accountRepository.findById(accountID).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
 
-            if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
-                throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
-            }
-            accounts.setUsb(null);
-            accounts.setIsConnectUsb(false);
-            Accounts accRemove = accountRepository.save(accounts);
-            AccountResponse accountResponse = accountMapper.toResponse(accRemove);
-            return ApiResponse.ok(accountResponse);
+        if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
+            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+        }
+        accounts.setUsb(null);
+        accounts.setIsConnectUsb(false);
+        Accounts accRemove = accountRepository.save(accounts);
+        AccountResponse accountResponse = accountMapper.toResponse(accRemove);
+        return ApiResponse.ok(accountResponse);
+    }
+
+    @Override
+    public AccountResponse activeAccount(Long id) throws ApiException {
+        Accounts accounts = validAccount(id);
+        Accounts accSecurity = validAccount(SecurityUtils.getUserId());
+        if (accounts.getStatus().equals(Const.ACTIVE)) {
+            throw new ApiException(ACCOUNT_STATUS_ACTIVE);
+        }
+
+        if (!accounts.getIsConnectComputer()) {
+            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+        }
+
+        if (!accounts.getIsConnectUsb()) {
+            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+        }
+
+        Role accSecu = Role.valueOf(accSecurity.getRoles().getCode());
+        Role accSave = Role.valueOf(accounts.getRoles().getCode());
+
+        if (accSecu.equals(Role.IT_ADMIN) || priorityRoles(accSecu) <= priorityRoles(accSave)) {
+            throw new ApiException(ACCOUNT_NOT_LOCK);
+        }
+
+        accounts.setStatus(Const.ACTIVE);
+        accounts.setUpdateAt(LocalDateTime.now());
+        accounts.setUpdateBy(SecurityUtils.getUserName());
+        var res = accountRepository.save(accounts);
+
+        return accountMapper.toResponse(res);
+    }
+
+    private int priorityRoles(Role role) {
+        switch (role) {
+            case VIEN_TRUONG:
+                return 10;
+            case VIEN_PHO:
+                return 9;
+            case TRUONG_PHONG:
+                return 8;
+            case PHO_PHONG:
+                return 7;
+            case KIEM_SAT_VIEN:
+                return 0;
+            default:
+                return 0;
+        }
     }
 
     @Override

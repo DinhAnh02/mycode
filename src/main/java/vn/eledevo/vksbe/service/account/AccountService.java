@@ -6,6 +6,7 @@ import java.util.Set;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
@@ -27,11 +28,13 @@ public interface AccountService {
 
     ApiResponse<String> removeConnectComputer(Long accountId, Long computerId) throws ApiException;
 
-    ApiResponse<UsbResponse> getUsbInfo(Long id) throws ApiException;
+    UsbResponse getUsbInfo(Long id) throws ApiException;
 
-    ApiResponse<List<ConnectComputerResponse>> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
+    List<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 
     ApiResponse<?> removeUSB(Long idAccount, Long idUsb) throws ApiException;
+
+    AccountResponse activeAccount(Long id) throws ApiException;
 
     ApiResponse<String> swapStatus(Long employeeId, Long requesterId) throws ApiException;
 }

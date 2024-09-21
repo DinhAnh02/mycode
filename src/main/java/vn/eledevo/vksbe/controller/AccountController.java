@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
@@ -91,7 +92,7 @@ public class AccountController {
     @Operation(summary = "Lấy thông tin USB liên kết với tài khoản", description = "Get usb by account-id")
     public ApiResponse<UsbResponse> getUsbInfo(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
-        return accountService.getUsbInfo(id);
+        return ApiResponse.ok(accountService.getUsbInfo(id));
     }
 
     @PatchMapping("/connect-computer/{id}/computers")
@@ -100,7 +101,7 @@ public class AccountController {
             @PathVariable Long idAccount,
             @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
             throws ApiException {
-        return accountService.connectComputers(idAccount, computerIds);
+        return ApiResponse.ok(accountService.connectComputers(idAccount, computerIds));
     }
 
     @PatchMapping("/remove-usb/{accountId}/usb/{usbId}")
@@ -108,6 +109,14 @@ public class AccountController {
     public ApiResponse<?> removeUsb(
             @PathVariable Long accountId, @PathVariable Long usbId) throws ApiException {
         return ApiResponse.ok(accountService.removeUSB(accountId, usbId));
+    }
+
+    @PatchMapping("/{idAccount}/activate")
+    @Operation(summary = "Active tài khoản")
+    public ApiResponse<AccountResponse> activateAccount(
+            @Parameter(description = "ID of the user", required = true) @PathVariable Long idAccount)
+            throws ApiException {
+        return ApiResponse.ok(accountService.activeAccount(idAccount));
     }
     @PatchMapping("/swapAccountStatus/{employeeId}/{requesterId}")
     @Operation(summary = "Hoán đổi vị trí trưởng phòng")
