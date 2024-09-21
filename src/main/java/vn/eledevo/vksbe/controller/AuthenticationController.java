@@ -1,18 +1,19 @@
 package vn.eledevo.vksbe.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
+import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
-import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
@@ -45,16 +46,13 @@ public class AuthenticationController {
 
     @PatchMapping("/create-pin")
     @Operation(summary = "Tạo mã PIN khi đăng nhật lần đầu")
-    public ApiResponse<String> createPin(
-            @RequestBody @Valid pinRequest pinRequest
-    ) throws ApiException{
+    public ApiResponse<String> createPin(@RequestBody @Valid pinRequest pinRequest) throws ApiException {
         return ApiResponse.ok(service.createPin(pinRequest));
     }
 
     @PatchMapping("/change-password")
-    @Operation(summary = "Đổi mật khẩu thành tài khoản" )
-    public ApiResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest request)
-            throws ApiException {
+    @Operation(summary = "Đổi mật khẩu thành tài khoản")
+    public ApiResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest request) throws ApiException {
         return ApiResponse.ok(service.changePassword(request));
     }
 }

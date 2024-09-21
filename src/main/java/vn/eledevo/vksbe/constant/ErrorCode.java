@@ -40,6 +40,7 @@ public enum ErrorCode {
     OLD_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu cũ không chính xác"),
     NEW_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu mới không được giống mật khẩu cũ"),
     CONFIRM_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu nhập lại không giống mật khẩu mới"),
+    PERMISSION_DENIED(FORBIDDEN, 4003, "Bạn không có quyền thực hiện hành động này"),
     ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {

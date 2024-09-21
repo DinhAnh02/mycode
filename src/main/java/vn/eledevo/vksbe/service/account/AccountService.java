@@ -5,14 +5,16 @@ import java.util.Set;
 
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
-import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 
 public interface AccountService {
     String resetPassword(Long id) throws ApiException;
@@ -37,4 +39,6 @@ public interface AccountService {
     AccountResponse activeAccount(Long id) throws ApiException;
 
     ApiResponse<String> swapStatus(Long employeeId, Long requesterId) throws ApiException;
+
+    AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException;
 }

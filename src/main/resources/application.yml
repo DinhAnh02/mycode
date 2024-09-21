@@ -28,3 +28,6 @@ application:
       expiration: 86400000
       refresh-token:
         expiration: 604800000
+
+file:
+  upload-dir: src/main/resources/storage
