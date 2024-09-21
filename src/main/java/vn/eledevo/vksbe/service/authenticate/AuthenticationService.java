@@ -28,8 +28,8 @@ import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.constant.TokenType;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
+import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
-import vn.eledevo.vksbe.dto.response.account.ChangePasswordResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.AuthTokens;
 import vn.eledevo.vksbe.entity.Computers;
@@ -195,20 +195,40 @@ public class AuthenticationService {
     //        return AuthenticationResponse.builder().accessToken(jwtToken).build();
     //    }
 
-    public ChangePasswordResponse changePassword(ChangePasswordRequest request) throws ApiException {
-
-        String userName = SecurityUtils.getUserName();
-        Optional<Accounts> accountRequest = accountRepository.findByUsernameAndActive(userName);
-        if (accountRequest.isEmpty()) {
-            throw new ApiException(ACCOUNT_NOT_FOUND);
-        }
-        Accounts exitsingAccounts = accountRepository
-                .findById(accountRequest.get().getId())
+    public String createPin(pinRequest pinRequest) throws ApiException {
+        String username = SecurityUtils.getUserName();
+        Accounts account = accountRepository
+                .findByUsernameAndActive(username)
                 .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
-        if (!exitsingAccounts.getStatus().equals("ACTIVE")) {
+        if (!account.getStatus().equals("ACTIVE")) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
         }
-        if (!passwordEncoder.matches(request.getOldPassword(), exitsingAccounts.getPassword())) {
+        if (!Boolean.FALSE.equals(account.getIsConditionLogin2())) {
+            return null;
+        }
+        if (!pinRequest.getPin().equals(pinRequest.getPin2())) {
+            throw new ApiException(ErrorCode.ACCOUNT_NOT_PIN);
+        }
+        String hashedPin = passwordEncoder.encode(pinRequest.getPin2());
+        account.setPin(hashedPin);
+        account.setIsConditionLogin2(Boolean.TRUE);
+        accountRepository.save(account);
+
+        return ResponseMessage.CREATE_PIN_SUCCESS;
+    }
+
+    public String changePassword(ChangePasswordRequest request) throws ApiException {
+        String userName = SecurityUtils.getUserName();
+        Accounts accountRequest = accountRepository
+                .findByUsernameAndActive(userName)
+                .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        if (!accountRequest.getStatus().equals("ACTIVE")) {
+            throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
+        }
+        if (!Boolean.FALSE.equals(accountRequest.getIsConditionLogin1())) {
+            return null;
+        }
+        if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
             throw new ApiException(OLD_PASSWORD_FAILURE);
         }
         if (request.getOldPassword().equals(request.getNewPassword())) {
@@ -217,10 +237,9 @@ public class AuthenticationService {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new ApiException(CONFIRM_PASSWORD_FAILURE);
         }
-        exitsingAccounts.setPassword(passwordEncoder.encode(request.getConfirmPassword()));
-        accountRepository.save(exitsingAccounts);
-        return ChangePasswordResponse.builder()
-                .message(ResponseMessage.CHANGE_PASSWORD_SUCCESS)
-                .build();
+        accountRequest.setPassword(passwordEncoder.encode(request.getConfirmPassword()));
+        accountRequest.setIsConditionLogin1(Boolean.TRUE);
+        accountRepository.save(accountRequest);
+        return ResponseMessage.CHANGE_PASSWORD_SUCCESS;
     }
 }
