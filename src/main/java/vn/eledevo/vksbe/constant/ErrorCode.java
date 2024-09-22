@@ -16,7 +16,7 @@ public enum ErrorCode {
     EX_NOT_FOUND(NOT_FOUND, 1008, "Không tìm thấy bản ghi"),
     RECORD_EXIST(CONFLICT, 1010, "Bản ghi đã tồn tại"),
     USER_EXIST(CONFLICT, 1010, "Tài khoản đã tồn tại"),
-    USER_NOT_EXIST(NOT_FOUND, 1008, "Tài khoản không tồn tại hoặc đã bị xóa trước đó"),
+    USER_NOT_EXIST(UNAUTHORIZED, 1008, "Tài khoản không tồn tại hoặc đã bị xóa trước đó"),
     DEVICE_NOT_EXIST(NOT_FOUND, 1008, "Thiết bị không tồn tại hoặc đã bị xóa trước đó"),
     PASSWORD_FAILURE(OK, 8000, "Sai tài khoản hoặc mật khẩu"),
     KEY_USB_NOT_FOUND(OK, 7000, "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kểm tra lại"),
@@ -48,6 +48,7 @@ public enum ErrorCode {
     AVATAR_NOT_FOUND(NOT_FOUND, 4042, "Không tìm thấy ảnh đại diện"),
     ROLE_NOT_FOUND(NOT_FOUND, 1101, "Chức vụ không tồn tại"),
     FOLDER_NOT_FOUND(NOT_FOUND, 1011, "Không tìm thấy thư mục."),
+    CHECK_ACTIVE_ACCOUNT(UNAUTHORIZED,6969,"Tài khoản chauw được kích hoạt")
     ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
