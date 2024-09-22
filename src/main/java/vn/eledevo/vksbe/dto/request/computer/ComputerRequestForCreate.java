@@ -21,8 +21,7 @@ public class ComputerRequestForCreate {
     String name;
 
     @NotBlank
-    @Size(min = 1, max = 100)
-    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "mã không chứa các kí tự đặc biệt")
+    @Size(min = 10, max = 100)
     String code;
 
     @NotBlank
