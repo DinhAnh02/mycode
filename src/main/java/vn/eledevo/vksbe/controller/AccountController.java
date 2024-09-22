@@ -131,4 +131,11 @@ public class AccountController {
                 .header("Content-Type", getContentType(fileName))
                 .body(accountService.downloadAvatar(fileName));
     }
+
+    @GetMapping("/{accountId}/remove-computer/{computerId}")
+    @Operation(summary = "Gỡ thiết bị máy tính đã liên kết với tài khoản")
+    public ResponseEntity<ApiResponse<String>> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
+            throws ApiException {
+        return ResponseEntity.ok(accountService.removeConnectComputer(accountId, computerId));
+    }
 }

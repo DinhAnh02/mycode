@@ -263,7 +263,11 @@ public class AccountServiceImpl implements AccountService {
                 accounts.setStatus("INACTIVE");
                 accountRepository.save(accounts);
             }
-            // Todo gỡ usb token
+            // gỡ usb token
+            Optional<Usbs> usb = usbRepository.findByAccounts_Id(accountId);
+            if (usb.isPresent()) {
+                accountServiceImpl.removeUSB(accountId, usb.get().getId());
+            }
             return ApiResponse.ok("Gỡ liên kết máy tính với tài khoản thành công");
         } catch (Exception e) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
