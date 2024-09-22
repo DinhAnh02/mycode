@@ -2,8 +2,7 @@ package vn.eledevo.vksbe.service.account;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_EXTENSION_INVALID;
-import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_MAX_SIZE;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_PHO;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_TRUONG;
 import static vn.eledevo.vksbe.utils.FileUtils.getFileExtension;
@@ -48,6 +47,8 @@ import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
+import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
@@ -464,33 +465,37 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ApiResponse<String> swapStatus(Long employeeId, Long requesterId) throws ApiException {
-        try {
-            Accounts existingAccount =
-                    accountRepository.findById(requesterId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
-            // Lấy thông tin phòng ban của tài khoản
-            Long departmentId = existingAccount.getDepartments().getId();
-            Optional<Accounts> existingDepartmentHead = accountRepository.findByDepartment(departmentId);
-            Accounts departmentHead = existingDepartmentHead.get();
-            if (existingDepartmentHead.isEmpty()) {
-                throw new ApiException(
-                        UNCATEGORIZED_EXCEPTION,
-                        "Đây không phải trưởng phòng, trưởng phòng có mã +" + departmentHead.getUsername() + "!");
-            }
+    public ObjectSwapResponse swapStatus(Long newAccountId, Long oldAccountId) throws ApiException {
+        return swap(newAccountId, oldAccountId);
+    }
 
-            if (!departmentHead.getId().equals(employeeId)) {
-                throw new ApiException(
-                        UNCATEGORIZED_EXCEPTION,
-                        "Đây không phải trưởng phòng, trưởng phòng có mã +" + departmentHead.getUsername() + "!");
-            }
-            existingAccount.setRoles(departmentHead.getRoles());
-            departmentHead.setStatus("INACTIVE");
-            accountRepository.save(existingAccount);
-            accountRepository.save(departmentHead);
-            return ApiResponse.ok("Hoán đổi thành công");
-        } catch (Exception e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
+    private ObjectSwapResponse swap(Long newAccountId, Long oldAccountId) throws ApiException {
+        Accounts existingAccount =
+                accountRepository.findById(newAccountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        if (!existingAccount.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
+                || !existingAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) return null;
+        Long departmentId = existingAccount.getDepartments().getId();
+        String roleCode = existingAccount.getRoles().getCode();
+        Optional<Accounts> accountLeadOptional = accountRepository.findByDepartment(departmentId, roleCode, "ACTIVE");
+        if (accountLeadOptional.isEmpty()) return null;
+        Accounts accountLead = accountLeadOptional.get();
+        if (!accountLead.getId().equals(oldAccountId)) {
+            AccountSwapResponse accountSwapResponse = AccountSwapResponse.builder()
+                    .id(accountLead.getId())
+                    .fullname(accountLead.getProfile().getFullName())
+                    .roleName(accountLead.getRoles().getName())
+                    .status(accountLead.getStatus())
+                    .build();
+            return ObjectSwapResponse.builder()
+                    .accountSwapResponse(accountSwapResponse)
+                    .build();
         }
+
+        accountLead.setStatus("INACTIVE");
+        existingAccount.setStatus("ACTIVE");
+        accountRepository.save(existingAccount);
+        accountRepository.save(accountLead);
+        return ObjectSwapResponse.builder().message(SWAP_ACCOUNT_SUCCESS).build();
     }
 
     @Override
