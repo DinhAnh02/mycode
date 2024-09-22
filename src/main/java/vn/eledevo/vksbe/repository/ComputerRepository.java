@@ -35,7 +35,7 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
             + "OR LOWER(c.name) LIKE %:textSearch% "
             + "OR LOWER(c.code) LIKE %:textSearch% ) "
             + "AND c.accounts IS NULL )")
-    Page<Computers> getByTextSearchAndAccountsIsNull(@Param("textSearch") String textSearch, Pageable pageable);
+    List<Computers> getByTextSearchAndAccountsIsNull(@Param("textSearch") String textSearch);
 
     boolean existsByCode(String code);
 
