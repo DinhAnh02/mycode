@@ -36,7 +36,7 @@ public interface AccountService {
 
     UsbResponse getUsbInfo(Long id) throws ApiException;
 
-    List<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
+    Result connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 
     ApiResponse<?> removeUSB(Long idAccount, Long idUsb) throws ApiException;
 
