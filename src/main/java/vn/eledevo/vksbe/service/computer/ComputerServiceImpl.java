@@ -71,13 +71,11 @@ public class ComputerServiceImpl implements ComputerService {
     }
 
     @Override
-    public PageResponse<ComputerResponse> getDisconnectedComputers(
-            Integer currentPage, Integer limit, String textSearch) {
+    public List<ComputerResponse> getDisconnectedComputers(String textSearch) {
         String keyword =
                 StringUtils.isBlank(textSearch) ? null : textSearch.trim().toLowerCase();
-        Pageable pageable = PageRequest.of(currentPage - 1, limit);
-        Page<Computers> page = computerRepository.getByTextSearchAndAccountsIsNull(keyword, pageable);
-        return new PageResponse<>(page.getTotalElements(), computerMapper.toListResponse(page.getContent()));
+        List<Computers> computersList = computerRepository.getByTextSearchAndAccountsIsNull(keyword);
+        return computerMapper.toListResponse(computersList);
     }
 
     @Override

@@ -61,7 +61,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/private/accounts/**")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
                         .requestMatchers("/api/v1/private/computers/disconnected")
-                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
+                        .hasAnyAuthority(Role.IT_ADMIN.name())
                         .requestMatchers("/api/v1/private/computers/update/computer-info/{id}")
                         .hasAuthority("IT_ADMIN")
                         .requestMatchers("/api/v1/private/accounts/{accountId}/inactivate")

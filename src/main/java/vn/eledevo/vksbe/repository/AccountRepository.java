@@ -52,7 +52,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
             Pageable pageable);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.username, p.fullName, r.name, d.name, o.name, a.status, a.createAt, a.updateAt, false , false) "
+            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.id, a.username, p.fullName, r.name, d.name, o.name, a.status, a.createAt, a.updateAt, false , false) "
                     + "FROM Accounts a "
                     + "JOIN Profiles p ON p.accounts.id = a.id "
                     + "JOIN Roles r ON r.id = a.roles.id "

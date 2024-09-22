@@ -34,11 +34,9 @@ public class ComputerController {
 
     @GetMapping("/disconnected")
     @Operation(summary = "Lấy danh sách máy tính không liên kết với tài khoản")
-    public ApiResponse<PageResponse<ComputerResponse>> getComputerDisconnectedList(
-            @RequestParam(required = false, defaultValue = "1") Integer currentPage,
-            @RequestParam(required = false, defaultValue = "10") Integer limit,
+    public ApiResponse<List<ComputerResponse>> getComputerDisconnectedList(
             @RequestParam(required = false) String textSearch) {
-        return ApiResponse.ok(computerService.getDisconnectedComputers(currentPage, limit, textSearch));
+        return ApiResponse.ok(computerService.getDisconnectedComputers(textSearch));
     }
 
     @PatchMapping("/update/computer-info/{id}")
