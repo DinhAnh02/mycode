@@ -7,8 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.RegexPattern;
@@ -29,7 +27,7 @@ public class AccountCreateRequest {
     @Size(min = 1, max = 255, message = FULL_NAME_SIZE)
     String fullName;
 
-    MultipartFile avatar;
+    String avatar;
 
     @NotNull(message = ROLE_ID_REQUIRE)
     Long roleId;

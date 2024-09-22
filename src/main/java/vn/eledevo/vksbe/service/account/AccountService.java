@@ -1,7 +1,10 @@
 package vn.eledevo.vksbe.service.account;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -10,7 +13,6 @@ import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
-import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
@@ -43,4 +45,8 @@ public interface AccountService {
     ObjectSwapResponse swapStatus(Long employeeId, Long requesterId) throws ApiException;
 
     AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException;
+
+    String uploadAvatar(MultipartFile file) throws ApiException, IOException;
+
+    byte[] downloadAvatar(String fileName) throws ApiException, IOException;
 }

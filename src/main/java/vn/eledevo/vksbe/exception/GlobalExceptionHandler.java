@@ -39,9 +39,10 @@ public class GlobalExceptionHandler extends Throwable {
 
     private ResponseEntity<Object> generateExceptionResponse(ErrorCode errorCode, Exception ex) {
         if (errorCode == ErrorCode.UNCATEGORIZED_EXCEPTION) log.error(ex.getMessage(), ex);
+        String displayMessage = (ex instanceof ApiException) ? ex.getMessage() : errorCode.getMessage();
         return ResponseEntity.status(errorCode.getStatusCode()).body(new HashMap<String, Object>() {
             {
-                put("message", errorCode.getMessage());
+                put("message", displayMessage);
                 put("code", errorCode.getCode());
             }
         });

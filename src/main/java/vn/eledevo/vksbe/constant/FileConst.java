@@ -10,5 +10,5 @@ public class FileConst {
 
     public static final String[] AVATAR_ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"};
 
-    public static final String AVATAR_URI = "/api/v1/private/avatar";
+    public static final String AVATAR_URI = "/api/v1/private/accounts/download-image/";
 }

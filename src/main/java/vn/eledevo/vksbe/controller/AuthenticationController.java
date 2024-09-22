@@ -1,9 +1,7 @@
 package vn.eledevo.vksbe.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +11,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
-import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
+import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
@@ -42,7 +40,8 @@ public class AuthenticationController {
     //    }
 
     @PostMapping("/2FA")
-    public ResponseEntity<AuthenticationResponse> twoFactorAuthentication(@RequestBody TwoFactorAuthenticationRequest request) throws Exception {
+    public ResponseEntity<AuthenticationResponse> twoFactorAuthentication(
+            @RequestBody TwoFactorAuthenticationRequest request) throws Exception {
         return ResponseEntity.ok(service.twoFactorAuthenticationRequest(request));
     }
 

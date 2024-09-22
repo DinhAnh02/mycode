@@ -68,4 +68,6 @@ public class ResponseMessage {
     public static final String AVATAR_EXTENSION_INVALID = "Ảnh đại diện chỉ chấp nhận định dạng {0}.";
 
     public static final String SWAP_ACCOUNT_SUCCESS = "Hoán đổi trạng thái tài khoản thành công";
+
+    public static final String AVATAR_URL_INVALID = "Đường dẫn ảnh đại diện không hợp lệ";
 }

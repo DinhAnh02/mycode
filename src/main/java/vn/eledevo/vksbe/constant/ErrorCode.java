@@ -42,6 +42,10 @@ public enum ErrorCode {
     NEW_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu mới không được giống mật khẩu cũ"),
     CONFIRM_PASSWORD_FAILURE(BAD_REQUEST, 4000, "Mật khẩu nhập lại không giống mật khẩu mới"),
     PERMISSION_DENIED(FORBIDDEN, 4003, "Bạn không có quyền thực hiện hành động này"),
+    AVATAR_EMPTY(BAD_REQUEST, 4005, "Hãy chọn ảnh đại diện"),
+    AVATAR_MAX_SIZE(BAD_REQUEST, 4006, "Ảnh đại diện không được vượt quá {0} MB."),
+    AVATAR_EXTENSION_INVALID(BAD_REQUEST, 4007, "Ảnh đại diện chỉ chấp nhận định dạng {0}."),
+    AVATAR_NOT_FOUND(NOT_FOUND, 4042, "Không tìm thấy ảnh đại diện"),
     ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
