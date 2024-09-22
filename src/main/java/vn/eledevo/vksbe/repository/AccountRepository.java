@@ -22,36 +22,6 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     Optional<Accounts> findByUsernameAndActive(String username);
 
     @Query(
-            value = "SELECT a.username, p.fullName, a.roleId, r.roleName,"
-                    + "a.departmentId, d.departmentName, a.status, a.createAt, a.updateAt "
-                    + "FROM accounts a "
-                    + "JOIN profiles p ON a.username = p.username "
-                    + "JOIN roles r ON a.roleId = r.roleId "
-                    + "JOIN departments d ON a.departmentId = d.departmentId "
-                    + "WHERE (:username IS NULL OR a.username = :username) "
-                    + "AND (:fullName IS NULL OR p.fullName = :fullName) "
-                    + "AND (:roleId = 0 OR a.roleId = :roleId) "
-                    + "AND (:departmentId = 0 OR a.departmentId = :departmentId) "
-                    + "AND (:status IS NULL OR a.status = :status)",
-            countQuery = "SELECT COUNT(*) " + "FROM accounts a "
-                    + "JOIN profiles p ON a.username = p.username "
-                    + "JOIN roles r ON a.roleId = r.roleId "
-                    + "JOIN departments d ON a.departmentId = d.departmentId "
-                    + "WHERE (:username IS NULL OR a.username = :username) "
-                    + "AND (:fullName IS NULL OR p.fullName = :fullName) "
-                    + "AND (:roleId = 0 OR a.roleId = :roleId) "
-                    + "AND (:departmentId = 0 OR a.departmentId = :departmentId) "
-                    + "AND (:status IS NULL OR a.status = :status)",
-            nativeQuery = true)
-    Page<Object[]> getAccountList(
-            @Param("username") String username,
-            @Param("fullName") String fullName,
-            @Param("roleId") int roleId,
-            @Param("departmentId") int departmentId,
-            @Param("status") String status,
-            Pageable pageable);
-
-    @Query(
             "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.id, a.username, p.fullName, r.name, d.name, o.name, a.status, a.createAt, a.updateAt, false , false) "
                     + "FROM Accounts a "
                     + "JOIN Profiles p ON p.accounts.id = a.id "
@@ -67,17 +37,11 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
                     + "AND a.createAt BETWEEN (:#{#filter.fromDate}) AND :#{#filter.toDate}")
     Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Pageable pageable);
 
-    @Query("SELECT new vn.eledevo.vksbe.dto.model.account.AccountInfo(a.roles.code, a.departments.id,"
-            + "a.isConnectComputer, a.isConnectUsb) from Accounts a where a.username =:username")
-    AccountInfo findByUsername(String username);
+    Accounts findAccountsByUsername(String username);
 
     @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountInactive(a.id, a.roles.code,"
             + "a.status) from Accounts a where a.username =:username")
     Optional<AccountInactive> findByUsernameActive(String username);
-
-    @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountProfile(a.id, a.roles.code," + "p.fullName) from Accounts a "
-            + "join Profiles p on a.id = p.accounts.id where a.username =:username")
-    AccountProfile findByUsernameAndProfile(String username);
 
     @Query(
             "SELECT a from Accounts  a where a.roles.code=:roleCode and a.departments.id=:departmentId and a.status=:accountStatus")

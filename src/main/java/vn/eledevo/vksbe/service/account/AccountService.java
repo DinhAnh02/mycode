@@ -26,7 +26,7 @@ public interface AccountService {
     Result<AccountResponseByFilter> getListAccountByFilter(
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException;
 
-    ApiResponse<AccountDetailResponse> getAccountDetail(Long accountId) throws ApiException;
+    AccountDetailResponse getAccountDetail(Long accountId) throws ApiException;
 
     List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException;
 

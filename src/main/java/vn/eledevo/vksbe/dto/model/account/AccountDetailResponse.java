@@ -7,21 +7,35 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountDetailResponse {
+    Long id;
     String username;
     String fullName;
+    Long departmentId;
     String departmentName;
+    Long roleId;
     String roleName;
+    Long organizationId;
+    String organizationName;
     String status;
     String phoneNumber;
     String avatar;
-    /** Check hiển thị tất cả các nút */
-    Boolean isDisplayAllButton;
-    /** true: trạng thái đang hoạt động của tài khoản */
-    Boolean isActive;
-    /** true: nút kích hoạt tài khoản bị disable, false: nút kích hoạt tài khoản không bị disable */
-    Boolean isDisableActiveButton;
-    /** true: không hiển thị nút nào, false: hiển thị nút kích hoạt tài khoản/khoá */
-    Boolean isReadOnly;
+
+    /** Trạng thái của nút KHÓA TÀI KHOẢN */
+    Boolean isEnabledLockButton;
+    Boolean isShowLockButton;
+
+    /** Trạng thái nút SỬA */
+    Boolean isEnabledEditButton;
+    Boolean isShowEditButton;
+
+    /** Trạng thái nút RESET MẬT KHẨU */
+    Boolean isEnableResetPasswordButton;
+    Boolean isShowResetPasswordButton;
+
+    /** Trạng thái nút KÍCH HOẠT TÀI KHOẢN */
+    Boolean isEnabledActivateButton;
+    Boolean isShowActivateButton;
 }
