@@ -48,6 +48,7 @@ public class ResponseMessage {
     public static final String PIN_SIZE = "Mã PIN phải có 6 kí";
 
     public static final String CREATE_PIN_SUCCESS = "Tạo mã PIN thành công";
+
     public static final String PHONE_NUMBER_REQUIRE = "Số điện thoại không được để trống";
 
     public static final String PHONE_NUMBER_INVALID = "Số điện thoại không hợp lệ";

@@ -1,6 +1,5 @@
 package vn.eledevo.vksbe.controller;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.CHECK_ORGANIZATIONAL_STRUCTURE;
 import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
 import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
@@ -29,9 +28,7 @@ import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.account.AccountService;
-import vn.eledevo.vksbe.service.department.DepartmentService;
-import vn.eledevo.vksbe.service.organization.OrganizationService;
-import vn.eledevo.vksbe.service.role.RoleService;
+import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructureService;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -40,9 +37,7 @@ import vn.eledevo.vksbe.service.role.RoleService;
 @Tag(name = "Quản lý tài khoản")
 public class AccountController {
     AccountService accountService;
-    final RoleService roleService;
-    final DepartmentService departmentService;
-    final OrganizationService organizationService;
+    OrganizationalStructureService organizationalStructureUtilsService;
 
     @PatchMapping("/reset-password/{id}")
     @Operation(summary = "Reset mật khẩu")
@@ -70,15 +65,9 @@ public class AccountController {
     @PostMapping()
     @Operation(summary = "Xem danh sách tài khoản")
     public ApiResponse<?> getAccountList(
-            @RequestBody AccountRequest req, @RequestParam Integer currentPage, @RequestParam Integer limit)
+            @RequestBody AccountRequest req, @RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer limit)
             throws ApiException {
-        if (Boolean.FALSE.equals(roleService.roleNameChangeDetector(req.getRoleId(), req.getRoleName()))
-                || Boolean.FALSE.equals(
-                        departmentService.departmentNameChangeDetector(req.getDepartmentId(), req.getDepartmentName()))
-                || Boolean.FALSE.equals(organizationService.organizationNameChangeDetector(
-                        req.getOrganizationId(), req.getOrganizationName()))) {
-            throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
-        }
+        organizationalStructureUtilsService.validate(req);
         return ApiResponse.ok(accountService.getListAccountByFilter(req, currentPage, limit));
     }
 

@@ -121,47 +121,21 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(
-            AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
-        try {
-            if (accountRequest.getFromDate() == null) {
-                accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
-            }
-            if (accountRequest.getToDate() == null) {
-                accountRequest.setToDate(LocalDateTime.now());
-            }
-            if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
-                throw new ApiException(CHECK_FROM_DATE);
-            }
-
-            if (currentPage == null || currentPage < 1) {
-                currentPage = 1;
-            }
-            if (limit == null) {
-                limit = 10;
-            }
-            Pageable pageable = PageRequest.of(currentPage - 1, limit);
-            Page<Object[]> page = accountRepository.getAccountList(accountRequest, pageable);
-            List<AccountResponseByFilter> responseByFilters = page.getContent().stream()
-                    .map(ele -> AccountResponseByFilter.builder()
-                            .username((String) ele[0])
-                            .fullName((String) ele[1])
-                            .roleId((Long) ele[2])
-                            .roleName((String) ele[3])
-                            .departmentId((Long) ele[4])
-                            .departmentName((String) ele[5])
-                            .status((String) ele[6])
-                            .createAt((LocalDateTime) ele[7])
-                            .updateAt((LocalDateTime) ele[8])
-                            .organizationId(accountRequest.getOrganizationId())
-                            .organizationName(accountRequest.getOrganizationName())
-                            .build())
-                    .toList();
-            Result<AccountResponseByFilter> result = new Result<>(responseByFilters, page.getTotalElements());
-            return ApiResponse.ok(result);
-        } catch (Exception e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+    public Result<AccountResponseByFilter> getListAccountByFilter(
+        AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
+        if (accountRequest.getFromDate() == null) {
+            accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
         }
+        if (accountRequest.getToDate() == null) {
+            accountRequest.setToDate(LocalDateTime.now());
+        }
+        if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
+            throw new ApiException(CHECK_FROM_DATE);
+        }
+        Pageable pageable = PageRequest.of(currentPage - 1, limit);
+        Page<AccountResponseByFilter> page = accountRepository.getAccountList(accountRequest, pageable);
+        Result<AccountResponseByFilter> result = new Result<>(page.getContent(), page.getTotalElements());
+        return result;
     }
 
     @Override
