@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 public class ComputerRequest {
     String name;
     String status;
-    String usbCode;
+    String computerCode;
     String fullName;
     String note;
 }

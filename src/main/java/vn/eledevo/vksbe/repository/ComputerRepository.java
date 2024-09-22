@@ -19,14 +19,13 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<Computers> findByAccounts_Id(Long accountId);
 
     @Query(
-            value = "SELECT c.name, c.status, c.note, p.full_name " + "FROM computers c "
-                    + "JOIN accounts a ON c.account_id = a.id "
-                    + "JOIN profiles p ON a.id = p.account_id "
-                    + "WHERE c.name = :#{#computerRequest.usbCode} "
-                    + "AND p.full_name = :#{#computerRequest.fullName} "
-                    + "AND c.status IS NOT NULL "
-                    + "AND c.status <> '' "
-                    + "AND c.status = :#{#computerRequest.status}",
+            value = "SELECT c.name, c.status, c.note, p.full_name " +
+                    "FROM computers c " +
+                    "JOIN accounts a ON c.account_id = a.id " +
+                    "JOIN profiles p ON a.id = p.account_id " +
+                    "WHERE (:#{#computerRequest.usbCode} IS NULL OR c.name LIKE %:#{#computerRequest.computerCode}%) " +
+                    "AND (:#{#computerRequest.fullName} IS NULL OR p.full_name LIKE %:#{#computerRequest.fullName}%) " +
+                    "AND (:#{#computerRequest.status} IS NULL OR c.status = :#{#computerRequest.status})",
             nativeQuery = true)
     Page<ListComputerResponse> getComputerList(ComputerRequest computerRequest, Pageable pageable);
 
