@@ -50,6 +50,7 @@ import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
+import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.entity.*;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -122,7 +123,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public Result<AccountResponseByFilter> getListAccountByFilter(
-        AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
+            AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
         if (accountRequest.getFromDate() == null) {
             accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
         }
@@ -138,76 +139,35 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ApiResponse<AccountDetailResponse> getAccountDetail(Long accountId) throws ApiException {
-        try {
-            String username = getUserName();
-            AccountInfo acc = accountRepository.findByUsername(username);
-            Accounts account = validAccount(accountId);
-
-            AccountDetailResponse accountDetailResponse = AccountDetailResponse.builder()
-                    .username(account.getUsername())
-                    .fullName(account.getProfile().getFullName())
-                    .departmentName(account.getDepartments().getName())
-                    .roleName(account.getRoles().getName())
-                    .status(account.getStatus())
-                    .phoneNumber(account.getProfile().getPhoneNumber())
-                    .avatar(account.getProfile().getAvatar())
-                    .isDisplayAllButton(RoleCodes.IT_ADMIN.equals(acc.getRoleCode()))
-                    .isActive("ACTIVE".equals(account.getStatus()))
-                    .isReadOnly(isReadOnly(acc, account))
-                    .isDisableActiveButton(isDisableActiveButton(account))
-                    .build();
-            return ApiResponse.ok(accountDetailResponse);
-        } catch (Exception e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
-        }
-    }
-
-    /**
-     * Kiểm tra điều kiện hiển thị nút kích hoạt/khoá
-     * Điều kiện hiển thị la:
-     * Role đăng nhập là "VIEN_TRUONG"
-     * Role đăng nhập là "IT_ADMIN"
-     * Role đăng nhập là "VIEN_PHO" và role xem chi tiết không phải "VIEN_TRUONG" hoặc "VIEN_PHO"
-     * Cùng phòng ban, role đăng nhập là "TRUONG_PHONG" và role xem chi tiết không phải "TRUONG_PHONG"
-     * Cùng phòng ban, role đăng nhập là "PHO_PHONG" và role xem chi tiết là "KIEM_SAT_VIEN"
-     * --> isReadOnly = false
-     *
-     * @param acc     Thông tin tài khoản đang đăng nhập
-     * @param account Thông tin tài khoản được xem chi tiết
-     * @return boolean true: không hiển thị nút nào, false: hiển thị nút kích hoạt/khoá
-     */
-    private static boolean isReadOnly(AccountInfo acc, Accounts account) {
-        String roleCodeLogin = acc.getRoleCode();
-        String roleCodeDetail = account.getRoles().getCode();
-        Long departmentLogin = acc.getDepartmentId();
-        Long departmentDetail = account.getDepartments().getId();
-
-        return !(VIEN_TRUONG.equals(roleCodeLogin)
-                || RoleCodes.IT_ADMIN.equals(roleCodeLogin)
-                || (VIEN_PHO.equals(roleCodeLogin)
-                        && !VIEN_TRUONG.equals(roleCodeDetail)
-                        && !VIEN_PHO.equals(roleCodeDetail))
-                || (departmentLogin.equals(departmentDetail)
-                        && RoleCodes.TRUONG_PHONG.equals(roleCodeLogin)
-                        && !RoleCodes.TRUONG_PHONG.equals(roleCodeDetail))
-                || (departmentLogin.equals(departmentDetail)
-                        && RoleCodes.PHO_PHONG.equals(roleCodeLogin)
-                        && RoleCodes.KIEM_SAT_VIEN.equals(roleCodeDetail)));
-    }
-
-    /**
-     * Kiểm tra điều kiện nút kích hoạt disable hay không?
-     * Điều kiện để nút kích hoạt không bị disable:
-     * - isActive = false
-     * - isConnectUsb = true
-     * - isConnectComputer = true
-     *
-     * @param acc Thông tin tài khoản được xem chi tiết
-     * @return boolean true: disable, false: active
-     */
-    private static boolean isDisableActiveButton(Accounts acc) {
-        return !("INACTIVE".equals(acc.getStatus()) && acc.getIsConnectComputer() && acc.getIsConnectUsb());
+    public AccountDetailResponse getAccountDetail(Long accountId) throws ApiException {
+        String loginAccountName = getUserName();
+        Accounts accSecurity = accountRepository.findAccountsByUsername(loginAccountName);
+        Accounts account = validAccount(accountId);
+        Organizations organizations = organizationRepository.findById(1L).get();
+        AccountDetailResponse detailResponse = AccountDetailResponse.builder()
+                .id(account.getId())
+                .username(account.getUsername())
+                .fullName(account.getProfile().getFullName())
+                .status(account.getStatus())
+                .phoneNumber(account.getProfile().getPhoneNumber())
+                .avatar(account.getProfile().getAvatar())
+                .roleId(account.getRoles().getId())
+                .roleName(account.getRoles().getName())
+                .departmentId(account.getDepartments().getId())
+                .departmentName(account.getDepartments().getName())
+                .organizationId(organizations.getId())
+                .organizationName(organizations.getName())
+                .isEnabledEditButton(false)
+                .isShowEditButton(false)
+                .isEnabledLockButton(false)
+                .isShowLockButton(false)
+                .isEnableResetPasswordButton(false)
+                .isShowResetPasswordButton(false)
+                .isEnabledActivateButton(false)
+                .isShowActivateButton(false)
+                .build();
+        validateRoleForViewButton(detailResponse, accSecurity, account);
+        return detailResponse;
     }
 
     @Override
@@ -493,6 +453,33 @@ public class AccountServiceImpl implements AccountService {
 
         Accounts savedAccount = accountRepository.save(account);
         return accountMapper.toResponse(savedAccount);
+    }
+
+    private void validateRoleForViewButton(AccountDetailResponse detailResponse, Accounts accSecurity, Accounts account){
+        Role roleSecurity = Role.valueOf(accSecurity.getRoles().getCode());
+        Role roleSave = Role.valueOf(account.getRoles().getCode());
+
+        if (roleSecurity.equals(Role.IT_ADMIN)) {
+            detailResponse.setIsEnabledEditButton(true);
+            detailResponse.setIsShowEditButton(true);
+            detailResponse.setIsEnableResetPasswordButton(true);
+            detailResponse.setIsShowResetPasswordButton(true);
+        }
+
+        if (roleSecurity.equals(Role.IT_ADMIN) || priorityRoles(roleSecurity) > priorityRoles(roleSave)) {
+            detailResponse.setIsEnabledLockButton(true);
+        }
+        if (account.getStatus().equals(Status.ACTIVE.name())) {
+            detailResponse.setIsShowLockButton(true);
+        }
+        if ((roleSecurity.equals(Role.IT_ADMIN) || priorityRoles(roleSecurity) > priorityRoles(roleSave))
+                && account.getIsConnectUsb().equals(Boolean.TRUE)
+                && account.getIsConnectComputer().equals(Boolean.TRUE)) {
+            detailResponse.setIsEnabledActivateButton(true);
+        }
+        if (!account.getStatus().equals(Status.ACTIVE.name())) {
+            detailResponse.setIsShowActivateButton(true);
+        }
     }
 
     private boolean isAllowedToCreateAccount(Accounts curLoginAcc) {

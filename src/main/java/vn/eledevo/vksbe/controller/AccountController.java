@@ -58,9 +58,9 @@ public class AccountController {
 
     @GetMapping("/detail/{id}")
     @Operation(summary = "Xem chi tiết thông tin tài khoản")
-    public ResponseEntity<ApiResponse<AccountDetailResponse>> getAccountDetail(@PathVariable Long id)
+    public ApiResponse<AccountDetailResponse> getAccountDetail(@PathVariable Long id)
             throws ApiException {
-        return ResponseEntity.ok(accountService.getAccountDetail(id));
+        return ApiResponse.ok(accountService.getAccountDetail(id));
     }
 
     @PostMapping()
