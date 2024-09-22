@@ -46,6 +46,7 @@ public enum ErrorCode {
     AVATAR_MAX_SIZE(BAD_REQUEST, 4006, "Ảnh đại diện không được vượt quá {0} MB."),
     AVATAR_EXTENSION_INVALID(BAD_REQUEST, 4007, "Ảnh đại diện chỉ chấp nhận định dạng {0}."),
     AVATAR_NOT_FOUND(NOT_FOUND, 4042, "Không tìm thấy ảnh đại diện"),
+    FOLDER_NOT_FOUND(NOT_FOUND, 1011, "Không tìm thấy thư mục."),
     ;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
