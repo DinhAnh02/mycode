@@ -78,6 +78,7 @@ public class AccountServiceImpl implements AccountService {
     RoleRepository roleRepository;
     DepartmentRepository departmentRepository;
     OrganizationRepository organizationRepository;
+    AccountServiceImpl accountServiceImpl;
 
     @Value("${file.upload-dir}")
     @NonFinal
@@ -318,6 +319,10 @@ public class AccountServiceImpl implements AccountService {
                         computer.setUpdateAt(LocalDateTime.now());
                         computer.setUpdateBy(nameUpdate);
                         connectedComputers.add(computer);
+                        Optional<Usbs> usb = usbRepository.findByAccounts_Id(id);
+                        if (usb.isPresent()) {
+                            accountServiceImpl.removeUSB(id, usb.get().getId());
+                        }
                     }
                 } else {
                     computerResponses.add(ConnectComputerResponse.builder()
