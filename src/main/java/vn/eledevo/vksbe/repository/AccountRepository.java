@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
@@ -79,7 +78,8 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
             + "join Profiles p on a.id = p.accounts.id where a.username =:username")
     AccountProfile findByUsernameAndProfile(String username);
 
-    @Query("SELECT a from Accounts  a where a.roles.code=:roleCode and a.departments.id=:departmentId and a.status=:accountStatus")
+    @Query(
+            "SELECT a from Accounts  a where a.roles.code=:roleCode and a.departments.id=:departmentId and a.status=:accountStatus")
     Optional<Accounts> findByDepartment(Long departmentId, String roleCode, String accountStatus);
 
     boolean existsByUsername(String username);

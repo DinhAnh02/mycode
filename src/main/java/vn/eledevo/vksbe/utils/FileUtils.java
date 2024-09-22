@@ -1,6 +1,7 @@
 package vn.eledevo.vksbe.utils;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 public class FileUtils {
 
@@ -24,5 +25,15 @@ public class FileUtils {
 
     public static boolean isAllowedExtension(String fileExtension, String[] allowedExtensions) {
         return Arrays.asList(allowedExtensions).contains(fileExtension.toLowerCase());
+    }
+
+    public static boolean isPathAllowedExtension(String path, String[] allowedExtensions) {
+        return Arrays.stream(allowedExtensions)
+                .anyMatch(ext -> path.toLowerCase().endsWith(ext));
+    }
+
+    public static String generateUniqueFileName(String originalFileName) {
+        String fileExtension = getFileExtension(originalFileName);
+        return UUID.randomUUID() + fileExtension;
     }
 }

@@ -34,10 +34,7 @@ build/
 ### VS Code ###
 .vscode/
 
-### file environments
-application.yml
-
-
 ### folder test
-!
 **/src/test
+
+src/main/resources/storage/

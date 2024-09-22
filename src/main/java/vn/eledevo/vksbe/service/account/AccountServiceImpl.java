@@ -5,11 +5,12 @@ import static vn.eledevo.vksbe.constant.FileConst.*;
 import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_PHO;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_TRUONG;
-import static vn.eledevo.vksbe.utils.FileUtils.getFileExtension;
-import static vn.eledevo.vksbe.utils.FileUtils.isAllowedExtension;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,10 +36,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import vn.eledevo.vksbe.constant.DepartmentCode;
-import vn.eledevo.vksbe.constant.ResponseMessage;
-import vn.eledevo.vksbe.constant.Role;
-import vn.eledevo.vksbe.constant.RoleCodes;
+import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
@@ -82,6 +81,10 @@ public class AccountServiceImpl implements AccountService {
     @Value("${file.upload-dir}")
     @NonFinal
     String uploadDir;
+
+    @Value("${app.host}")
+    @NonFinal
+    private String appHost;
 
     private Accounts validAccount(Long id) throws ApiException {
         return accountRepository.findById(id).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
@@ -536,7 +539,7 @@ public class AccountServiceImpl implements AccountService {
         validateRole(request.getRoleId(), request.getRoleName(), errors);
         validateDepartment(request.getDepartmentId(), request.getDepartmentName(), errors);
         validateOrganization(request.getOrganizationId(), request.getOrganizationName(), errors);
-        errors.putAll(validateAvatarFile(request.getAvatar()));
+        validateAvatar(request.getAvatar(), errors);
 
         return errors;
     }
@@ -587,17 +590,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Profiles createProfile(AccountCreateRequest request) {
-        Profiles profile = Profiles.builder()
+        return Profiles.builder()
                 .fullName(request.getFullName())
+                .avatar(request.getAvatar())
                 .phoneNumber(request.getPhoneNumber())
                 .build();
-
-        String avatarUrl = saveAvatar(request.getAvatar());
-        if (Objects.nonNull(avatarUrl)) {
-            profile.setAvatar(avatarUrl);
-        }
-
-        return profile;
     }
 
     private Accounts createAccount(AccountCreateRequest request, Profiles profile) {
@@ -611,50 +608,77 @@ public class AccountServiceImpl implements AccountService {
                 .build();
     }
 
-    private String saveAvatar(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            return null;
+    public void validateAvatar(String avatarUrl, Map<String, String> errors) {
+        if (StringUtils.isBlank(avatarUrl)) {
+            return;
         }
+        String keyError = "avatar";
 
         try {
-            Path uploadPath = Files.createDirectories(Paths.get(uploadDir));
-            String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
-            Path filePath = uploadPath.resolve(uniqueFileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return AVATAR_URI + uniqueFileName;
-        } catch (IOException e) {
-            log.error("Could not save avatar", e);
-            return null;
+            URI uri = new URI(avatarUrl);
+
+            String scheme = uri.getScheme();
+            if (!"http".equals(scheme) && !"https".equals(scheme)) {
+                errors.put(keyError, AVATAR_URL_INVALID);
+                return;
+            }
+
+            String host = uri.getHost();
+            if (host == null || !appHost.contains(host)) {
+                errors.put(keyError, AVATAR_URL_INVALID);
+                return;
+            }
+
+            String path = uri.getPath();
+            if (path == null || !path.startsWith(AVATAR_URI)) {
+                errors.put(keyError, AVATAR_URL_INVALID);
+                return;
+            }
+
+            if (!isPathAllowedExtension(path, AVATAR_ALLOWED_EXTENSIONS)) {
+                errors.put(keyError, AVATAR_URL_INVALID);
+            }
+
+        } catch (URISyntaxException e) {
+            errors.put("avatar", AVATAR_URL_INVALID);
         }
     }
 
-    private String generateUniqueFileName(String originalFileName) {
-        String fileExtension = getFileExtension(originalFileName);
-        return UUID.randomUUID() + fileExtension;
+    @Override
+    public String uploadAvatar(MultipartFile file) throws ApiException, IOException {
+        validateAvatarFile(file);
+
+        Path uploadPath = Files.createDirectories(Paths.get(uploadDir));
+        String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
+        Path filePath = uploadPath.resolve(uniqueFileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return appHost + AVATAR_URI + uniqueFileName;
     }
 
-    private Map<String, String> validateAvatarFile(MultipartFile file) {
-        Map<String, String> errors = new HashMap<>();
+    @Override
+    public byte[] downloadAvatar(String fileName) throws ApiException, IOException {
+        if (fileName == null || fileName.isEmpty()) {
+            throw new ApiException(AVATAR_NOT_FOUND);
+        }
+        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+        return Files.readAllBytes(filePath);
+    }
+
+    private void validateAvatarFile(MultipartFile file) throws ApiException {
         if (file == null || file.isEmpty()) {
-            return errors;
-        }
-
-        List<String> errorMessages = new ArrayList<>();
-
-        if (file.getSize() > MAX_AVATAR_SIZE * BYTES_IN_MB) {
-            errorMessages.add(MessageFormat.format(AVATAR_MAX_SIZE, MAX_AVATAR_SIZE));
+            throw new ApiException(AVATAR_EMPTY);
         }
 
         String fileExtension = getFileExtension(file.getOriginalFilename());
         if (!isAllowedExtension(fileExtension, AVATAR_ALLOWED_EXTENSIONS)) {
-            errorMessages.add(
-                    MessageFormat.format(AVATAR_EXTENSION_INVALID, String.join(", ", AVATAR_ALLOWED_EXTENSIONS)));
+            String msg = MessageFormat.format(
+                    ErrorCode.AVATAR_EXTENSION_INVALID.getMessage(), String.join(", ", AVATAR_ALLOWED_EXTENSIONS));
+            throw new ApiException(ErrorCode.AVATAR_EXTENSION_INVALID, msg);
         }
 
-        if (!errorMessages.isEmpty()) {
-            errors.put("avatar", String.join("\n", errorMessages));
+        if (file.getSize() > MAX_AVATAR_SIZE * BYTES_IN_MB) {
+            String msg = MessageFormat.format(ErrorCode.AVATAR_MAX_SIZE.getMessage(), MAX_AVATAR_SIZE);
+            throw new ApiException(ErrorCode.AVATAR_MAX_SIZE, msg);
         }
-
-        return errors;
     }
 }

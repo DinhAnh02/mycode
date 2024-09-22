@@ -1,13 +1,20 @@
 package vn.eledevo.vksbe.service.authenticate;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.ResponseMessage;
@@ -31,12 +38,6 @@ import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.service.ChangeData;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -169,6 +170,7 @@ public class AuthenticationService {
         accountRepository.save(accountRequest);
         return ResponseMessage.CHANGE_PASSWORD_SUCCESS;
     }
+
     public AuthenticationResponse twoFactorAuthenticationRequest(TwoFactorAuthenticationRequest request)
             throws Exception {
         String employeeCode = SecurityUtils.getUserName();
@@ -188,13 +190,14 @@ public class AuthenticationService {
         if (!request.getCurrentUsbCode().equals(responseTokenUsb.getHasString().getUsbCode())) {
             throw new ApiException(ErrorCode.CHECK_USB);
         }
-        if( !request.getCurrentUsbCode().equals(usbToken.get().getUsbCode())){
+        if (!request.getCurrentUsbCode().equals(usbToken.get().getUsbCode())) {
             throw new ApiException(ErrorCode.CHECK_USB);
         }
-        if (!request.getCurrentUsbVendorCode().equals(responseTokenUsb.getHasString().getUsbVendorCode())) {
+        if (!request.getCurrentUsbVendorCode()
+                .equals(responseTokenUsb.getHasString().getUsbVendorCode())) {
             throw new ApiException(ErrorCode.CHECK_USB);
         }
-        if(!request.getCurrentUsbVendorCode().equals(usbToken.get().getUsbVendorCode())){
+        if (!request.getCurrentUsbVendorCode().equals(usbToken.get().getUsbVendorCode())) {
             throw new ApiException(ErrorCode.CHECK_USB);
         }
         checkComputerForAccount(request.getCurrentDeviceId(), accounts.get().getId());

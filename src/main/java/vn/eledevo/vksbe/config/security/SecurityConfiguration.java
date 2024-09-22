@@ -58,7 +58,7 @@ public class SecurityConfiguration {
                                 Role.PHO_PHONG.toString())
                         .requestMatchers("/api/v1/private/accounts/detail")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
-                        .requestMatchers("/api/v1/private/accounts")
+                        .requestMatchers("/api/v1/private/accounts/**")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
                         .requestMatchers("/api/v1/private/computers/disconnected")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")

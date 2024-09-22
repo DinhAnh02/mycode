@@ -2,7 +2,9 @@ package vn.eledevo.vksbe.controller;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.CHECK_ORGANIZATIONAL_STRUCTURE;
 import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
+import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +12,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -106,8 +109,7 @@ public class AccountController {
 
     @PatchMapping("/remove-usb/{accountId}/usb/{usbId}")
     @Operation(summary = "Gỡ USB kết nối với tài khoản")
-    public ApiResponse<?> removeUsb(
-            @PathVariable Long accountId, @PathVariable Long usbId) throws ApiException {
+    public ApiResponse<?> removeUsb(@PathVariable Long accountId, @PathVariable Long usbId) throws ApiException {
         return ApiResponse.ok(accountService.removeUSB(accountId, usbId));
     }
 
@@ -118,10 +120,25 @@ public class AccountController {
             throws ApiException {
         return ApiResponse.ok(accountService.activeAccount(idAccount));
     }
+
     @PatchMapping("/swap-account-status/{employeeId}/{requesterId}")
     @Operation(summary = "Hoán đổi vị trí trưởng phòng")
-    public ApiResponse<?> swapAccountSattus(
-            @PathVariable Long employeeId, @PathVariable Long requesterId) throws ApiException {
+    public ApiResponse<?> swapAccountSattus(@PathVariable Long employeeId, @PathVariable Long requesterId)
+            throws ApiException {
         return ApiResponse.ok(accountService.swapStatus(employeeId, requesterId));
+    }
+
+    @PostMapping("/upload-image")
+    @Operation(summary = "Upload avatar")
+    public ApiResponse<String> uploadAvatar(@RequestParam("file") MultipartFile file) throws ApiException, IOException {
+        return ApiResponse.ok(accountService.uploadAvatar(file));
+    }
+
+    @GetMapping("/download-image/{fileName:.+}")
+    @Operation(summary = "Download avatar")
+    public ResponseEntity<byte[]> downloadAvatar(@PathVariable String fileName) throws ApiException, IOException {
+        return ResponseEntity.ok()
+                .header("Content-Type", getContentType(fileName))
+                .body(accountService.downloadAvatar(fileName));
     }
 }
