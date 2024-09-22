@@ -71,7 +71,7 @@ public class AuthenticationService {
             }
             Optional<Usbs> universalSerialBus = usbRepository.findByAccounts_Id(account.getId());
             if (universalSerialBus.isEmpty()) {
-                throw new ApiException(ErrorCode.EX_NOT_FOUND);
+                throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
             }
             var jwtToken = jwtService.generateToken(
                     account, UUID.fromString(universalSerialBus.get().getKeyUsb()));
