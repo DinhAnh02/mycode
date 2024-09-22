@@ -14,13 +14,12 @@ import lombok.experimental.FieldDefaults;
 public class AccountResponseByFilter {
     String username;
     String fullName;
-    Long roleId;
     String roleName;
-    Long departmentId;
     String departmentName;
-    Long organizationId;
     String organizationName;
     String status;
     LocalDateTime createAt;
     LocalDateTime updateAt;
+    Boolean isIconLock;
+    Boolean isDisable;
 }

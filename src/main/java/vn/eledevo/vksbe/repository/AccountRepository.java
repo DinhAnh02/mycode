@@ -13,6 +13,7 @@ import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountProfile;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.entity.Accounts;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
@@ -51,20 +52,20 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
             Pageable pageable);
 
     @Query(
-            """
-					SELECT a.username, p.fullName, a.roles.id, r.name, a.departments.id, d.name,
-							a.status, a.createAt, a.updateAt
-					FROM Accounts a
-					JOIN a.profile p
-					JOIN a.roles r
-					JOIN a.departments d
-					WHERE (:#{#filter.username} IS NULL OR a.username like %:#{#filter.username}%)
-					AND (:#{#filter.fullName} IS NULL OR p.fullName like %:#{#filter.fullName}%)
-					AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId})
-					AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId})
-					AND (:#{#filter.status} IS NULL OR a.status = :#{#filter.status})
-					""")
-    Page<Object[]> getAccountList(AccountRequest filter, Pageable pageable);
+            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.username, p.fullName, r.name, d.name, o.name, a.status, a.createAt, a.updateAt, false , false) "
+                    + "FROM Accounts a "
+                    + "JOIN Profiles p ON p.accounts.id = a.id "
+                    + "JOIN Roles r ON r.id = a.roles.id "
+                    + "JOIN Departments d ON d.id = a.departments.id "
+                    + "JOIN Organizations o ON 1=1 "
+                    + "WHERE (:#{#filter.username} IS NULL OR a.username like %:#{#filter.username}%) "
+                    + "AND (:#{#filter.fullName} IS NULL OR p.fullName like %:#{#filter.fullName}%) "
+                    + "AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId}) "
+                    + "AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId}) "
+                    + "AND (:#{#filter.organizationId} = 0 OR o.id= :#{#filter.organizationId}) "
+                    + "AND (:#{#filter.status} IS NULL OR a.status like %:#{#filter.status}%) "
+                    + "AND a.createAt BETWEEN (:#{#filter.fromDate}) AND :#{#filter.toDate}")
+    Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Pageable pageable);
 
     @Query("SELECT new vn.eledevo.vksbe.dto.model.account.AccountInfo(a.roles.code, a.departments.id,"
             + "a.isConnectComputer, a.isConnectUsb) from Accounts a where a.username =:username")

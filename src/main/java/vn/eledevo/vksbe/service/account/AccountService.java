@@ -23,7 +23,7 @@ import vn.eledevo.vksbe.exception.ValidationException;
 public interface AccountService {
     String resetPassword(Long id) throws ApiException;
 
-    ApiResponse<Result<AccountResponseByFilter>> getListAccountByFilter(
+    Result<AccountResponseByFilter> getListAccountByFilter(
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException;
 
     ApiResponse<AccountDetailResponse> getAccountDetail(Long accountId) throws ApiException;
@@ -49,4 +49,6 @@ public interface AccountService {
     String uploadAvatar(MultipartFile file) throws ApiException, IOException;
 
     byte[] downloadAvatar(String fileName) throws ApiException, IOException;
+
+
 }
