@@ -37,8 +37,7 @@ public class SecurityConfiguration {
         "/swagger-ui/**",
         "/webjars/**",
         "/swagger-ui.html",
-        "/api/v1/auth/download",
-            "/api/v1/private/usbs/download/{username}"
+        "/api/v1/auth/download"
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -75,6 +74,8 @@ public class SecurityConfiguration {
                         .hasAuthority(Role.IT_ADMIN.name())
                         .requestMatchers("/api/v1/private/accounts/swap-account-status/{employeeId}/{requesterId}")
                         .hasAnyAuthority("IT_ADMIN", "VIEN_TRUONG", "VIEN_PHO")
+                        .requestMatchers("/api/v1/private/usbs/download/{username}")
+                        .hasAuthority(Role.IT_ADMIN.name())
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
