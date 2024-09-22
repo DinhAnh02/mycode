@@ -66,4 +66,6 @@ public class ResponseMessage {
     public static final String AVATAR_MAX_SIZE = "Ảnh đại diện không được vượt quá {0} MB.";
 
     public static final String AVATAR_EXTENSION_INVALID = "Ảnh đại diện chỉ chấp nhận định dạng {0}.";
+
+    public static final String SWAP_ACCOUNT_SUCCESS = "Hoán đổi trạng thái tài khoản thành công";
 }

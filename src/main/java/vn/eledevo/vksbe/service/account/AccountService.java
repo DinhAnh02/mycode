@@ -10,6 +10,8 @@ import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
+import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
@@ -38,7 +40,7 @@ public interface AccountService {
 
     AccountResponse activeAccount(Long id) throws ApiException;
 
-    ApiResponse<String> swapStatus(Long employeeId, Long requesterId) throws ApiException;
+    ObjectSwapResponse swapStatus(Long employeeId, Long requesterId) throws ApiException;
 
     AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException;
 }
