@@ -20,6 +20,7 @@ import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.PageResponse;
+import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.computer.ComputerService;
@@ -34,7 +35,7 @@ public class ComputerController {
 
     @GetMapping("/disconnected")
     @Operation(summary = "Lấy danh sách máy tính không liên kết với tài khoản")
-    public ApiResponse<List<ComputerResponse>> getComputerDisconnectedList(
+    public ApiResponse<Result> getComputerDisconnectedList(
             @RequestParam(required = false) String textSearch) {
         return ApiResponse.ok(computerService.getDisconnectedComputers(textSearch));
     }

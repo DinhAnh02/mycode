@@ -134,8 +134,7 @@ public class AccountServiceImpl implements AccountService {
         }
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<AccountResponseByFilter> page = accountRepository.getAccountList(accountRequest, pageable);
-        Result<AccountResponseByFilter> result = new Result<>(page.getContent(), page.getTotalElements());
-        return result;
+        return new Result<>(page.getContent(), (int) page.getTotalElements());
     }
 
     @Override
@@ -322,7 +321,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
+    public Result connectComputers(Long id, Set<Long> computerIds) throws ApiException {
         Accounts accounts = validAccount(id);
         if (!accounts.getStatus().equals(Const.ACTIVE)) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
@@ -374,7 +373,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        return computerResponses;
+        return new Result(computerResponses, computerResponses.size());
     }
 
     @Override

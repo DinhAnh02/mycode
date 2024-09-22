@@ -61,7 +61,7 @@ public class UsbServiceImpl implements UsbService {
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<UsbResponseFilter> page = usbRepository.getUsbDeviceList(usbRequest, pageable);
 
-        return new Result(page.getContent(), page.getTotalElements());
+        return new Result(page.getContent(), (int) page.getTotalElements());
     }
 
     @Override

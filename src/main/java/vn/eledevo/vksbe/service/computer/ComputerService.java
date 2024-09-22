@@ -5,6 +5,7 @@ import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.PageResponse;
+import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 
@@ -16,7 +17,7 @@ public interface ComputerService {
 
     ApiResponse updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException;
 
-    List<ComputerResponse> getDisconnectedComputers(String textSearch);
+    Result getDisconnectedComputers(String textSearch);
 
     ApiResponse<?> createComputer(ComputerRequestForCreate request) throws ApiException;
 }

@@ -23,6 +23,7 @@ import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
@@ -89,11 +90,11 @@ public class AccountController {
 
     @PatchMapping("/connect-computer/{id}/computers")
     @Operation(summary = "Kết nối tài khoản với thiết bị máy tính", description = "Kết nối tài khoản với thiết bị")
-    public ApiResponse<List<ConnectComputerResponse>> connectComputers(
-            @PathVariable Long idAccount,
-            @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
+    public ApiResponse<Result> connectComputers(
+            @PathVariable("id") Long accountId,
+            @RequestBody @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
             throws ApiException {
-        return ApiResponse.ok(accountService.connectComputers(idAccount, computerIds));
+        return ApiResponse.ok(accountService.connectComputers(accountId, computerIds));
     }
 
     @PatchMapping("/remove-usb/{accountId}/usb/{usbId}")

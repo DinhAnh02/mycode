@@ -12,5 +12,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Result<T> {
     List<T> content;
-    Long total;
+    Integer total;
 }
