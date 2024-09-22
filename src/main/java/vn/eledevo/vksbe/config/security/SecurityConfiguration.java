@@ -76,6 +76,8 @@ public class SecurityConfiguration {
                         .hasAnyAuthority("IT_ADMIN", "VIEN_TRUONG", "VIEN_PHO")
                         .requestMatchers("/api/v1/private/usbs/download/{username}")
                         .hasAuthority(Role.IT_ADMIN.name())
+                        .requestMatchers("/api/v1/private/accounts/{accountId}/remove-computer/{computerId}")
+                        .hasAuthority(Role.IT_ADMIN.name())
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
