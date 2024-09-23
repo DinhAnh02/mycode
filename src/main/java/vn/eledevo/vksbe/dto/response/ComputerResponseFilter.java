@@ -9,9 +9,13 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ListComputerResponse {
+public class ComputerResponseFilter {
+    Long id;
+    String code;
+    String brand;
+    String type;
     String name;
     String status;
     String note;
-    String fullName;
+    String accountFullName;
 }

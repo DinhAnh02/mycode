@@ -9,9 +9,9 @@ import vn.eledevo.vksbe.exception.ApiException;
 
 public interface ComputerService {
 
-    ApiResponse getComputerList(ComputerRequest computerRequest, Long currentPage, Long limit) throws ApiException;
+    Result<?> getComputerList(ComputerRequest computerRequest, Integer currentPage, Integer limit) throws ApiException;
 
-    ApiResponse updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException;
+    String updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException;
 
     Result getDisconnectedComputers(String textSearch);
 

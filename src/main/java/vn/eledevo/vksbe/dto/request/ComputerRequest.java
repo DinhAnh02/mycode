@@ -12,7 +12,5 @@ import lombok.experimental.FieldDefaults;
 public class ComputerRequest {
     String name;
     String status;
-    String computerCode;
-    String fullName;
-    String note;
+    String accountFullName;
 }

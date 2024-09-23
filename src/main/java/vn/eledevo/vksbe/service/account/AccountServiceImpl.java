@@ -286,7 +286,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Result connectComputers(Long id, Set<Long> computerIds) throws ApiException {
+    public Result<?> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
         Accounts accounts = validAccount(id);
         if (!accounts.getStatus().equals(Const.ACTIVE)) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
@@ -342,7 +342,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        return new Result(computerResponses, computerResponses.size());
+        return new Result<>(computerResponses, computerResponses.size());
     }
 
     @Override
