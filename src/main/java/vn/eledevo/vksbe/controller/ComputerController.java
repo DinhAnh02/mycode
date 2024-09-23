@@ -39,21 +39,16 @@ public class ComputerController {
 
     @PatchMapping("/update/computer-info/{id}")
     @Operation(summary = "Chỉnh sửa thông tin máy tính")
-    public ApiResponse<?> updateComputer(
+    public ApiResponse<String> updateComputer(
             @Valid @PathVariable("id") Long id, @RequestBody ComputersModel computerRequest, BindingResult result)
             throws ApiException {
-        try {
-            if (result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors().stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                throw new ApiException(UNCATEGORIZED_EXCEPTION, String.join(", ", errorMessages));
-            }
-            computerService.updateComputer(id, computerRequest);
-            return ApiResponse.ok("Cập nhật thành công");
-        } catch (ApiException e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+        if (result.hasErrors()) {
+            List<String> errorMessages = result.getFieldErrors().stream()
+                    .map(FieldError::getDefaultMessage)
+                    .toList();
+            throw new ApiException(UNCATEGORIZED_EXCEPTION, String.join(", ", errorMessages));
         }
+        return ApiResponse.ok(computerService.updateComputer(id, computerRequest));
     }
 
     @PostMapping("/create/computer-info")
@@ -64,9 +59,9 @@ public class ComputerController {
 
     @PostMapping("")
     @Operation(summary = "Xem danh sách thiết bị máy tính")
-    public ApiResponse<?> getComputerList(
-            @RequestParam(required = false, defaultValue = "1") Long currentPage,
-            @RequestParam(required = false, defaultValue = "10") Long limit,
+    public ApiResponse<Result<?>> getComputerList(
+            @RequestParam(required = false, defaultValue = "1") Integer currentPage,
+            @RequestParam(required = false, defaultValue = "10") Integer limit,
             @RequestBody ComputerRequest computerRequest)
             throws ApiException {
         return ApiResponse.ok(computerService.getComputerList(computerRequest, currentPage, limit));

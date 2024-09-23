@@ -49,7 +49,7 @@ public class UsbServiceImpl implements UsbService {
     AccountRepository accountRepository;
 
     @Override
-    public Result getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit) throws ApiException {
+    public Result<?> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit) throws ApiException {
         if (usbRequest.getFromDate() == null) {
             usbRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
         }
@@ -62,7 +62,7 @@ public class UsbServiceImpl implements UsbService {
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<UsbResponseFilter> page = usbRepository.getUsbDeviceList(usbRequest, pageable);
 
-        return new Result(page.getContent(), (int) page.getTotalElements());
+        return new Result<>(page.getContent(), (int) page.getTotalElements());
     }
 
     @Override

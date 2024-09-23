@@ -15,17 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
-import vn.eledevo.vksbe.dto.response.ListComputerResponse;
+import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
-import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 
 @Service
@@ -33,49 +33,37 @@ import vn.eledevo.vksbe.repository.ComputerRepository;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComputerServiceImpl implements ComputerService {
     ComputerRepository computerRepository;
-    AccountRepository accountRepository;
     ComputerMapper computerMapper;
 
     @Override
-    public ApiResponse<List<ListComputerResponse>> getComputerList(
-            ComputerRequest computerRequest, Long currentPage, Long limit) throws ApiException {
-        try {
-            Pageable pageable = PageRequest.of(currentPage.intValue(), limit.intValue());
-            Page<ListComputerResponse> responsePage = computerRepository.getComputerList(computerRequest, pageable);
-            List<ListComputerResponse> listComputerResponses =
-                    responsePage.getContent().stream().toList();
-            return ApiResponse.ok(listComputerResponses);
-        } catch (Exception e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
-        }
+    public Result<?> getComputerList(ComputerRequest computerRequest, Integer currentPage, Integer limit) {
+        Pageable pageable = PageRequest.of(currentPage - 1, limit);
+        Page<ComputerResponseFilter> page = computerRepository.getComputerList(computerRequest, pageable);
+        return new Result<>(page.getContent(), (int) page.getTotalElements());
     }
 
     @Override
-    public ApiResponse updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException {
-        try {
-            Computers exitstingComputer =
-                    computerRepository.findById(computerId).orElseThrow(() -> new ApiException(DEVICE_NOT_EXIST));
-            if (computerRepository.existsByName(computerRequest.getName())) {
-                throw new ApiException(DEVICE_NOT_EXIST);
-            }
-
-            exitstingComputer.setName(computerRequest.getName());
-            exitstingComputer.setBrand(computerRequest.getBrand());
-            exitstingComputer.setType(computerRequest.getType());
-            exitstingComputer.setNote(computerRequest.getNote());
-            computerRepository.save(exitstingComputer);
-            return new ApiResponse(200, "Cập nhật thành công");
-        } catch (Exception e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+    public String updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException {
+        Computers exitstingComputer =
+                computerRepository.findById(computerId).orElseThrow(() -> new ApiException(DEVICE_NOT_EXIST));
+        if (computerRepository.existsByName(computerRequest.getName())) {
+            throw new ApiException(DEVICE_NOT_EXIST);
         }
+
+        exitstingComputer.setName(computerRequest.getName());
+        exitstingComputer.setBrand(computerRequest.getBrand());
+        exitstingComputer.setType(computerRequest.getType());
+        exitstingComputer.setNote(computerRequest.getNote());
+        computerRepository.save(exitstingComputer);
+        return ResponseMessage.UPDATE_COMPUTER_INFOR_SUCCESS;
     }
 
     @Override
-    public Result getDisconnectedComputers(String textSearch) {
+    public Result<?> getDisconnectedComputers(String textSearch) {
         String keyword =
                 StringUtils.isBlank(textSearch) ? null : textSearch.trim().toLowerCase();
         List<Computers> computersList = computerRepository.getByTextSearchAndAccountsIsNull(keyword);
-        return new Result(computerMapper.toListResponse(computersList), computersList.size());
+        return new Result<>(computerMapper.toListResponse(computersList), computersList.size());
     }
 
     @Override

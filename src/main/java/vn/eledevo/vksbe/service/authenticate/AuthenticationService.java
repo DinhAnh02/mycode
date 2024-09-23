@@ -132,7 +132,7 @@ public class AuthenticationService {
         if (!account.getStatus().equals("ACTIVE")) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
         }
-        if (!Boolean.FALSE.equals(account.getIsConditionLogin2())) {
+        if (Boolean.FALSE.equals(account.getIsConditionLogin2())) {
             return null;
         }
         if (!pinRequest.getPin().equals(pinRequest.getPin2())) {
@@ -140,7 +140,7 @@ public class AuthenticationService {
         }
         String hashedPin = passwordEncoder.encode(pinRequest.getPin2());
         account.setPin(hashedPin);
-        account.setIsConditionLogin2(Boolean.TRUE);
+        account.setIsConditionLogin2(Boolean.FALSE);
         accountRepository.save(account);
 
         return ResponseMessage.CREATE_PIN_SUCCESS;
@@ -154,7 +154,7 @@ public class AuthenticationService {
         if (!accountRequest.getStatus().equals("ACTIVE")) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
         }
-        if (!Boolean.FALSE.equals(accountRequest.getIsConditionLogin1())) {
+        if (Boolean.FALSE.equals(accountRequest.getIsConditionLogin1())) {
             return null;
         }
         if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
@@ -167,7 +167,7 @@ public class AuthenticationService {
             throw new ApiException(CONFIRM_PASSWORD_FAILURE);
         }
         accountRequest.setPassword(passwordEncoder.encode(request.getConfirmPassword()));
-        accountRequest.setIsConditionLogin1(Boolean.TRUE);
+        accountRequest.setIsConditionLogin1(Boolean.FALSE);
         accountRepository.save(accountRequest);
         return ResponseMessage.CHANGE_PASSWORD_SUCCESS;
     }

@@ -94,7 +94,7 @@ public class AccountController {
 
     @PatchMapping("/connect-computer/{id}/computers")
     @Operation(summary = "Kết nối tài khoản với thiết bị máy tính", description = "Kết nối tài khoản với thiết bị")
-    public ApiResponse<Result> connectComputers(
+    public ApiResponse<Result<?>> connectComputers(
             @PathVariable("id") Long accountId,
             @RequestBody @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
             throws ApiException {

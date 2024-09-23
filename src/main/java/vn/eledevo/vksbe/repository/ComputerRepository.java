@@ -9,19 +9,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
-import vn.eledevo.vksbe.dto.response.ListComputerResponse;
+import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
 import vn.eledevo.vksbe.entity.Computers;
 
 public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<Computers> findByAccounts_Id(Long accountId);
 
-    @Query("SELECT c.name, c.status, c.note, p.fullName " + "FROM Computers c "
-            + "JOIN Accounts a ON c.accounts.id = a.id "
-            + "JOIN Profiles p ON a.id = p.accounts.id "
-            + "WHERE (:#{#computerRequest.computerCode} IS NULL OR c.name LIKE %:#{#computerRequest.computerCode}%) "
-            + "AND (:#{#computerRequest.fullName} IS NULL OR p.fullName LIKE %:#{#computerRequest.fullName}%) "
-            + "AND (:#{#computerRequest.status} IS NULL OR c.status = :#{#computerRequest.status})")
-    Page<ListComputerResponse> getComputerList(ComputerRequest computerRequest, Pageable pageable);
+    @Query("SELECT new vn.eledevo.vksbe.dto.response.ComputerResponseFilter(c.id, c.code, c.brand, c.type, c.name, c.status, c.note, p.fullName) " +
+            "FROM Computers c " +
+            "LEFT JOIN Accounts a ON c.accounts.id = a.id " +
+            "LEFT JOIN Profiles p ON p.accounts.id = a.id " +
+            "WHERE (:#{#computerRequest.name} IS NULL OR COALESCE(c.name, '') LIKE %:#{#computerRequest.name}%) " +
+            "AND (:#{#computerRequest.accountFullName} IS NULL OR COALESCE(p.fullName, '') LIKE %:#{#computerRequest.accountFullName}%) " +
+            "AND (:#{#computerRequest.status} IS NULL OR :#{#computerRequest.status} = '' OR COALESCE(c.status, '') = :#{#computerRequest.status})")
+    Page<ComputerResponseFilter> getComputerList(ComputerRequest computerRequest, Pageable pageable);
 
     @Query("SELECT c FROM Computers c "
             + "WHERE (((COALESCE(:textSearch, NULL) IS NULL ) "
