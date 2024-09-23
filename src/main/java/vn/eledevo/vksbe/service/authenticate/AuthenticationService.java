@@ -50,6 +50,7 @@ public class AuthenticationService {
     final PasswordEncoder passwordEncoder;
     final JwtService jwtService;
     final AuthenticationManager authenticationManager;
+
     /**
      * Đăng ký người dùng mới vào hệ thống.
      *
@@ -74,7 +75,7 @@ public class AuthenticationService {
                 throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
             }
             var jwtToken = jwtService.generateToken(
-                    account, UUID.fromString(universalSerialBus.get().getKeyUsb()));
+                    account, UUID.fromString(universalSerialBus.get().getKeyUsb()), account.getRoles().getCode());
             // Hủy tất cả các token hiện có của người dùng
             revokeAllUserTokens(account);
             // Lưu token truy cập mới vào cơ sở dữ liệu
@@ -93,7 +94,7 @@ public class AuthenticationService {
     /**
      * Lưu token truy cập cho người dùng vào cơ sở dữ liệu.
      *
-     * @param account     Đối tượng User
+     * @param account  Đối tượng User
      * @param jwtToken Token truy cập JWT
      */
     private void saveUserToken(Accounts account, String jwtToken, String type) {
@@ -200,11 +201,14 @@ public class AuthenticationService {
         if (!request.getCurrentUsbVendorCode().equals(usbToken.get().getUsbVendorCode())) {
             throw new ApiException(ErrorCode.CHECK_USB);
         }
-        checkComputerForAccount(request.getCurrentDeviceId(), accounts.get().getId());
+        Boolean isCheck = checkRoleItAdmin(accounts.get().getRoles().getCode());
+        if (Boolean.FALSE.equals(isCheck)) {
+            checkComputerForAccount(request.getCurrentDeviceId(), accounts.get().getId());
+        }
         UserInfo userInfo =
                 accountRepository.findAccountProfileById(accounts.get().getId());
         var jwtToken = jwtService.generateToken(
-                accounts.get(), UUID.fromString(usbToken.get().getKeyUsb()));
+                accounts.get(), UUID.fromString(usbToken.get().getKeyUsb()), accounts.get().getRoles().getCode());
         // Hủy tất cả các token hiện có của người dùng
         revokeAllUserTokens(accounts.get());
         // Lưu token truy cập mới vào cơ sở dữ liệu
