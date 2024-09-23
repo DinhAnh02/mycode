@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
 import org.springframework.http.ResponseEntity;
@@ -21,13 +22,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
-import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructureService;
 
@@ -66,7 +68,9 @@ public class AccountController {
     @PostMapping()
     @Operation(summary = "Xem danh sách tài khoản")
     public ApiResponse<?> getAccountList(
-            @RequestBody AccountRequest req, @RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer limit)
+            @RequestBody AccountRequest req,
+            @RequestParam(defaultValue = "1") Integer currentPage,
+            @RequestParam(defaultValue = "10") Integer limit)
             throws ApiException {
         organizationalStructureUtilsService.validate(req);
         return ApiResponse.ok(accountService.getListAccountByFilter(req, currentPage, limit));
@@ -130,6 +134,13 @@ public class AccountController {
         return ResponseEntity.ok()
                 .header("Content-Type", getContentType(fileName))
                 .body(accountService.downloadAvatar(fileName));
+    }
+
+    @PostMapping("/create")
+    @Operation(summary = "Tạo mới tài khoản")
+    public ApiResponse<AccountResponse> createAccount(@RequestBody @Valid AccountCreateRequest request)
+            throws ApiException, ValidationException {
+        return ApiResponse.ok(accountService.createAccountInfo(request));
     }
 
     @GetMapping("/{accountId}/remove-computer/{computerId}")

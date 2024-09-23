@@ -13,20 +13,14 @@ import vn.eledevo.vksbe.dto.response.ListComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 
 public interface ComputerRepository extends BaseRepository<Computers, Long> {
-    @Query(value = "Select c from computers c where c.accounts.id = :accountId", nativeQuery = true)
-    List<Computers> findByAccountId(Long accountId);
-
     List<Computers> findByAccounts_Id(Long accountId);
 
-    @Query(
-            value = "SELECT c.name, c.status, c.note, p.full_name " +
-                    "FROM computers c " +
-                    "JOIN accounts a ON c.account_id = a.id " +
-                    "JOIN profiles p ON a.id = p.account_id " +
-                    "WHERE (:#{#computerRequest.usbCode} IS NULL OR c.name LIKE %:#{#computerRequest.computerCode}%) " +
-                    "AND (:#{#computerRequest.fullName} IS NULL OR p.full_name LIKE %:#{#computerRequest.fullName}%) " +
-                    "AND (:#{#computerRequest.status} IS NULL OR c.status = :#{#computerRequest.status})",
-            nativeQuery = true)
+    @Query("SELECT c.name, c.status, c.note, p.fullName " + "FROM Computers c "
+            + "JOIN Accounts a ON c.accounts.id = a.id "
+            + "JOIN Profiles p ON a.id = p.accounts.id "
+            + "WHERE (:#{#computerRequest.computerCode} IS NULL OR c.name LIKE %:#{#computerRequest.computerCode}%) "
+            + "AND (:#{#computerRequest.fullName} IS NULL OR p.fullName LIKE %:#{#computerRequest.fullName}%) "
+            + "AND (:#{#computerRequest.status} IS NULL OR c.status = :#{#computerRequest.status})")
     Page<ListComputerResponse> getComputerList(ComputerRequest computerRequest, Pageable pageable);
 
     @Query("SELECT c FROM Computers c "

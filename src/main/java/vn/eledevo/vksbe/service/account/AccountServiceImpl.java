@@ -2,7 +2,8 @@ package vn.eledevo.vksbe.service.account;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_URL_INVALID;
+import static vn.eledevo.vksbe.constant.ResponseMessage.SWAP_ACCOUNT_SUCCESS;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_PHO;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_TRUONG;
 import static vn.eledevo.vksbe.utils.FileUtils.*;
@@ -497,7 +498,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         Departments curLoginDepartment = departmentRepository.findByAccountId(curLoginAcc.getId());
-        return !Objects.equals(curLoginDepartment.getCode(), DepartmentCode.PB_KY_THUAT.name());
+        return Objects.equals(curLoginDepartment.getCode(), DepartmentCode.PB_KY_THUAT.name());
     }
 
     private Map<String, String> validateAccountCreateRequest(AccountCreateRequest request) {

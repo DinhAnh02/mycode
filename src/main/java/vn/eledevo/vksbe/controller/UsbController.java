@@ -1,29 +1,28 @@
 package vn.eledevo.vksbe.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.usb.UsbService;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/private/usbs")
@@ -43,6 +42,7 @@ public class UsbController {
             throws ApiException {
         return ApiResponse.ok(usbService.getUsbByFilter(usbRequest, currentPage, limit));
     }
+
     @GetMapping("/download/{username}")
     public ResponseEntity<InputStreamResource> createUsbToken(@PathVariable String username) throws Exception {
         String zipFilePath = usbService.createUsbToken(username);

@@ -15,7 +15,6 @@ import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
-import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
@@ -49,6 +48,4 @@ public interface AccountService {
     String uploadAvatar(MultipartFile file) throws ApiException, IOException;
 
     byte[] downloadAvatar(String fileName) throws ApiException, IOException;
-
-
 }
