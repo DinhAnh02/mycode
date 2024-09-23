@@ -29,9 +29,9 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     @Operation(summary = "Đăng nhập")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request)
+    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request)
             throws ApiException {
-        return ResponseEntity.ok(service.authenticate(request));
+        return ApiResponse.ok(service.authenticate(request));
     }
 
     //    @PostMapping("/refresh-token")
@@ -40,9 +40,9 @@ public class AuthenticationController {
     //    }
 
     @PostMapping("/2FA")
-    public ResponseEntity<AuthenticationResponse> twoFactorAuthentication(
+    public ApiResponse<AuthenticationResponse> twoFactorAuthentication(
             @RequestBody TwoFactorAuthenticationRequest request) throws Exception {
-        return ResponseEntity.ok(service.twoFactorAuthenticationRequest(request));
+        return ApiResponse.ok(service.twoFactorAuthenticationRequest(request));
     }
 
     @PatchMapping("/create-pin")
