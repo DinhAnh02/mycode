@@ -67,8 +67,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Access token JWT
      */
-    public String generateToken(UserDetails userDetails, UUID keyUsb) {
-        return generateToken(new HashMap<>(), userDetails, keyUsb);
+    public String generateToken(UserDetails userDetails, UUID keyUsb,String role) {
+        return generateToken(new HashMap<>(), userDetails, keyUsb,role);
     }
 
     /**
@@ -78,8 +78,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Access token JWT
      */
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, UUID keyUsb) {
-        return buildToken(extraClaims, userDetails, jwtExpiration, keyUsb);
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, UUID keyUsb,String role) {
+        return buildToken(extraClaims, userDetails, jwtExpiration, keyUsb,role);
     }
 
     /**
@@ -88,8 +88,8 @@ public class JwtService {
      * @param userDetails Thông tin của người dùng
      * @return Refresh token JWT
      */
-    public String generateRefreshToken(UserDetails userDetails, UUID keyUsb) {
-        return buildToken(new HashMap<>(), userDetails, refreshExpiration, keyUsb);
+    public String generateRefreshToken(UserDetails userDetails, UUID keyUsb,String role) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration, keyUsb,role);
     }
 
     /**
@@ -105,8 +105,10 @@ public class JwtService {
             Map<String, Object> extraClaims, // Đối tượng map
             UserDetails userDetails, // Đối tượng là userDetails
             long expiration, // Thời gian tồn tại của token
-            UUID keyUsb) {
+            UUID keyUsb,
+            String role) {
         extraClaims.put("keyUsb", keyUsb);
+        extraClaims.put("role",role);
         return Jwts.builder()
                 .setClaims(extraClaims) // Khởi tạo 1 object payload
                 // thêm các giá trị vào bên trong payload
