@@ -1,27 +1,6 @@
 package vn.eledevo.vksbe.service.usb;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.dto.request.AccountInactive;
-import vn.eledevo.vksbe.dto.request.DataChange;
-import vn.eledevo.vksbe.dto.request.UsbRequest;
-import vn.eledevo.vksbe.dto.response.Result;
-import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
-import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Computers;
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.repository.AccountRepository;
-import vn.eledevo.vksbe.repository.UsbRepository;
-import vn.eledevo.vksbe.service.ChangeData;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 import java.io.*;
 import java.net.URL;
@@ -37,7 +16,29 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import vn.eledevo.vksbe.constant.ErrorCode;
+import vn.eledevo.vksbe.dto.request.AccountInactive;
+import vn.eledevo.vksbe.dto.request.DataChange;
+import vn.eledevo.vksbe.dto.request.UsbRequest;
+import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
+import vn.eledevo.vksbe.entity.Accounts;
+import vn.eledevo.vksbe.entity.Computers;
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.repository.AccountRepository;
+import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.service.ChangeData;
 
 @Service
 @RequiredArgsConstructor
@@ -74,9 +75,8 @@ public class UsbServiceImpl implements UsbService {
             Optional<Accounts> acc = accountRepository.findById(account.get().getId());
             if (acc.isPresent()) {
                 List<Computers> computers = acc.get().getComputers();
-                String[] computerNames = computers.stream()
-                        .map(Computers::getName)
-                        .toArray(String[]::new);
+                String[] computerNames =
+                        computers.stream().map(Computers::getName).toArray(String[]::new);
                 DataChange usbInfoToEncrypt = DataChange.builder()
                         .maPin(acc.get().getPin())
                         .keyUsb(acc.get().getUsb().getKeyUsb())
@@ -91,10 +91,10 @@ public class UsbServiceImpl implements UsbService {
                 // ghi đè vào file setup.vks
                 writeToFile(encryptedData);
 
-                //zip file
+                // zip file
                 zipFiles();
 
-                //delete folder unzipped
+                // delete folder unzipped
                 deleteDirectory(Paths.get(unzippedFolderPath));
                 return zipFilePath;
             }
@@ -148,7 +148,7 @@ public class UsbServiceImpl implements UsbService {
         String zipFilePath = "src/AppUsb/setup.zip";
 
         try (FileOutputStream fos = new FileOutputStream(zipFilePath);
-             ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+                ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
             // Nén từng file trong thư mục
             File folder = new File(sourceFolder);
@@ -200,14 +200,13 @@ public class UsbServiceImpl implements UsbService {
     private void deleteDirectory(Path path) throws IOException {
         if (Files.exists(path)) {
             try (Stream<Path> paths = Files.walk(path)) {
-                paths.sorted((p1, p2) -> p2.compareTo(p1))
-                        .forEach(p -> {
-                            try {
-                                Files.delete(p);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
+                paths.sorted((p1, p2) -> p2.compareTo(p1)).forEach(p -> {
+                    try {
+                        Files.delete(p);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         }
     }

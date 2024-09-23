@@ -1,12 +1,10 @@
 package vn.eledevo.vksbe.dto.model.usb;
 
-import lombok.AllArgsConstructor;
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import vn.eledevo.vksbe.entity.Computers;
-
-import java.util.List;
 
 @Setter
 @Getter
