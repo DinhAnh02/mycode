@@ -288,10 +288,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Result<?> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
         Accounts accounts = validAccount(id);
-        if (!accounts.getStatus().equals(Const.ACTIVE)) {
-            throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
-        }
-
         List<ConnectComputerResponse> computerResponses = new ArrayList<>();
         if (!CollectionUtils.isEmpty(computerIds)) {
             List<Computers> computers = computerRepository.findByIdIn(computerIds);
