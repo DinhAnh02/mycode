@@ -13,11 +13,15 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
+import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
 import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
+import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -55,5 +59,10 @@ public class AuthenticationController {
     @Operation(summary = "Đổi mật khẩu thành tài khoản")
     public ApiResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest request) throws ApiException {
         return ApiResponse.ok(service.changePassword(request));
+    }
+
+    @PostMapping("/createAccountTest")
+    public ApiResponse<CreateAccountTest> createAccountTest(@RequestBody CreateAccountTest createAccountTest){
+        return ApiResponse.ok(service.createAccountTest(createAccountTest));
     }
 }

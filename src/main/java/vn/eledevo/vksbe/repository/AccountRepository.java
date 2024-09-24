@@ -18,8 +18,8 @@ import vn.eledevo.vksbe.entity.Accounts;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
     @Query(
-            "SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username and a.status = 'ACTIVE'")
-    Optional<Accounts> findByUsernameAndActive(String username);
+            "SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username")
+    Optional<Accounts> findAccountInSystem(String username);
 
     @Query(
             "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.id, a.username, p.fullName, r.name, d.name, o.name, a.status, a.createAt, a.updateAt, false , false) "

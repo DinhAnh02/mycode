@@ -24,6 +24,7 @@ import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
+import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
 import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.dto.response.Token2FAResponse;
@@ -61,18 +62,21 @@ public class AuthenticationService {
         // Xác thực thông tin đăng nhập của người dùng
         try {
             var account = accountRepository
-                    .findByUsernameAndActive(request.getUsername())
+                    .findAccountInSystem(request.getUsername())
                     .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            if(!account.getStatus().equals("ACTIVE")){
+               throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
+            }
             Boolean isCheck = checkRoleItAdmin(account.getRoles().getCode());
             if (Boolean.FALSE.equals(isCheck)) {
                 checkComputerForAccount(request.getCurrentDeviceId(), account.getId());
             }
             Optional<Usbs> universalSerialBus = usbRepository.findByAccounts_Id(account.getId());
             if (universalSerialBus.isEmpty()) {
-                throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
+                throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
             }
             var jwtToken = jwtService.generateToken(
                     account, UUID.fromString(universalSerialBus.get().getKeyUsb()), account.getRoles().getCode());
@@ -127,7 +131,7 @@ public class AuthenticationService {
     public String createPin(pinRequest pinRequest) throws ApiException {
         String username = SecurityUtils.getUserName();
         Accounts account = accountRepository
-                .findByUsernameAndActive(username)
+                .findAccountInSystem(username)
                 .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         if (!account.getStatus().equals("ACTIVE")) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
@@ -149,7 +153,7 @@ public class AuthenticationService {
     public String changePassword(ChangePasswordRequest request) throws ApiException {
         String userName = SecurityUtils.getUserName();
         Accounts accountRequest = accountRepository
-                .findByUsernameAndActive(userName)
+                .findAccountInSystem(userName)
                 .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         if (!accountRequest.getStatus().equals("ACTIVE")) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
@@ -179,9 +183,12 @@ public class AuthenticationService {
         if (responseTokenUsb.getExpireTime() > System.currentTimeMillis()) {
             throw new ApiException(ErrorCode.TOKEN_EXPIRE);
         }
-        Optional<Accounts> accounts = accountRepository.findByUsernameAndActive(employeeCode);
+        Optional<Accounts> accounts = accountRepository.findAccountInSystem(employeeCode);
         if (accounts.isEmpty()) {
             throw new ApiException(ErrorCode.USER_NOT_EXIST);
+        }
+        if(accounts.get().getStatus().equals("ACTIVE")){
+            throw new ApiException(CHECK_ACTIVE_ACCOUNT);
         }
         Optional<Usbs> usbToken =
                 usbRepository.usbByAccountAndConnect(accounts.get().getId());
@@ -235,5 +242,11 @@ public class AuthenticationService {
         if (Boolean.FALSE.equals(deviceExists)) {
             throw new ApiException(ErrorCode.COMPUTER_NOT_CONNECT_TO_ACCOUNT);
         }
+    }
+
+    public CreateAccountTest createAccountTest(CreateAccountTest createAccountTest) {
+        createAccountTest.setPassword(passwordEncoder.encode(createAccountTest.getPassword()));
+        createAccountTest.setPinCode(passwordEncoder.encode(createAccountTest.getPinCode()));
+        return createAccountTest;
     }
 }
