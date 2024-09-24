@@ -187,7 +187,7 @@ public class AuthenticationService {
         if (accounts.isEmpty()) {
             throw new ApiException(ErrorCode.USER_NOT_EXIST);
         }
-        if(accounts.get().getStatus().equals("ACTIVE")){
+        if(!accounts.get().getStatus().equals("ACTIVE")){
             throw new ApiException(CHECK_ACTIVE_ACCOUNT);
         }
         Optional<Usbs> usbToken =
