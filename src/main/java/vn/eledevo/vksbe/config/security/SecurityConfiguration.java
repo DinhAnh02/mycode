@@ -26,6 +26,7 @@ public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
         "/api/v1/auth/authenticate",
+        "/api/v1/auth/createAccountTest",
         "/api/v1/private/categories/getAll",
         "/v2/api-docs",
         "/v3/api-docs",
@@ -37,7 +38,7 @@ public class SecurityConfiguration {
         "/swagger-ui/**",
         "/webjars/**",
         "/swagger-ui.html",
-        "/api/v1/auth/download"
+        "/api/v1/auth/download",
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -56,9 +57,10 @@ public class SecurityConfiguration {
                                 Role.VIEN_TRUONG.toString(),
                                 Role.TRUONG_PHONG.toString(),
                                 Role.PHO_PHONG.toString())
-//                        .requestMatchers("/api/v1/private/accounts/detail")
-//                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
-                        .requestMatchers("/api/v1/private/accounts/**","/api/v1/private/accounts/detail")
+                        //                        .requestMatchers("/api/v1/private/accounts/detail")
+                        //                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG",
+                        // "PHO_PHONG", "IT_ADMIN")
+                        .requestMatchers("/api/v1/private/accounts/**", "/api/v1/private/accounts/detail")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
                         .requestMatchers("/api/v1/private/computers/disconnected")
                         .hasAnyAuthority(Role.IT_ADMIN.name())
