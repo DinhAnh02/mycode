@@ -60,8 +60,7 @@ public class AccountController {
 
     @GetMapping("/detail/{id}")
     @Operation(summary = "Xem chi tiết thông tin tài khoản")
-    public ApiResponse<AccountDetailResponse> getAccountDetail(@PathVariable Long id)
-            throws ApiException {
+    public ApiResponse<AccountDetailResponse> getAccountDetail(@PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getAccountDetail(id));
     }
 
@@ -108,15 +107,15 @@ public class AccountController {
     }
 
     @PatchMapping("/{idAccount}/activate")
-    @Operation(summary = "Active tài khoản")
-    public ApiResponse<AccountResponse> activateAccount(
+    @Operation(summary = "Kích hoạt tài khoản")
+    public ApiResponse<String> activateAccount(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long idAccount)
             throws ApiException {
         return ApiResponse.ok(accountService.activeAccount(idAccount));
     }
 
     @PatchMapping("/swap-account-status/{employeeId}/{requesterId}")
-    @Operation(summary = "Hoán đổi vị trí trưởng phòng")
+    @Operation(summary = "Hoán đổi vị trí trưởng phòng/viện trưởng")
     public ApiResponse<?> swapAccountSattus(@PathVariable Long employeeId, @PathVariable Long requesterId)
             throws ApiException {
         return ApiResponse.ok(accountService.swapStatus(employeeId, requesterId));
@@ -145,8 +144,8 @@ public class AccountController {
 
     @GetMapping("/{accountId}/remove-computer/{computerId}")
     @Operation(summary = "Gỡ thiết bị máy tính đã liên kết với tài khoản")
-    public ResponseEntity<ApiResponse<String>> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
-            throws ApiException {
+    public ResponseEntity<ApiResponse<String>> removeComputer(
+            @PathVariable Long accountId, @PathVariable Long computerId) throws ApiException {
         return ResponseEntity.ok(accountService.removeConnectComputer(accountId, computerId));
     }
 }
