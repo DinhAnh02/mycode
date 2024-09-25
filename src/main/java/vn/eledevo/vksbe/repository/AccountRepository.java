@@ -33,7 +33,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
                     + "AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId}) "
                     + "AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId}) "
                     + "AND (:#{#filter.organizationId} = 0 OR o.id= :#{#filter.organizationId}) "
-                    + "AND (:#{#filter.status} IS NULL OR a.status like %:#{#filter.status}%) "
+                    + "AND (:#{#filter.status} IS NULL OR a.status = :#{#filter.status}) "
                     + "AND a.createAt BETWEEN (:#{#filter.fromDate}) AND :#{#filter.toDate}")
     Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Pageable pageable);
 

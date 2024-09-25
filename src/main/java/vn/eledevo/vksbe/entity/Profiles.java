@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.utils.SecurityUtils;
@@ -23,6 +24,8 @@ public class Profiles {
 
     String fullName;
     String phoneNumber;
+
+    @Size(max = 1000)
     String avatar;
     String gender;
     LocalDateTime createAt;
