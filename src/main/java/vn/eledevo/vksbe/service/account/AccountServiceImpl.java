@@ -312,7 +312,7 @@ public class AccountServiceImpl implements AccountService {
                                 .id(computer.getId())
                                 .name(computer.getName())
                                 .code(computer.getCode())
-                                .message("Kế nối thiết bị thành công")
+                                .message("Kết nối thiết bị thành công")
                                 .build());
                         computer.setAccounts(accounts);
                         computer.setStatus(Const.CONNECTED);
