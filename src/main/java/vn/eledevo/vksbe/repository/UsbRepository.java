@@ -21,7 +21,7 @@ public interface UsbRepository extends BaseRepository<Usbs, Long> {
                     + "WHERE (COALESCE(u.usbCode, '') LIKE %:#{#usbRequest.usbCode}% OR :#{#usbRequest.usbCode} IS NULL) "
                     + "AND (COALESCE(p.fullName, '') LIKE %:#{#usbRequest.createByAccountName}% OR :#{#usbRequest.createByAccountName} IS NULL) "
                     + "AND (:#{#usbRequest.status}='' OR COALESCE(u.status, '') = :#{#usbRequest.status} OR :#{#usbRequest.status} IS NULL) "
-                    + "AND u.createAt BETWEEN :#{#usbRequest.fromDate} AND :#{#usbRequest.toDate}")
+                    + "AND DATE(u.createAt) BETWEEN DATE(:#{#usbRequest.fromDate}) AND DATE(:#{#usbRequest.toDate})")
     Page<UsbResponseFilter> getUsbDeviceList(UsbRequest usbRequest, Pageable pageable);
 
     @Query(

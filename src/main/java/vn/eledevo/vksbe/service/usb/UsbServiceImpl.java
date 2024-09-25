@@ -8,7 +8,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -51,10 +51,10 @@ public class UsbServiceImpl implements UsbService {
     @Override
     public Result<?> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit) throws ApiException {
         if (usbRequest.getFromDate() == null) {
-            usbRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
+            usbRequest.setFromDate(LocalDate.of(1900, 1, 1));
         }
         if (usbRequest.getToDate() == null) {
-            usbRequest.setToDate(LocalDateTime.now());
+            usbRequest.setToDate(LocalDate.now());
         }
         if (usbRequest.getFromDate().isAfter(usbRequest.getToDate())) {
             throw new ApiException(ErrorCode.CHECK_FROM_DATE);

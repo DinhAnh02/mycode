@@ -1,9 +1,9 @@
 package vn.eledevo.vksbe.dto.request;
 
-import java.time.LocalDateTime;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,6 +15,6 @@ public class UsbRequest {
     String usbCode;
     String createByAccountName;
     String status;
-    LocalDateTime fromDate;
-    LocalDateTime toDate;
+    LocalDate fromDate;
+    LocalDate toDate;
 }
