@@ -33,7 +33,7 @@ public class OrganizationalStructureService {
                         req.getDepartmentId(), req.getDepartmentName()))) {
             throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
         }
-        if (!Objects.equals(req.getDepartmentName(), "")
+        if (!Objects.equals(req.getOrganizationName(), "")
                 && Boolean.FALSE.equals(organizationService.organizationNameChangeDetector(
                         req.getOrganizationId(), req.getOrganizationName()))) {
             throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
