@@ -1,8 +1,7 @@
 package vn.eledevo.vksbe.controller;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -21,6 +20,7 @@ import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.computer.ComputerService;
 
 @RestController
@@ -40,13 +40,14 @@ public class ComputerController {
     @PatchMapping("/update/computer-info/{id}")
     @Operation(summary = "Chỉnh sửa thông tin máy tính")
     public ApiResponse<String> updateComputer(
-            @Valid @PathVariable("id") Long id, @RequestBody ComputersModel computerRequest, BindingResult result)
-            throws ApiException {
+            @Valid @PathVariable("id") Long id,
+            @Valid @RequestBody ComputersModel computerRequest,
+            BindingResult result)
+            throws ApiException, ValidationException {
         if (result.hasErrors()) {
-            List<String> errorMessages = result.getFieldErrors().stream()
-                    .map(FieldError::getDefaultMessage)
-                    .toList();
-            throw new ApiException(UNCATEGORIZED_EXCEPTION, String.join(", ", errorMessages));
+            Map<String, String> errorMessages = result.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            throw new ValidationException(errorMessages);
         }
         return ApiResponse.ok(computerService.updateComputer(id, computerRequest));
     }

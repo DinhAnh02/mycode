@@ -58,7 +58,7 @@ public class GlobalExceptionHandler extends Throwable {
         Map<String, String> errors = ex.getErrors();
         ApiResponse<Map<String, String>> response =
                 new ApiResponse<>(FIELD_INVALID.getCode(), FIELD_INVALID.getMessage(), errors);
-        return ResponseEntity.status(FIELD_INVALID.getStatusCode()).body(response);
+        return ResponseEntity.status(OK).body(response);
     }
 
     @ExceptionHandler(Exception.class)
