@@ -29,7 +29,7 @@ public interface AccountService {
 
     List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException;
 
-    ApiResponse inactivateAccount(Long idAccount) throws ApiException;
+    String inactivateAccount(Long idAccount) throws ApiException;
 
     ApiResponse<String> removeConnectComputer(Long accountId, Long computerId) throws ApiException;
 

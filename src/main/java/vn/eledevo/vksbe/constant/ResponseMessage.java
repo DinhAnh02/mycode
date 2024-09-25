@@ -73,4 +73,6 @@ public class ResponseMessage {
     public static final String AVATAR_URL_INVALID = "Đường dẫn ảnh đại diện không hợp lệ";
 
     public static final String UPDATE_COMPUTER_INFOR_SUCCESS = "Chỉnh sửa thông tin thiết bị máy tính thành công";
+
+    public static final String LOCK_ACCOUNT_SUCCESS = "Khóa tài khoản thành công";
 }

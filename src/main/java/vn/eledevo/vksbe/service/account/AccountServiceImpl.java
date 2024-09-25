@@ -181,65 +181,51 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ApiResponse inactivateAccount(Long idAccount) throws ApiException {
-        try {
+    public String inactivateAccount(Long idAccount) throws ApiException {
+        String userName = SecurityUtils.getUserName();
+        Optional<AccountInactive> accountRequest = accountRepository.findByUsernameActive(userName);
 
-            String userName = SecurityUtils.getUserName();
-            // Save account tìm được từ username
-            Optional<AccountInactive> accountRequest = accountRepository.findByUsernameActive(userName);
-            // Kiểm tra xem tài khoản có tồn tại không
-            if (accountRequest.isEmpty()) {
-                throw new ApiException(ACCOUNT_NOT_FOUND);
-            }
-            // Check account theo idAccount có tồn tại trong db không
-            Accounts exitsingAccounts =
-                    accountRepository.findById(idAccount).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
-            // Check account được lấy từ username có trùng với account muốn khóa không
-            if (!exitsingAccounts.getId().equals(accountRequest.get().getId())) {
-                if (exitsingAccounts.getStatus().equals("ACTIVE")) {
-                    switch (accountRequest.get().getRoleCode()) {
-                        case "VIEN_TRUONG":
-                            if (exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")) {
-                                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện trưởng không thể khóa IT
-                            } else {
-                                exitsingAccounts.setStatus("INACTIVE");
-                            }
-                            break;
-                        case "VIEN_PHO":
-                            if (exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")
-                                    || exitsingAccounts.getRoles().getCode().equals("VIEN_TRUONG")) {
-                                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
-                            } else {
-                                exitsingAccounts.setStatus("INACTIVE");
-                            }
-                            break;
-                        case "TRUONG_PHONG":
-                        case "PHO_PHONG":
-                            // Trưởng phòng và phó phòng có thể khóa tài khoản có chức vụ thấp hơn
-                            if (exitsingAccounts.getRoles().getCode().equals("VIEN_TRUONG")
-                                    || exitsingAccounts.getRoles().getCode().equals("VIEN_PHO")
-                                    || exitsingAccounts.getRoles().getCode().equals("IT_ADMIN")) {
-                                throw new ApiException(ACCOUNT_NOT_LOCK); // Không được khóa viện trưởng hoặc viện phó
-                            } else {
-                                // Cập nhật trạng thái tài khoản
-                                exitsingAccounts.setStatus("INACTIVE");
-                            }
-                            break;
-                        default:
-                            exitsingAccounts.setStatus("INACTIVE");
-                            break;
-                    }
-                } else {
-                    throw new ApiException(UNCATEGORIZED_EXCEPTION);
-                }
-            } else {
-                throw new ApiException(DUPLICATE_ACCOUNT);
-            }
-            accountRepository.save(exitsingAccounts);
-            return new ApiResponse<>(200, "Khóa tài khoản thành công");
-        } catch (Exception e) {
+        //check account có tồn tại không
+        if (accountRequest.isEmpty()) {
+            throw new ApiException(ACCOUNT_NOT_FOUND);
+        }
+
+        Accounts existingAccount = accountRepository.findById(idAccount)
+                .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+
+        // check id request có trùng với người khóa
+        if (existingAccount.getId().equals(accountRequest.get().getId())) {
+            throw new ApiException(DUPLICATE_ACCOUNT);
+        }
+
+        if (!existingAccount.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }
+
+        String roleCode = accountRequest.get().getRoleCode();
+        String existingRoleCode = existingAccount.getRoles().getCode();
+        boolean existingRole = existingRoleCode.equals(Role.VIEN_TRUONG.name()) || existingRoleCode.equals(Role.VIEN_PHO.name()) || existingRoleCode.equals(Role.IT_ADMIN.name());
+
+        if (roleCode.equals(Role.VIEN_TRUONG.name()) && existingRoleCode.equals(Role.IT_ADMIN.name())) {
+                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện trưởng không thể khóa IT
+        }
+
+        if (roleCode.equals(Role.VIEN_PHO.name()) && (existingRoleCode.equals(Role.IT_ADMIN.name()) || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
+                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
+        }
+
+        if (roleCode.equals(Role.TRUONG_PHONG.name()) && existingRole) {
+                throw new ApiException(ACCOUNT_NOT_LOCK); // Không được khóa viện trưởng hoặc viện phó
+        }
+
+        if(roleCode.equals(Role.PHO_PHONG.name()) && existingRole) {
+            throw new ApiException(ACCOUNT_NOT_LOCK);
+        }
+        // khóa account qua status
+        existingAccount.setStatus(Status.INACTIVE.name());
+        accountRepository.save(existingAccount);
+
+        return ResponseMessage.LOCK_ACCOUNT_SUCCESS;
     }
 
     @Override
