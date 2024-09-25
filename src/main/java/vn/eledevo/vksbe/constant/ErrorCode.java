@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(INTERNAL_SERVER_ERROR, 500, "INTERNAL_SERVER_ERROR"),
-    FIELD_INVALID(UNPROCESSABLE_ENTITY, 1001, "Các trường không hợp lệ!"),
+    FIELD_INVALID(UNPROCESSABLE_ENTITY, 4200, "Lỗi validate không hợp lệ!"),
     METHOD_ERROR(METHOD_NOT_ALLOWED, 1002, "Phương thức không hợp lệ!"),
     EX_NOT_FOUND(NOT_FOUND, 1008, "Không tìm thấy bản ghi"),
     RECORD_EXIST(CONFLICT, 1010, "Bản ghi đã tồn tại"),
@@ -48,8 +48,7 @@ public enum ErrorCode {
     AVATAR_NOT_FOUND(NOT_FOUND, 4042, "Không tìm thấy ảnh đại diện"),
     ROLE_NOT_FOUND(NOT_FOUND, 1101, "Chức vụ không tồn tại"),
     FOLDER_NOT_FOUND(NOT_FOUND, 1011, "Không tìm thấy thư mục."),
-    CHECK_ACTIVE_ACCOUNT(UNAUTHORIZED,6969,"Tài khoản chưa được kích hoạt")
-    ;
+    CHECK_ACTIVE_ACCOUNT(UNAUTHORIZED, 6969, "Tài khoản chưa được kích hoạt");
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;

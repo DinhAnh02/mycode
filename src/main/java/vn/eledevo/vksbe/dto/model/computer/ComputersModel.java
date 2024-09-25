@@ -14,16 +14,15 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ComputersModel {
-    @NotBlank(message = "Tên máy tính không được để trống")
-    @Size(min = 10, message = "Tên máy tính phải có độ dài ít nhất từ 10 ký tự")
+    @Size(min = 10, message = "Tên máy tính phải có độ dài ít nhất từ 10 ký tự.")
     String name;
 
-    @NotBlank(message = "Thương hiệu không được để trống")
+    @NotBlank(message = "Thương hiệu không được để trống.")
     String brand;
 
-    @NotBlank
+    @NotBlank(message = "Loại máy tính không được để trống.")
     String type;
 
-    @Size(max = 224, message = "Mô tả không vượt quá 225 kí tự")
+    @Size(max = 224, message = "Mô tả không được vượt quá 225 kí tự.")
     String note;
 }
