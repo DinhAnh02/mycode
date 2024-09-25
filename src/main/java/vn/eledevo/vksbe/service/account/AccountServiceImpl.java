@@ -2,8 +2,7 @@ package vn.eledevo.vksbe.service.account;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_URL_INVALID;
-import static vn.eledevo.vksbe.constant.ResponseMessage.SWAP_ACCOUNT_SUCCESS;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_PHO;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_TRUONG;
 import static vn.eledevo.vksbe.utils.FileUtils.*;
@@ -39,7 +38,6 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
-import vn.eledevo.vksbe.dto.model.account.AccountInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
@@ -51,7 +49,6 @@ import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
-import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.entity.*;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -344,51 +341,45 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponse activeAccount(Long id) throws ApiException {
-        Accounts accounts = validAccount(id);
-        Accounts accSecurity = validAccount(SecurityUtils.getUserId());
-        if (accounts.getStatus().equals(Const.ACTIVE)) {
+    public String activeAccount(Long id) throws ApiException {
+        Accounts activedAcc = validAccount(id);
+        Accounts loginAcc = validAccount(SecurityUtils.getUserId());
+        if (activedAcc.getStatus().equals(Const.ACTIVE)) {
             throw new ApiException(ACCOUNT_STATUS_ACTIVE);
         }
 
-        if (!accounts.getIsConnectComputer()) {
+        if (!activedAcc.getIsConnectComputer()) {
             throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
         }
 
-        if (!accounts.getIsConnectUsb()) {
+        if (!activedAcc.getIsConnectUsb()) {
             throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
         }
 
-        Role accSecu = Role.valueOf(accSecurity.getRoles().getCode());
-        Role accSave = Role.valueOf(accounts.getRoles().getCode());
+        Role loginAccRole = Role.valueOf(loginAcc.getRoles().getCode());
+        Role activedAccRole = Role.valueOf(activedAcc.getRoles().getCode());
 
-        if (accSecu.equals(Role.IT_ADMIN) || priorityRoles(accSecu) <= priorityRoles(accSave)) {
-            throw new ApiException(ACCOUNT_NOT_LOCK);
+        if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
+            throw new ApiException(UNAUTHORIZED_ACTIVE_ACCOUNT);
         }
 
-        accounts.setStatus(Const.ACTIVE);
-        accounts.setUpdateAt(LocalDateTime.now());
-        accounts.setUpdateBy(SecurityUtils.getUserName());
-        var res = accountRepository.save(accounts);
+        activedAcc.setStatus(Const.ACTIVE);
+        activedAcc.setUpdateAt(LocalDateTime.now());
+        activedAcc.setUpdateBy(SecurityUtils.getUserName());
+        accountRepository.save(activedAcc);
 
-        return accountMapper.toResponse(res);
+        return ACTIVE_ACCOUNT_SUCCESS;
     }
 
     private int priorityRoles(Role role) {
-        switch (role) {
-            case VIEN_TRUONG:
-                return 10;
-            case VIEN_PHO:
-                return 9;
-            case TRUONG_PHONG:
-                return 8;
-            case PHO_PHONG:
-                return 7;
-            case KIEM_SAT_VIEN:
-                return 0;
-            default:
-                return 0;
-        }
+        return switch (role) {
+            case IT_ADMIN -> 11;
+            case VIEN_TRUONG -> 10;
+            case VIEN_PHO -> 9;
+            case TRUONG_PHONG -> 8;
+            case PHO_PHONG -> 7;
+            default -> 0;
+        };
     }
 
     @Override
@@ -446,7 +437,8 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.toResponse(savedAccount);
     }
 
-    private void validateRoleForViewButton(AccountDetailResponse detailResponse, Accounts accSecurity, Accounts account){
+    private void validateRoleForViewButton(
+            AccountDetailResponse detailResponse, Accounts accSecurity, Accounts account) {
         Role roleSecurity = Role.valueOf(accSecurity.getRoles().getCode());
         Role roleSave = Role.valueOf(account.getRoles().getCode());
 

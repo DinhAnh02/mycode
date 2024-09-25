@@ -39,7 +39,7 @@ public interface AccountService {
 
     ApiResponse<?> removeUSB(Long idAccount, Long idUsb) throws ApiException;
 
-    AccountResponse activeAccount(Long id) throws ApiException;
+    String activeAccount(Long id) throws ApiException;
 
     ObjectSwapResponse swapStatus(Long employeeId, Long requesterId) throws ApiException;
 
