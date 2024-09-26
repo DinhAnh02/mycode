@@ -182,13 +182,13 @@ public class AccountServiceImpl implements AccountService {
         String userName = SecurityUtils.getUserName();
         Optional<AccountInactive> accountRequest = accountRepository.findByUsernameActive(userName);
 
-        //check account có tồn tại không
+        // check account có tồn tại không
         if (accountRequest.isEmpty()) {
             throw new ApiException(ACCOUNT_NOT_FOUND);
         }
 
-        Accounts existingAccount = accountRepository.findById(idAccount)
-                .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        Accounts existingAccount =
+                accountRepository.findById(idAccount).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
 
         // check id request có trùng với người khóa
         if (existingAccount.getId().equals(accountRequest.get().getId())) {
@@ -201,21 +201,25 @@ public class AccountServiceImpl implements AccountService {
 
         String roleCode = accountRequest.get().getRoleCode();
         String existingRoleCode = existingAccount.getRoles().getCode();
-        boolean existingRole = existingRoleCode.equals(Role.VIEN_TRUONG.name()) || existingRoleCode.equals(Role.VIEN_PHO.name()) || existingRoleCode.equals(Role.IT_ADMIN.name());
+        boolean existingRole = existingRoleCode.equals(Role.VIEN_TRUONG.name())
+                || existingRoleCode.equals(Role.VIEN_PHO.name())
+                || existingRoleCode.equals(Role.IT_ADMIN.name());
 
         if (roleCode.equals(Role.VIEN_TRUONG.name()) && existingRoleCode.equals(Role.IT_ADMIN.name())) {
-                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện trưởng không thể khóa IT
+            throw new ApiException(ACCOUNT_NOT_LOCK); // Viện trưởng không thể khóa IT
         }
 
-        if (roleCode.equals(Role.VIEN_PHO.name()) && (existingRoleCode.equals(Role.IT_ADMIN.name()) || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
-                throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
+        if (roleCode.equals(Role.VIEN_PHO.name())
+                && (existingRoleCode.equals(Role.IT_ADMIN.name())
+                        || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
+            throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
         }
 
         if (roleCode.equals(Role.TRUONG_PHONG.name()) && existingRole) {
-                throw new ApiException(ACCOUNT_NOT_LOCK); // Không được khóa viện trưởng hoặc viện phó
+            throw new ApiException(ACCOUNT_NOT_LOCK); // Không được khóa viện trưởng hoặc viện phó
         }
 
-        if(roleCode.equals(Role.PHO_PHONG.name()) && existingRole) {
+        if (roleCode.equals(Role.PHO_PHONG.name()) && existingRole) {
             throw new ApiException(ACCOUNT_NOT_LOCK);
         }
         // khóa account qua status
@@ -439,29 +443,42 @@ public class AccountServiceImpl implements AccountService {
 
     private void validateRoleForViewButton(
             AccountDetailResponse detailResponse, Accounts accSecurity, Accounts account) {
-        Role roleSecurity = Role.valueOf(accSecurity.getRoles().getCode());
-        Role roleSave = Role.valueOf(account.getRoles().getCode());
+        Role loginAcc = Role.valueOf(accSecurity.getRoles().getCode());
+        Role detailedAcc = Role.valueOf(account.getRoles().getCode());
 
-        if (roleSecurity.equals(Role.IT_ADMIN)) {
+        if (loginAcc.equals(Role.IT_ADMIN)) {
             detailResponse.setIsEnabledEditButton(true);
             detailResponse.setIsShowEditButton(true);
             detailResponse.setIsEnableResetPasswordButton(true);
             detailResponse.setIsShowResetPasswordButton(true);
         }
 
-        if (roleSecurity.equals(Role.IT_ADMIN) || priorityRoles(roleSecurity) > priorityRoles(roleSave)) {
+        if (loginAcc.equals(Role.IT_ADMIN) || priorityRoles(loginAcc) > priorityRoles(detailedAcc)) {
             detailResponse.setIsEnabledLockButton(true);
         }
-        if (account.getStatus().equals(Status.ACTIVE.name())) {
+        if (account.getStatus().equals(Status.ACTIVE.name()) && priorityRoles(loginAcc) > priorityRoles(detailedAcc)) {
             detailResponse.setIsShowLockButton(true);
         }
-        if ((roleSecurity.equals(Role.IT_ADMIN) || priorityRoles(roleSecurity) > priorityRoles(roleSave))
+        if ((loginAcc.equals(Role.IT_ADMIN) || priorityRoles(loginAcc) > priorityRoles(detailedAcc))
                 && account.getIsConnectUsb().equals(Boolean.TRUE)
                 && account.getIsConnectComputer().equals(Boolean.TRUE)) {
             detailResponse.setIsEnabledActivateButton(true);
         }
-        if (!account.getStatus().equals(Status.ACTIVE.name())) {
+        if (!account.getStatus().equals(Status.ACTIVE.name()) && priorityRoles(loginAcc) > priorityRoles(detailedAcc)) {
             detailResponse.setIsShowActivateButton(true);
+        }
+        if ((loginAcc.equals(Role.TRUONG_PHONG) || loginAcc.equals(Role.PHO_PHONG))
+                && priorityRoles(loginAcc) > priorityRoles(detailedAcc)
+                && accSecurity
+                        .getDepartments()
+                        .getId()
+                        .equals(account.getDepartments().getId())
+                && account.getStatus().equals(Status.ACTIVE.name())) {
+            detailResponse.setIsShowLockButton(true);
+            detailResponse.setIsEnabledLockButton(true);
+        } else {
+            detailResponse.setIsShowLockButton(false);
+            detailResponse.setIsEnabledLockButton(false);
         }
     }
 
