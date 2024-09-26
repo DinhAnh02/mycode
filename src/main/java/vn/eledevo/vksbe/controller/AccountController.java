@@ -26,6 +26,7 @@ import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -108,7 +109,7 @@ public class AccountController {
 
     @PatchMapping("/{idAccount}/activate")
     @Operation(summary = "Kích hoạt tài khoản")
-    public ApiResponse<String> activateAccount(
+    public ApiResponse<ActivedAccountResponse> activateAccount(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long idAccount)
             throws ApiException {
         return ApiResponse.ok(accountService.activeAccount(idAccount));

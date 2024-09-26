@@ -41,6 +41,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
+import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
@@ -49,6 +50,7 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
+import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
@@ -368,7 +370,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String activeAccount(Long id) throws ApiException {
+    public ActivedAccountResponse activeAccount(Long id) throws ApiException {
         Accounts activedAcc = validAccount(id);
         Accounts loginAcc = validAccount(SecurityUtils.getUserId());
         if (activedAcc.getStatus().equals(Const.ACTIVE)) {
@@ -389,13 +391,19 @@ public class AccountServiceImpl implements AccountService {
         if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
             throw new ApiException(UNAUTHORIZED_ACTIVE_ACCOUNT);
         }
-
-        activedAcc.setStatus(Const.ACTIVE);
-        activedAcc.setUpdateAt(LocalDateTime.now());
-        activedAcc.setUpdateBy(SecurityUtils.getUserName());
-        accountRepository.save(activedAcc);
-
-        return ACTIVE_ACCOUNT_SUCCESS;
+        if (activedAccRole.equals(Role.VIEN_TRUONG) || activedAccRole.equals(Role.TRUONG_PHONG)) {
+            OldPositionAccInfo old = accountRepository.getOldPositionAccInfo(
+                    activedAcc.getDepartments().getId());
+            if (old.getId() != null) {
+                return ActivedAccountResponse.builder().oldPositionAccInfo(old).build();
+            } else {
+                activedAcc.setStatus(Const.ACTIVE);
+                activedAcc.setUpdateAt(LocalDateTime.now());
+                activedAcc.setUpdateBy(SecurityUtils.getUserName());
+                accountRepository.save(activedAcc);
+            }
+        }
+        return ActivedAccountResponse.builder().message(ACTIVE_ACCOUNT_SUCCESS).build();
     }
 
     private int priorityRoles(Role role) {

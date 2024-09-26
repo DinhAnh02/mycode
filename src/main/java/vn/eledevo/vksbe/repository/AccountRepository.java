@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -54,4 +56,13 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
                     + "JOIN a.profile p "
                     + "WHERE a.id = :accountId")
     UserInfo findAccountProfileById(@Param("accountId") Long accountId);
+
+    @Query(
+            "SELECT new vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo(a.id, a.username, p.fullName) "
+                    + "FROM Accounts a "
+                    + "JOIN a.profile p "
+                    + "WHERE a.departments.id = :departmentId "
+                    + "AND a.status = 'ACTIVE' "
+                    + "AND a.roles.id IN(1, 4)")
+    OldPositionAccInfo getOldPositionAccInfo(@Param("departmentId") Long departmentId);
 }
