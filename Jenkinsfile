@@ -28,12 +28,9 @@ pipeline {
                 stage('Pull Code from Develop') {
                     steps {
                         sshagent(['jenkins-ssh-key']) {
-                            sh 'git checkout develop'
-                            sh 'git pull'
-                            sh 'git checkout tester'
                             sh 'git config user.email "$GIT_USER_EMAIL"'
                             sh 'git config user.name "$GIT_USER_NAME"'
-                            sh 'git merge develop'
+                            sh 'git pull origin develop'
                         }
                     }
                 }
