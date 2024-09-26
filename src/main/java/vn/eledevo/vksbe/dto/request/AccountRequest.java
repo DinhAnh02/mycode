@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.dto.request;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +20,6 @@ public class AccountRequest {
     Long organizationId;
     String organizationName;
     String status;
-    LocalDateTime fromDate;
-    LocalDateTime toDate;
+    LocalDate fromDate;
+    LocalDate toDate;
 }
