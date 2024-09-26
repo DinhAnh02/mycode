@@ -20,7 +20,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     Optional<Accounts> findAccountInSystem(String username);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.id, a.username, p.fullName, r.name, d.name, o.name, a.status, a.createAt, a.updateAt, false , false) "
+            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.id, a.username, p.fullName, r.name, d.name, o.name, a.status, a.isConnectComputer, a.isConnectUsb, a.createAt, a.updateAt, false , false) "
                     + "FROM Accounts a "
                     + "LEFT JOIN Profiles p ON p.accounts.id = a.id "
                     + "LEFT JOIN Roles r ON r.id = a.roles.id "
@@ -33,7 +33,8 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
                     + "AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId}) "
                     + "AND (:#{#filter.organizationId} = 0 OR o.id = :#{#filter.organizationId}) "
                     + "AND (:#{#filter.status} IS NULL OR a.status LIKE %:#{#filter.status}%) "
-                    + "AND a.createAt BETWEEN (:#{#filter.fromDate}) AND :#{#filter.toDate}")
+                    + "AND a.createAt >= :#{#filter.fromDate.atStartOfDay()} "
+                    + "AND a.createAt <= :#{#filter.toDate.atTime(23, 59, 59)}")
     Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Boolean isBoss, Pageable pageable);
 
     Accounts findAccountsByUsername(String username);

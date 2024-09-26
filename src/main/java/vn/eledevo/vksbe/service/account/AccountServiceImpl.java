@@ -3,10 +3,6 @@ package vn.eledevo.vksbe.service.account;
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 import static vn.eledevo.vksbe.constant.FileConst.*;
 import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_PHO;
-import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_TRUONG;
-import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_URL_INVALID;
-import static vn.eledevo.vksbe.constant.ResponseMessage.SWAP_ACCOUNT_SUCCESS;
 import static vn.eledevo.vksbe.constant.RoleCodes.*;
 import static vn.eledevo.vksbe.utils.FileUtils.*;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
@@ -19,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +44,7 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
@@ -133,7 +131,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public Result<AccountResponseByFilter> getListAccountByFilter(
+    public ResponseFilter<AccountResponseByFilter> getListAccountByFilter(
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
         String loginAccountName = getUserName();
         Accounts accSecurity = accountRepository.findAccountsByUsername(loginAccountName);
@@ -144,10 +142,10 @@ public class AccountServiceImpl implements AccountService {
             limit = 10;
         }
         if (accountRequest.getFromDate() == null) {
-            accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
+            accountRequest.setFromDate(LocalDate.of(1900, 1, 1));
         }
         if (accountRequest.getToDate() == null) {
-            accountRequest.setToDate(LocalDateTime.now());
+            accountRequest.setToDate(LocalDate.now());
         }
         if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
             throw new ApiException(CHECK_FROM_DATE);
@@ -158,7 +156,9 @@ public class AccountServiceImpl implements AccountService {
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<AccountResponseByFilter> page =
                 accountRepository.getAccountList(accountRequest, isBoss(accSecurity), pageable);
-        return new Result<>(page.getContent(), (int) page.getTotalElements());
+        return new ResponseFilter<>(
+                page.getContent(), (int) page.getTotalElements(), page.getSize(), page.getNumber(),
+                        page.getTotalPages());
     }
 
     @Override

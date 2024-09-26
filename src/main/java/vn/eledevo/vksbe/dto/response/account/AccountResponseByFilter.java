@@ -19,6 +19,8 @@ public class AccountResponseByFilter {
     String departmentName;
     String organizationName;
     String status;
+    Boolean isConnectComputer;
+    Boolean isConnectUsb;
     LocalDateTime createAt;
     LocalDateTime updateAt;
     Boolean isIconLock;

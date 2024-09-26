@@ -7,11 +7,11 @@ import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
-import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
@@ -24,7 +24,7 @@ import vn.eledevo.vksbe.exception.ValidationException;
 public interface AccountService {
     String resetPassword(Long id) throws ApiException;
 
-    Result<AccountResponseByFilter> getListAccountByFilter(
+    ResponseFilter<AccountResponseByFilter> getListAccountByFilter(
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException;
 
     AccountDetailResponse getAccountDetail(Long accountId) throws ApiException;
