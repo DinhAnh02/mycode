@@ -7,12 +7,14 @@ import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
+import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
@@ -39,7 +41,7 @@ public interface AccountService {
 
     ApiResponse<?> removeUSB(Long idAccount, Long idUsb) throws ApiException;
 
-    String activeAccount(Long id) throws ApiException;
+    ActivedAccountResponse activeAccount(Long id) throws ApiException;
 
     ObjectSwapResponse swapStatus(Long employeeId, Long requesterId) throws ApiException;
 
