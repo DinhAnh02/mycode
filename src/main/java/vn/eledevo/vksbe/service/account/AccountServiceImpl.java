@@ -5,6 +5,9 @@ import static vn.eledevo.vksbe.constant.FileConst.*;
 import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_PHO;
 import static vn.eledevo.vksbe.constant.RoleCodes.VIEN_TRUONG;
+import static vn.eledevo.vksbe.constant.ResponseMessage.AVATAR_URL_INVALID;
+import static vn.eledevo.vksbe.constant.ResponseMessage.SWAP_ACCOUNT_SUCCESS;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
 import static vn.eledevo.vksbe.utils.FileUtils.*;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
@@ -118,10 +121,26 @@ public class AccountServiceImpl implements AccountService {
         return ResponseMessage.RESET_PASSWORD_SUCCESS;
     }
 
+    private Boolean isBoss(Accounts accSecurity) {
+        return switch (accSecurity.getRoles().getCode()) {
+            case IT_ADMIN, VIEN_TRUONG -> true;
+            case VIEN_PHO -> true;
+            default -> false;
+        };
+    }
+
     @Override
     @Transactional
     public Result<AccountResponseByFilter> getListAccountByFilter(
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
+        String loginAccountName = getUserName();
+        Accounts accSecurity = accountRepository.findAccountsByUsername(loginAccountName);
+        if (currentPage < 1) {
+            currentPage = 1;
+        }
+        if (limit < 1) {
+            limit = 10;
+        }
         if (accountRequest.getFromDate() == null) {
             accountRequest.setFromDate(LocalDateTime.of(1900, 1, 1, 0, 0));
         }
@@ -131,8 +150,12 @@ public class AccountServiceImpl implements AccountService {
         if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
             throw new ApiException(CHECK_FROM_DATE);
         }
+        if (Boolean.FALSE.equals(isBoss(accSecurity))) {
+            accountRequest.setDepartmentId(accSecurity.getDepartments().getId());
+        }
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
-        Page<AccountResponseByFilter> page = accountRepository.getAccountList(accountRequest, pageable);
+        Page<AccountResponseByFilter> page =
+                accountRepository.getAccountList(accountRequest, isBoss(accSecurity), pageable);
         return new Result<>(page.getContent(), (int) page.getTotalElements());
     }
 
@@ -352,11 +375,11 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(ACCOUNT_STATUS_ACTIVE);
         }
 
-        if (!activedAcc.getIsConnectComputer()) {
+        if (Boolean.FALSE.equals(activedAcc.getIsConnectComputer())) {
             throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
         }
 
-        if (!activedAcc.getIsConnectUsb()) {
+        if (Boolean.FALSE.equals(activedAcc.getIsConnectUsb())) {
             throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
         }
 
