@@ -52,7 +52,7 @@ pipeline {
                    }
                }
              }
-           stage('Send to develop') {
+           stage('Send to tester') {
                 steps {
                     sshagent(credentials: ['jenkins-ssh-key']){
                       sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
