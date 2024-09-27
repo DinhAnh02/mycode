@@ -58,7 +58,7 @@ pipeline {
                       sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
                     }
                 }
-              }
+          }
       }
     }
     stage('Deploy to develop') {
