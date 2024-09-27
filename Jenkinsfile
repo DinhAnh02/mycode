@@ -48,7 +48,7 @@ pipeline {
          stage('Send to develop') {
               steps {
                   sshagent(credentials: ['jenkins-ssh-key']) {
-                    sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key target/${NAME_BACKEND}.jar root@${DEVELOP_HOST}:/home/docker-image"
+                    sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key target/${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
                   }
               }
          }
@@ -62,36 +62,40 @@ pipeline {
       }
     }
     stage('Deploy to develop') {
-        steps {
-          script {
-            def deployFile = "deploy-${NAME_BACKEND}.sh"
-            def deploying = '#!/bin/bash\n' +
-              "pkill -f '${NAME_BACKEND}.jar' || echo 'No application to stop'\n" + // Kiểm tra và dừng ứng dụng cũ nếu đang chạy
-              'cd /home/docker-image\n' +
-              "nohup java -jar ${NAME_BACKEND}.jar --spring.profiles.active=dev > /home/app/deploy-${NAME_BACKEND}.log 2>&1 &" // Chạy ứng dụng với profile dev
-            sshagent(credentials: ['jenkins-ssh-key']) {
-              sh """
-                  ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-              """
-            }
+      steps {
+        script {
+          def deployFile = "deploy-${NAME_BACKEND}.sh"
+          def deploying = '#!/bin/bash\n' +
+            'cd /home/docker-image\n' +
+            "docker load < ${NAME_BACKEND}.tar.gz\n" +  // Load image từ file tar.gz
+            "docker stop ${NAME_BACKEND} || echo 'No container to stop'\n" + // Dừng container cũ nếu có
+            "docker rm ${NAME_BACKEND} || echo 'No container to remove'\n" + // Xóa container cũ nếu có
+            "docker run -d --name ${NAME_BACKEND} -p 8081:8080 ${NAME_BACKEND}:$DOCKER_TAG\n" // Chạy container mới
+          sshagent(credentials: ['jenkins-ssh-key']) {
+            sh """
+              ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+            """
           }
         }
+      }
     }
     stage('Deploy to tester') {
-         steps {
-            script {
-              def deployFile = "deploy-${NAME_BACKEND}.sh"
-              def deploying = '#!/bin/bash\n' +
-                "pkill -f '${NAME_BACKEND}.jar' || echo 'No application to stop'\n" + // Kiểm tra và dừng ứng dụng cũ nếu đang chạy
-                'cd /home/docker-image\n' +
-                "nohup java -jar ${NAME_BACKEND}.jar --spring.profiles.active=test > /home/app/deploy-${NAME_BACKEND}.log 2>&1 &" // Chạy ứng dụng với profile test
-              sshagent(credentials: ['jenkins-ssh-key']) {
-                sh """
-                    ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-                """
-              }
-            }
+      steps {
+        script {
+          def deployFile = "deploy-${NAME_BACKEND}.sh"
+          def deploying = '#!/bin/bash\n' +
+            'cd /home/docker-image\n' +
+            "docker load < ${NAME_BACKEND}.tar.gz\n" +
+            "docker stop ${NAME_BACKEND} || echo 'No container to stop'\n" +
+            "docker rm ${NAME_BACKEND} || echo 'No container to remove'\n" +
+            "docker run -d --name ${NAME_BACKEND} -p 8082:8080 ${NAME_BACKEND}:$DOCKER_TAG\n"
+          sshagent(credentials: ['jenkins-ssh-key']) {
+            sh """
+              ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+            """
           }
+        }
+      }
     }
   }
 }
