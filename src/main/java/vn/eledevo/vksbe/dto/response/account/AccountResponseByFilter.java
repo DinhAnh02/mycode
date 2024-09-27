@@ -16,13 +16,19 @@ public class AccountResponseByFilter {
     String username;
     String fullName;
     String roleName;
+    String roleCode;
+    Long roleId;
+    Long departmentId;
     String departmentName;
+    Long organizationId;
     String organizationName;
     String status;
     Boolean isConnectComputer;
     Boolean isConnectUsb;
     LocalDateTime createAt;
     LocalDateTime updateAt;
-    Boolean isIconLock;
-    Boolean isDisable;
+    Boolean isShowLockButton;
+    Boolean isShowUnlockButton;
+    Boolean isEnableLockButton;
+    Boolean isEnableUnlockButton;
 }
