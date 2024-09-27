@@ -78,7 +78,7 @@ pipeline {
               }
             }
           }
-    stage('Deploy to develop') {
+    stage('Deploy to tester') {
             steps {
               script {
                 def deployFile = "deploy-${NAME_BACKEND}.sh"
