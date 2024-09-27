@@ -45,20 +45,20 @@ pipeline {
      }
     stage("Send JAR file to develop and tester") {
       parallel {
-         stage('Send to develop') {
-              steps {
-                  sshagent(credentials: ['jenkins-ssh-key']) {
-                    sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key target/${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
-                  }
+          stage('Send to develop') {
+               steps {
+                   sshagent(credentials: ['jenkins-ssh-key']){
+                     sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
+                   }
+               }
+             }
+           stage('Send to develop') {
+                steps {
+                    sshagent(credentials: ['jenkins-ssh-key']){
+                      sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
+                    }
+                }
               }
-         }
-          stage('Send to tester') {
-            steps {
-              sshagent(credentials: ['jenkins-ssh-key']) {
-                  sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key target/${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
-              }
-            }
-          }
       }
     }
     stage('Deploy to develop') {
