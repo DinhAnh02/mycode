@@ -1,7 +1,17 @@
+server:
+  port: 8081
+
 spring:
+  profiles:
+    active: local
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: true
+  datasource:
+    username: root
+    password: 12345
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/vks-db
   jackson:
     default-property-inclusion: non_null
   mvc:
@@ -31,51 +41,6 @@ application:
 
 file:
   upload-dir: src/main/resources/storage
+
 app:
-  host: http://100.67.168.11
----
-spring:
-  datasource:
-    username: eledevo
-    password: eledevo@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://100.67.168.11:3306/vks-db
-  server:
-    port: 8081
-  app:
-    host: http://100.67.168.11:${server.port}
-  profiles:
-    active: dev
-
-# Cấu hình cho môi trường kiểm thử (test)
----
-spring:
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.xml
-    enabled: true
-  datasource:
-    username: tester
-    password: eledevo@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://100.67.168.11:3307/test-db
-  server:
-    port: 8082
-  app:
-    host: http://100.67.168.11:${server.port}
-  profiles:
-    active: test
-
-# Cấu hình cho môi trường sản xuất (production)
----
-spring:
-  datasource:
-    username: product
-    password: eledevo@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://100.67.168.11:3308/prod-db
-  server:
-    port: 8083
-  app:
-    host: http://100.67.168.11:${server.port}
-  profiles:
-    active: prod
+  host: ${APP_HOST:http://localhost:${server.port}}
