@@ -86,6 +86,11 @@ public class SecurityConfiguration {
                         .hasAuthority(Role.IT_ADMIN.name())
                         .requestMatchers("/api/v1/private/accounts/remove-usb/{accountId}/usb/{usbId}")
                         .hasAuthority(Role.IT_ADMIN.name())
+                        .requestMatchers("/api/v1/private/accounts/create")
+                        .hasAuthority(Role.IT_ADMIN.name())
+                        .requestMatchers("/api/v1/private/accounts/connect-computer/{id}/computers")
+                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
+
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
