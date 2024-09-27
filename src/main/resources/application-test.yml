@@ -2,8 +2,6 @@ server:
   port: 8082
 
 spring:
-  profiles:
-    active: test
   datasource:
     username: tester
     password: eledevo@123
