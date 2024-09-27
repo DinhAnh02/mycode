@@ -79,7 +79,7 @@ pipeline {
         }
     }
     stage('Deploy to tester') {
-          steps {
+         steps {
             script {
               def deployFile = "deploy-${NAME_BACKEND}.sh"
               def deploying = '#!/bin/bash\n' +
@@ -93,7 +93,7 @@ pipeline {
                 """
               }
             }
-          }
+         }
     }
   }
 }
