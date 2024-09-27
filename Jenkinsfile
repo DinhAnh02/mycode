@@ -14,86 +14,78 @@ pipeline {
     maven 'maven-3.9.6'
   }
   stages {
-     stage('Executing the unit testing') {
-         steps {
-           sh "mvn clean dependency:copy-dependencies test jacoco:report"
-       }
+    stage('Executing the unit testing') {
+      steps {
+        sh "mvn clean dependency:copy-dependencies test jacoco:report"
+      }
     }
     stage('Test with Sonarqube') {
       steps {
         withSonarQubeEnv('Sonarqube admin server') {
-          sh "docker run \
-                --rm \
-                -e SONAR_HOST_URL=$SONAR_HOST_URL \
-                -e SONAR_SCANNER_OPTS='-Dsonar.projectKey=$SONAR_PROJECT_KEY' \
-                -e SONAR_TOKEN=$SONAR_TOKEN \
-                -v '.:/usr/src' \
-                sonarsource/sonar-scanner-cli"
+          sh "docker run --rm -e SONAR_HOST_URL=$SONAR_HOST_URL -e SONAR_SCANNER_OPTS='-Dsonar.projectKey=$SONAR_PROJECT_KEY' -e SONAR_TOKEN=$SONAR_TOKEN -v '.:/usr/src' sonarsource/sonar-scanner-cli"
         }
       }
     }
-     stage('Build image') {
-       steps {
-          sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
-       }
-     }
-     stage('Save image') {
-       steps {
-         sh "docker save ${NAME_BACKEND}:$DOCKER_TAG | gzip -> ${NAME_BACKEND}.tar.gz \
-             && docker rmi -f ${NAME_BACKEND}:$DOCKER_TAG"
-       }
-     }
-    stage("Send JAR file to develop and tester") {
-      parallel {
-          stage('Send to develop') {
-               steps {
-                   sshagent(credentials: ['jenkins-ssh-key']){
-                     sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
-                   }
-               }
-             }
-           stage('Send to tester') {
-                steps {
-                    sshagent(credentials: ['jenkins-ssh-key']){
-                      sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
-                    }
-                }
-          }
+    stage('Build image') {
+      steps {
+        sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
+      }
+    }
+    stage('Save image') {
+      steps {
+        sh "docker save ${NAME_BACKEND}:$DOCKER_TAG | gzip > ${NAME_BACKEND}.tar.gz"
+        sh "docker rmi -f ${NAME_BACKEND}:$DOCKER_TAG"  // Xóa image sau khi đã lưu
+      }
+    }
+    stage('Send to develop') {
+      steps {
+        sshagent(credentials: ['jenkins-ssh-key']) {
+          sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
+        }
       }
     }
     stage('Deploy to develop') {
-            steps {
-              script {
-                def deployFile = "deploy-${NAME_BACKEND}.sh"
-                def deploying = '#!/bin/bash\n' +
-                  "docker rm -f ${NAME_BACKEND}\n" +
-                  'cd /home/docker-image\n' +
-                  "docker load -i ${NAME_BACKEND}.tar.gz\n" +
-                  "docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG"
-                sshagent(credentials: ['jenkins-ssh-key']) {
-                  sh """
-                      ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-                  """
-                }
-              }
-            }
+      steps {
+        script {
+          def deployFile = "deploy-${NAME_BACKEND}.sh"
+          def deploying = '''#!/bin/bash
+            docker rm -f ${NAME_BACKEND} || true  # Xóa container nếu nó tồn tại
+            cd /home/docker-image
+            docker load -i ${NAME_BACKEND}.tar.gz
+            docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG
+          '''
+          sshagent(credentials: ['jenkins-ssh-key']) {
+            sh """
+                ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo '${deploying}' > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+            """
           }
+        }
+      }
+    }
+    stage('Send to tester') {
+      steps {
+        sshagent(credentials: ['jenkins-ssh-key']) {
+          sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
+        }
+      }
+    }
     stage('Deploy to tester') {
-            steps {
-              script {
-                def deployFile = "deploy-${NAME_BACKEND}.sh"
-                def deploying = '#!/bin/bash\n' +
-                  "docker rm -f ${NAME_BACKEND}\n" +
-                  'cd /home/docker-image\n' +
-                  "docker load -i ${NAME_BACKEND}.tar.gz\n" +
-                  "docker run --name ${NAME_BACKEND} -dp 8080:8082 ${NAME_BACKEND}:$DOCKER_TAG"
-                sshagent(credentials: ['jenkins-ssh-key']) {
-                  sh """
-                      ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-                  """
-                }
-              }
-            }
+      steps {
+        script {
+          def deployFile = "deploy-${NAME_BACKEND}.sh"
+          def deploying = '''#!/bin/bash
+            docker rm -f ${NAME_BACKEND} || true  # Xóa container nếu nó tồn tại
+            cd /home/docker-image
+            docker load -i ${NAME_BACKEND}.tar.gz
+            docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG
+          '''
+          sshagent(credentials: ['jenkins-ssh-key']) {
+            sh """
+                ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo '${deploying}' > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+            """
           }
+        }
+      }
+    }
   }
 }
