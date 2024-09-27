@@ -50,6 +50,9 @@ spring:
 # Cấu hình cho môi trường kiểm thử (test)
 ---
 spring:
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
   datasource:
     username: tester
     password: eledevo@123
