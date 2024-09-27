@@ -2,7 +2,6 @@ package vn.eledevo.vksbe.controller;
 
 import jakarta.validation.Valid;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,11 +16,8 @@ import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
 import vn.eledevo.vksbe.dto.request.pinRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
-import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -62,7 +58,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/createAccountTest")
-    public ApiResponse<CreateAccountTest> createAccountTest(@RequestBody CreateAccountTest createAccountTest){
+    public ApiResponse<CreateAccountTest> createAccountTest(@RequestBody CreateAccountTest createAccountTest) {
         return ApiResponse.ok(service.createAccountTest(createAccountTest));
     }
 }

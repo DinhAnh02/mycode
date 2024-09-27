@@ -49,8 +49,8 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(NOT_FOUND, 1101, "Chức vụ không tồn tại"),
     FOLDER_NOT_FOUND(NOT_FOUND, 1011, "Không tìm thấy thư mục."),
     CHECK_ACTIVE_ACCOUNT(UNAUTHORIZED, 6969, "Tài khoản chưa được kích hoạt"),
-    UNAUTHORIZED_ACTIVE_ACCOUNT(OK, 403, "Bạn không có quyền kích hoạt tài khoản.") //Sửa code business thanh "TK-403"
-    ;
+    UNAUTHORIZED_ACTIVE_ACCOUNT(OK, 403, "Bạn không có quyền kích hoạt tài khoản.") // Sửa code business thanh "TK-403"
+;
 
     ErrorCode(HttpStatusCode statusCode, int code, String message) {
         this.statusCode = statusCode;

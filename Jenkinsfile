@@ -43,14 +43,25 @@ pipeline {
             && docker rmi -f ${NAME_BACKEND}:$DOCKER_TAG"
       }
     }
-    stage('Send to develop') {
-      steps {
-          sshagent(credentials: ['jenkins-ssh-key']){
-            sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
+    stage("Send image to develop and tester"){
+      parallel {
+         stage('Send to develop') {
+              steps {
+                  sshagent(credentials: ['jenkins-ssh-key']){
+                    sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${DEVELOP_HOST}:/home/docker-image"
+                  }
+              }
+         }
+          stage('Send to tester') {
+            steps {
+              sshagent(credentials: ['jenkins-ssh-key']){
+                  sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
+              }
+            }
           }
       }
     }
-      stage('Deploy to develop') {
+    stage('Deploy to develop') {
         steps {
           script {
             def deployFile = "deploy-${NAME_BACKEND}.sh"
@@ -66,6 +77,23 @@ pipeline {
             }
           }
         }
-      }
+    }
+    stage('Deploy to tester') {
+          steps {
+            script {
+              def deployFile = "deploy-${NAME_BACKEND}.sh"
+              def deploying = '#!/bin/bash\n' +
+                "docker rm -f ${NAME_BACKEND}\n" +
+                'cd /home/docker-image\n' +
+                "docker load -i ${NAME_BACKEND}.tar.gz\n" +
+                "docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG"
+              sshagent(credentials: ['jenkins-ssh-key']) {
+                sh """
+                    ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+                """
+              }
+            }
+          }
+    }
   }
 }
