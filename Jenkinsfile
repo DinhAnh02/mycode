@@ -32,11 +32,17 @@ pipeline {
         }
       }
     }
-    stage('Build JAR file') {
-      steps {
-        sh "mvn clean package -DskipTests"
-      }
-    }
+     stage('Build image') {
+       steps {
+          sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
+       }
+     }
+     stage('Save image') {
+       steps {
+         sh "docker save ${NAME_BACKEND}:$DOCKER_TAG | gzip -> ${NAME_BACKEND}.tar.gz \
+             && docker rmi -f ${NAME_BACKEND}:$DOCKER_TAG"
+       }
+     }
     stage("Send JAR file to develop and tester") {
       parallel {
          stage('Send to develop') {
