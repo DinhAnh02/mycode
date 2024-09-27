@@ -60,7 +60,8 @@ public class SecurityConfiguration {
                         //                        .requestMatchers("/api/v1/private/accounts/detail")
                         //                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG",
                         // "PHO_PHONG", "IT_ADMIN")
-                        .requestMatchers("/api/v1/private/accounts", "/api/v1/private/accounts/detail")
+                        .requestMatchers("/api/v1/private/accounts", "/api/v1/private/accounts/detail"
+                        ,"/api/v1/private/accounts/{id}/usb")
                         .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
                         .requestMatchers(
                                 "/api/v1/private/computers/disconnected", "/api/v1/private/accounts/reset-password/**")
