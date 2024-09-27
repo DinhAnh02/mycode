@@ -20,7 +20,10 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     Optional<Accounts> findAccountInSystem(String username);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter(a.id, a.username, p.fullName, r.name, d.name, o.name, a.status, a.isConnectComputer, a.isConnectUsb, a.createAt, a.updateAt, false , false) "
+            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter("
+                    + "a.id, a.username, p.fullName, r.name, r.code, r.id, d.id, d.name, o.id,"
+                    + "o.name, a.status, a.isConnectComputer, "
+                    + "a.isConnectUsb, a.createAt, a.updateAt, false , false, false , false) "
                     + "FROM Accounts a "
                     + "LEFT JOIN Profiles p ON p.accounts.id = a.id "
                     + "LEFT JOIN Roles r ON r.id = a.roles.id "

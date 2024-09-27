@@ -156,9 +156,49 @@ public class AccountServiceImpl implements AccountService {
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<AccountResponseByFilter> page =
                 accountRepository.getAccountList(accountRequest, isBoss(accSecurity), pageable);
+
+        page.getContent().forEach(account -> {
+            checkRoleToShowLockOrUnlockButton(account, accSecurity);
+        });
         return new ResponseFilter<>(
-                page.getContent(), (int) page.getTotalElements(), page.getSize(), page.getNumber(),
+                page.getContent(),
+                (int) page.getTotalElements(),
+                page.getSize(),
+                page.getNumber(),
                 page.getTotalPages());
+    }
+
+    private void checkRoleToShowLockOrUnlockButton(AccountResponseByFilter account, Accounts accSecurity) {
+        Role viewedAccRole = Role.valueOf(account.getRoleCode());
+        Role loginAccRole = Role.valueOf(accSecurity.getRoles().getCode());
+        if (account.getStatus().equals("ACTIVE") && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)) {
+            account.setIsShowLockButton(true);
+            account.setIsEnableLockButton(true);
+        }
+        if ((account.getStatus().equals("INACTIVE") || account.getStatus().equals("INITIAL"))
+                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
+                && account.getIsConnectComputer()
+                && account.getIsConnectUsb()) {
+            account.setIsShowUnlockButton(true);
+            account.setIsEnableUnlockButton(true);
+        }
+        if ((loginAccRole.equals(Role.TRUONG_PHONG) || loginAccRole.equals(Role.PHO_PHONG))
+                && accSecurity.getDepartments().getId().equals(account.getDepartmentId())
+                && account.getStatus().equals("ACTIVE")
+                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)) {
+            account.setIsShowLockButton(true);
+            account.setIsEnableLockButton(true);
+        }
+
+        if ((loginAccRole.equals(Role.TRUONG_PHONG) || loginAccRole.equals(Role.PHO_PHONG))
+                && (account.getStatus().equals("INACTIVE")
+                        || account.getStatus().equals("INITIAL")
+                                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
+                                && account.getIsConnectComputer()
+                                && account.getIsConnectUsb())) {
+            account.setIsShowUnlockButton(true);
+            account.setIsEnableUnlockButton(true);
+        }
     }
 
     @Override
@@ -236,7 +276,7 @@ public class AccountServiceImpl implements AccountService {
 
         if (roleCode.equals(Role.VIEN_PHO.name())
                 && (existingRoleCode.equals(Role.IT_ADMIN.name())
-                || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
+                        || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
             throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
         }
 
