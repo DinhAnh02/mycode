@@ -51,7 +51,4 @@ public class AccountCreateRequest {
     @NotBlank(message = PHONE_NUMBER_REQUIRE)
     @Pattern(regexp = RegexPattern.PHONE_NUMBER, message = PHONE_NUMBER_INVALID)
     String phoneNumber;
-
-    @NotBlank(message = PASSWD_BLANK)
-    String password;
 }

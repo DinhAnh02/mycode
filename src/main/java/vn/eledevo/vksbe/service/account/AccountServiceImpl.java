@@ -594,7 +594,12 @@ public class AccountServiceImpl implements AccountService {
                 .roles(roleRepository.findById(request.getRoleId()).orElseThrow())
                 .departments(
                         departmentRepository.findById(request.getDepartmentId()).orElseThrow())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(passwordEncoder.encode(request.getUsername()))
+                .isConditionLogin1(true)
+                .isConditionLogin2(true)
+                .isConnectComputer(false)
+                .isConnectUsb(false)
+                .status(Status.INITIAL.name())
                 .profile(profile)
                 .build();
     }
