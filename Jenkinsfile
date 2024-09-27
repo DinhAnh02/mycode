@@ -62,40 +62,38 @@ pipeline {
       }
     }
     stage('Deploy to develop') {
-      steps {
-        script {
-          def deployFile = "deploy-${NAME_BACKEND}.sh"
-          def deploying = '#!/bin/bash\n' +
-            'cd /home/docker-image\n' +
-            "docker load < ${NAME_BACKEND}.tar.gz\n" +  // Load image từ file tar.gz
-            "docker stop ${NAME_BACKEND} || echo 'No container to stop'\n" + // Dừng container cũ nếu có
-            "docker rm ${NAME_BACKEND} || echo 'No container to remove'\n" + // Xóa container cũ nếu có
-            "docker run -d --name ${NAME_BACKEND} -p 8081:8080 ${NAME_BACKEND}:$DOCKER_TAG\n" // Chạy container mới
-          sshagent(credentials: ['jenkins-ssh-key']) {
-            sh """
-              ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-            """
+            steps {
+              script {
+                def deployFile = "deploy-${NAME_BACKEND}.sh"
+                def deploying = '#!/bin/bash\n' +
+                  "docker rm -f ${NAME_BACKEND}\n" +
+                  'cd /home/docker-image\n' +
+                  "docker load -i ${NAME_BACKEND}.tar.gz\n" +
+                  "docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG"
+                sshagent(credentials: ['jenkins-ssh-key']) {
+                  sh """
+                      ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+                  """
+                }
+              }
+            }
           }
-        }
-      }
-    }
-    stage('Deploy to tester') {
-      steps {
-        script {
-          def deployFile = "deploy-${NAME_BACKEND}.sh"
-          def deploying = '#!/bin/bash\n' +
-            'cd /home/docker-image\n' +
-            "docker load < ${NAME_BACKEND}.tar.gz\n" +
-            "docker stop ${NAME_BACKEND} || echo 'No container to stop'\n" +
-            "docker rm ${NAME_BACKEND} || echo 'No container to remove'\n" +
-            "docker run -d --name ${NAME_BACKEND} -p 8082:8080 ${NAME_BACKEND}:$DOCKER_TAG\n"
-          sshagent(credentials: ['jenkins-ssh-key']) {
-            sh """
-              ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-            """
+    stage('Deploy to develop') {
+            steps {
+              script {
+                def deployFile = "deploy-${NAME_BACKEND}.sh"
+                def deploying = '#!/bin/bash\n' +
+                  "docker rm -f ${NAME_BACKEND}\n" +
+                  'cd /home/docker-image\n' +
+                  "docker load -i ${NAME_BACKEND}.tar.gz\n" +
+                  "docker run --name ${NAME_BACKEND} -dp 8080:8082 ${NAME_BACKEND}:$DOCKER_TAG"
+                sshagent(credentials: ['jenkins-ssh-key']) {
+                  sh """
+                      ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+                  """
+                }
+              }
+            }
           }
-        }
-      }
-    }
   }
 }
