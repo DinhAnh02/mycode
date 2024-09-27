@@ -46,10 +46,7 @@ import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
-import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
-import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
-import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
+import vn.eledevo.vksbe.dto.response.account.*;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
@@ -79,6 +76,7 @@ public class AccountServiceImpl implements AccountService {
     RoleRepository roleRepository;
     DepartmentRepository departmentRepository;
     OrganizationRepository organizationRepository;
+    ProfileRepository profileRepository;
 
     @Value("${file.upload-dir}")
     @NonFinal
@@ -467,7 +465,7 @@ public class AccountServiceImpl implements AccountService {
                 accountRepository.findById(newAccountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         if (!existingAccount.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
                 && !existingAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) {
-           throw new ApiException(ROLE_NOT_TRUE);
+            throw new ApiException(ROLE_NOT_TRUE);
         }
 
         Long departmentId = existingAccount.getDepartments().getId();
@@ -546,9 +544,9 @@ public class AccountServiceImpl implements AccountService {
         if ((loginAcc.equals(Role.TRUONG_PHONG) || loginAcc.equals(Role.PHO_PHONG))
                 && priorityRoles(loginAcc) > priorityRoles(detailedAcc)
                 && accSecurity
-                .getDepartments()
-                .getId()
-                .equals(account.getDepartments().getId())
+                        .getDepartments()
+                        .getId()
+                        .equals(account.getDepartments().getId())
                 && account.getStatus().equals(Status.ACTIVE.name())) {
             detailResponse.setIsShowLockButton(true);
             detailResponse.setIsEnabledLockButton(true);
@@ -703,6 +701,49 @@ public class AccountServiceImpl implements AccountService {
         }
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         return Files.readAllBytes(filePath);
+    }
+
+    @Override
+    @Transactional
+    public AccResponse<Object> updateAccountInfo(Long updatedAccId, Long swappedAccId, AccountCreateRequest req)
+            throws ApiException {
+        OldPositionAccInfo oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
+        Accounts updatedAcc =
+                accountRepository.findById(updatedAccId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+
+        if (swappedAccId == null) {
+            if (oldPositionAccInfo.getId() == null) {
+                Accounts account = accountToUpdate(req, updatedAcc);
+                accountRepository.save(account);
+                return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+            } else {
+                return AccResponse.builder().account(oldPositionAccInfo).build();
+            }
+        } else {
+            if (oldPositionAccInfo.getId() != null && oldPositionAccInfo.getId().equals(swappedAccId)) {
+                Accounts account = accountToUpdate(req, updatedAcc);
+                accountRepository.save(account);
+                swap(updatedAccId, swappedAccId);
+                return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+            } else {
+                return AccResponse.builder().account(oldPositionAccInfo).build();
+            }
+        }
+    }
+
+    private Accounts accountToUpdate(AccountCreateRequest req, Accounts updatedAcc) {
+        Profiles profile = profileRepository.findByAccountId(updatedAcc.getId());
+        profile.setAvatar(req.getAvatar());
+        profile.setPhoneNumber(req.getPhoneNumber());
+        profile.setFullName(req.getFullName());
+
+        updatedAcc.setStatus(Status.INACTIVE.name());
+        updatedAcc.setRoles(roleRepository.findById(req.getRoleId()).orElseThrow());
+        updatedAcc.setDepartments(
+                departmentRepository.findById(req.getDepartmentId()).orElseThrow());
+        updatedAcc.setProfile(profile);
+
+        return updatedAcc;
     }
 
     private void validateAvatarFile(MultipartFile file) throws ApiException {

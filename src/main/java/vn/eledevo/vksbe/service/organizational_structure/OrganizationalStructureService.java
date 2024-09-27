@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.department.DepartmentService;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
@@ -24,6 +25,23 @@ public class OrganizationalStructureService {
     OrganizationService organizationService;
 
     public void validate(AccountRequest req) throws ApiException {
+        if (!Objects.equals(req.getRoleName(), "")
+                && Boolean.FALSE.equals(roleService.roleNameChangeDetector(req.getRoleId(), req.getRoleName()))) {
+            throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
+        }
+        if (!Objects.equals(req.getDepartmentName(), "")
+                && Boolean.FALSE.equals(departmentService.departmentNameChangeDetector(
+                        req.getDepartmentId(), req.getDepartmentName()))) {
+            throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
+        }
+        if (!Objects.equals(req.getOrganizationName(), "")
+                && Boolean.FALSE.equals(organizationService.organizationNameChangeDetector(
+                        req.getOrganizationId(), req.getOrganizationName()))) {
+            throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);
+        }
+    }
+
+    public void validateUpdate(AccountCreateRequest req) throws ApiException {
         if (!Objects.equals(req.getRoleName(), "")
                 && Boolean.FALSE.equals(roleService.roleNameChangeDetector(req.getRoleId(), req.getRoleName()))) {
             throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);

@@ -13,6 +13,7 @@ import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.account.AccResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
@@ -50,4 +51,6 @@ public interface AccountService {
     String uploadAvatar(MultipartFile file) throws ApiException, IOException;
 
     byte[] downloadAvatar(String fileName) throws ApiException, IOException;
+
+    AccResponse<Object> updateAccountInfo(Long updatedAccId, Long swappedAccId, AccountCreateRequest req) throws ApiException;
 }

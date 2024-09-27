@@ -77,4 +77,6 @@ public class ResponseMessage {
     public static final String ACTIVE_ACCOUNT_SUCCESS = "Kích hoạt tài khoản thành công";
 
     public static final String LOCK_ACCOUNT_SUCCESS = "Khóa tài khoản thành công";
+
+    public static final String UPDATE_ACCOUNT_SUCCESS = "Chỉnh sửa thông tin tài khoản thành công";
 }
