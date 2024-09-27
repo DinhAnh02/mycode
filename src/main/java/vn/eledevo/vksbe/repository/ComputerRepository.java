@@ -15,13 +15,14 @@ import vn.eledevo.vksbe.entity.Computers;
 public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<Computers> findByAccounts_Id(Long accountId);
 
-    @Query("SELECT new vn.eledevo.vksbe.dto.response.ComputerResponseFilter(c.id, c.code, c.brand, c.type, c.name, c.status, c.note, p.fullName) " +
-            "FROM Computers c " +
-            "LEFT JOIN Accounts a ON c.accounts.id = a.id " +
-            "LEFT JOIN Profiles p ON p.accounts.id = a.id " +
-            "WHERE (:#{#computerRequest.name} IS NULL OR COALESCE(c.name, '') LIKE %:#{#computerRequest.name}%) " +
-            "AND (:#{#computerRequest.accountFullName} IS NULL OR COALESCE(p.fullName, '') LIKE %:#{#computerRequest.accountFullName}%) " +
-            "AND (:#{#computerRequest.status} IS NULL OR :#{#computerRequest.status} = '' OR COALESCE(c.status, '') = :#{#computerRequest.status})")
+    @Query(
+            "SELECT new vn.eledevo.vksbe.dto.response.ComputerResponseFilter(c.id, c.code, c.brand, c.type, c.name, c.status, c.note, p.fullName) "
+                    + "FROM Computers c "
+                    + "LEFT JOIN Accounts a ON c.accounts.id = a.id "
+                    + "LEFT JOIN Profiles p ON p.accounts.id = a.id "
+                    + "WHERE (:#{#computerRequest.name} IS NULL OR COALESCE(c.name, '') LIKE %:#{#computerRequest.name}%) "
+                    + "AND (:#{#computerRequest.accountFullName} IS NULL OR COALESCE(p.fullName, '') LIKE %:#{#computerRequest.accountFullName}%) "
+                    + "AND (:#{#computerRequest.status} IS NULL OR :#{#computerRequest.status} = '' OR COALESCE(c.status, '') = :#{#computerRequest.status})")
     Page<ComputerResponseFilter> getComputerList(ComputerRequest computerRequest, Pageable pageable);
 
     @Query("SELECT c FROM Computers c "

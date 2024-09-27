@@ -67,8 +67,8 @@ public class AuthenticationService {
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            if(!account.getStatus().equals("ACTIVE")){
-               throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
+            if (!account.getStatus().equals("ACTIVE")) {
+                throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
             }
             Boolean isCheck = checkRoleItAdmin(account.getRoles().getCode());
             if (Boolean.FALSE.equals(isCheck)) {
@@ -79,7 +79,9 @@ public class AuthenticationService {
                 throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
             }
             var jwtToken = jwtService.generateToken(
-                    account, UUID.fromString(universalSerialBus.get().getKeyUsb()), account.getRoles().getCode());
+                    account,
+                    UUID.fromString(universalSerialBus.get().getKeyUsb()),
+                    account.getRoles().getCode());
             // Hủy tất cả các token hiện có của người dùng
             revokeAllUserTokens(account);
             // Lưu token truy cập mới vào cơ sở dữ liệu
@@ -130,9 +132,8 @@ public class AuthenticationService {
 
     public String createPin(pinRequest pinRequest) throws ApiException {
         String username = SecurityUtils.getUserName();
-        Accounts account = accountRepository
-                .findAccountInSystem(username)
-                .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        Accounts account =
+                accountRepository.findAccountInSystem(username).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         if (!account.getStatus().equals("ACTIVE")) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
         }
@@ -152,9 +153,8 @@ public class AuthenticationService {
 
     public String changePassword(ChangePasswordRequest request) throws ApiException {
         String userName = SecurityUtils.getUserName();
-        Accounts accountRequest = accountRepository
-                .findAccountInSystem(userName)
-                .orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        Accounts accountRequest =
+                accountRepository.findAccountInSystem(userName).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         if (!accountRequest.getStatus().equals("ACTIVE")) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
         }
@@ -187,7 +187,7 @@ public class AuthenticationService {
         if (accounts.isEmpty()) {
             throw new ApiException(ErrorCode.USER_NOT_EXIST);
         }
-        if(!accounts.get().getStatus().equals("ACTIVE")){
+        if (!accounts.get().getStatus().equals("ACTIVE")) {
             throw new ApiException(CHECK_ACTIVE_ACCOUNT);
         }
         Optional<Usbs> usbToken =
@@ -215,7 +215,9 @@ public class AuthenticationService {
         UserInfo userInfo =
                 accountRepository.findAccountProfileById(accounts.get().getId());
         var jwtToken = jwtService.generateToken(
-                accounts.get(), UUID.fromString(usbToken.get().getKeyUsb()), accounts.get().getRoles().getCode());
+                accounts.get(),
+                UUID.fromString(usbToken.get().getKeyUsb()),
+                accounts.get().getRoles().getCode());
         // Hủy tất cả các token hiện có của người dùng
         revokeAllUserTokens(accounts.get());
         // Lưu token truy cập mới vào cơ sở dữ liệu

@@ -1,5 +1,7 @@
 package vn.eledevo.vksbe.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -12,8 +14,6 @@ import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.entity.Accounts;
-
-import java.util.Optional;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
     @Query("SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username")
@@ -58,12 +58,11 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
                     + "WHERE a.id = :accountId")
     UserInfo findAccountProfileById(@Param("accountId") Long accountId);
 
-    @Query(
-            "SELECT new vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo(a.id, a.username, p.fullName) "
-                    + "FROM Accounts a "
-                    + "JOIN a.profile p "
-                    + "WHERE a.departments.id = :departmentId "
-                    + "AND a.status = 'ACTIVE' "
-                    + "AND a.roles.id IN(1, 4)")
+    @Query("SELECT new vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo(a.id, a.username, p.fullName) "
+            + "FROM Accounts a "
+            + "JOIN a.profile p "
+            + "WHERE a.departments.id = :departmentId "
+            + "AND a.status = 'ACTIVE' "
+            + "AND a.roles.id IN(1, 4)")
     OldPositionAccInfo getOldPositionAccInfo(@Param("departmentId") Long departmentId);
 }

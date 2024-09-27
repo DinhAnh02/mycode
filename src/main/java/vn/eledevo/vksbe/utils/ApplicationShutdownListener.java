@@ -1,4 +1,5 @@
 package vn.eledevo.vksbe.utils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
