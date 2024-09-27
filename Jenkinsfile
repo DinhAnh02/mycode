@@ -69,7 +69,7 @@ pipeline {
               "docker rm -f ${NAME_BACKEND}\n" +
               'cd /home/docker-image\n' +
               "docker load -i ${NAME_BACKEND}.tar.gz\n" +
-              "docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG"
+              "docker run --name ${NAME_BACKEND} -dp 8080:8081 -e SPRING_PROFILES_ACTIVE=dev ${NAME_BACKEND}:$DOCKER_TAG"
             sshagent(credentials: ['jenkins-ssh-key']) {
               sh """
                   ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${DEVELOP_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
@@ -86,14 +86,14 @@ pipeline {
                 "docker rm -f ${NAME_BACKEND}\n" +
                 'cd /home/docker-image\n' +
                 "docker load -i ${NAME_BACKEND}.tar.gz\n" +
-                "docker run --name ${NAME_BACKEND} -dp 8080:8082 ${NAME_BACKEND}:$DOCKER_TAG"
+                "docker run --name ${NAME_BACKEND} -dp 8080:8082 -e SPRING_PROFILES_ACTIVE=test ${NAME_BACKEND}:$DOCKER_TAG"
               sshagent(credentials: ['jenkins-ssh-key']) {
                 sh """
                     ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo \\\"${deploying}\\\" > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
                 """
               }
             }
-         }
+          }
     }
   }
 }
