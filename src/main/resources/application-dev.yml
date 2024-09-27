@@ -2,14 +2,10 @@ server:
   port: 8081
 
 spring:
-  profiles:
-    active: dev
   datasource:
     username: eledevo
     password: eledevo@123
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://100.67.168.11:3306/vks-db
-  app:
-    host: http://100.67.168.11:${server.port}
 
 

@@ -1,7 +1,6 @@
-server:
-  port: 8081  # Mặc định cho local
-
 spring:
+  profiles:
+    active: dev
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: true
@@ -34,37 +33,5 @@ application:
 
 file:
   upload-dir: src/main/resources/storage
-
-# Cấu hình cho từng môi trường
----
-spring:
-  profiles: local
-  datasource:
-    username: root
-    password: 12345
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/vks-db  # Cấu hình cho local
-  app:
-    host: http://localhost:8081
-
----
-spring:
-  profiles: dev
-  datasource:
-    username: eledevo
-    password: eledevo@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://100.67.168.11:3306/vks-db  # Cấu hình cho dev
-  app:
-    host: http://100.67.168.11:8081
-
----
-spring:
-  profiles: test
-  datasource:
-    username: tester
-    password: eledevo@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://100.67.168.11:3307/test-db  # Cấu hình cho test
-  app:
-    host: http://100.67.168.11:8082
+app:
+  host: http://100.67.168.11:${server.port}
