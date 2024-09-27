@@ -158,7 +158,7 @@ public class AccountServiceImpl implements AccountService {
                 accountRepository.getAccountList(accountRequest, isBoss(accSecurity), pageable);
         return new ResponseFilter<>(
                 page.getContent(), (int) page.getTotalElements(), page.getSize(), page.getNumber(),
-                        page.getTotalPages());
+                page.getTotalPages());
     }
 
     @Override
@@ -236,7 +236,7 @@ public class AccountServiceImpl implements AccountService {
 
         if (roleCode.equals(Role.VIEN_PHO.name())
                 && (existingRoleCode.equals(Role.IT_ADMIN.name())
-                        || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
+                || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
             throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
         }
 
@@ -426,11 +426,16 @@ public class AccountServiceImpl implements AccountService {
         Accounts existingAccount =
                 accountRepository.findById(newAccountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         if (!existingAccount.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
-                || !existingAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) return null;
+                && !existingAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) {
+           throw new ApiException(ROLE_NOT_TRUE);
+        }
+
         Long departmentId = existingAccount.getDepartments().getId();
         String roleCode = existingAccount.getRoles().getCode();
         Optional<Accounts> accountLeadOptional = accountRepository.findByDepartment(departmentId, roleCode, "ACTIVE");
-        if (accountLeadOptional.isEmpty()) return null;
+        if (accountLeadOptional.isEmpty()) {
+            throw new ApiException(LEADER_NOT_FOUND);
+        }
         Accounts accountLead = accountLeadOptional.get();
         if (!accountLead.getId().equals(oldAccountId)) {
             AccountSwapResponse accountSwapResponse = AccountSwapResponse.builder()
@@ -501,9 +506,9 @@ public class AccountServiceImpl implements AccountService {
         if ((loginAcc.equals(Role.TRUONG_PHONG) || loginAcc.equals(Role.PHO_PHONG))
                 && priorityRoles(loginAcc) > priorityRoles(detailedAcc)
                 && accSecurity
-                        .getDepartments()
-                        .getId()
-                        .equals(account.getDepartments().getId())
+                .getDepartments()
+                .getId()
+                .equals(account.getDepartments().getId())
                 && account.getStatus().equals(Status.ACTIVE.name())) {
             detailResponse.setIsShowLockButton(true);
             detailResponse.setIsEnabledLockButton(true);
