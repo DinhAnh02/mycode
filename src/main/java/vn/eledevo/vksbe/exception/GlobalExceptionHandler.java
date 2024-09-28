@@ -42,6 +42,7 @@ public class GlobalExceptionHandler extends Throwable {
         String displayMessage = (ex instanceof ApiException) ? ex.getMessage() : errorCode.getMessage();
         return ResponseEntity.status(errorCode.getStatusCode()).body(new HashMap<String, Object>() {
             {
+                put("result", errorCode.getResult());
                 put("message", displayMessage);
                 put("code", errorCode.getCode());
             }
