@@ -169,7 +169,7 @@ public class AccountController {
         return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, req));
     }
     @GetMapping("/get-user-info")
-    @Operation(summary = "Thông tin chi tiết theo tài khoản")
+    @Operation(summary = "Thông tin cá nhân")
     public ApiResponse<UserInfo> userDetail () throws ApiException {
         return ApiResponse.ok(accountService.userInfo());
     }
