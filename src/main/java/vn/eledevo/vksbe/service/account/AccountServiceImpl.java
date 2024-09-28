@@ -266,32 +266,46 @@ public class AccountServiceImpl implements AccountService {
 
         String roleCode = accountRequest.get().getRoleCode();
         String existingRoleCode = existingAccount.getRoles().getCode();
-        boolean existingRole = existingRoleCode.equals(Role.VIEN_TRUONG.name())
-                || existingRoleCode.equals(Role.VIEN_PHO.name())
-                || existingRoleCode.equals(Role.IT_ADMIN.name());
+        boolean sameDepartment = accountRequest
+                .get()
+                .getDepartmentId()
+                .equals(existingAccount.getDepartments().getId());
 
-        if (roleCode.equals(Role.VIEN_TRUONG.name()) && existingRoleCode.equals(Role.IT_ADMIN.name())) {
-            throw new ApiException(ACCOUNT_NOT_LOCK); // Viện trưởng không thể khóa IT
+        switch (roleCode) {
+            case VIEN_TRUONG -> handleVienTruong(existingRoleCode);
+            case VIEN_PHO -> handleVienPho(existingRoleCode);
+            case TRUONG_PHONG -> handleTruongPhong(existingRoleCode, sameDepartment);
+            case PHO_PHONG -> handlePhoPhong(existingRoleCode, sameDepartment);
+            default -> throw new ApiException(UNCATEGORIZED_EXCEPTION);
         }
-
-        if (roleCode.equals(Role.VIEN_PHO.name())
-                && (existingRoleCode.equals(Role.IT_ADMIN.name())
-                        || existingRoleCode.equals(Role.VIEN_TRUONG.name()))) {
-            throw new ApiException(ACCOUNT_NOT_LOCK); // Viện phó không thể khóa IT, VT
-        }
-
-        if (roleCode.equals(Role.TRUONG_PHONG.name()) && existingRole) {
-            throw new ApiException(ACCOUNT_NOT_LOCK); // Không được khóa viện trưởng hoặc viện phó
-        }
-
-        if (roleCode.equals(Role.PHO_PHONG.name()) && existingRole) {
-            throw new ApiException(ACCOUNT_NOT_LOCK);
-        }
-        // khóa account qua status
         existingAccount.setStatus(Status.INACTIVE.name());
         accountRepository.save(existingAccount);
-
         return ResponseMessage.LOCK_ACCOUNT_SUCCESS;
+    }
+
+    private void handleVienTruong(String existingRoleCode) throws ApiException {
+        if (existingRoleCode.equals(IT_ADMIN)) {
+            throw new ApiException(ACCOUNT_NOT_LOCK);
+        }
+    }
+
+    private void handleVienPho(String existingRoleCode) throws ApiException {
+        List<String> restrictedRoles = List.of(IT_ADMIN,VIEN_TRUONG, VIEN_PHO);
+        if (restrictedRoles.contains(existingRoleCode)) {
+            throw new ApiException(ACCOUNT_NOT_LOCK);
+        }
+    }
+
+    private void handleTruongPhong(String existingRoleCode, boolean sameDepartment) throws ApiException {
+        if ((!existingRoleCode.equals(PHO_PHONG) && !existingRoleCode.equals(KIEM_SAT_VIEN)) || !sameDepartment) {
+            throw new ApiException(ACCOUNT_NOT_LOCK);
+        }
+    }
+
+    private void handlePhoPhong(String existingRoleCode, boolean sameDepartment) throws ApiException {
+        if (!existingRoleCode.equals(KIEM_SAT_VIEN) || !sameDepartment) {
+            throw new ApiException(ACCOUNT_NOT_LOCK);
+        }
     }
 
     @Override
