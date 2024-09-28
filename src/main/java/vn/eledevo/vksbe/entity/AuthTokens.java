@@ -22,8 +22,8 @@ public class AuthTokens {
 
     String token;
     String tokenType;
-    Boolean isExpireTime;
-    LocalDateTime createTime;
+    Boolean isExpiredTime;
+    LocalDateTime createdTime;
 
     @ManyToOne
     @JoinColumn(name = "accountId", nullable = false)
@@ -31,6 +31,6 @@ public class AuthTokens {
 
     @PrePersist
     public void prePersist() {
-        this.createTime = LocalDateTime.now();
+        this.createdTime = LocalDateTime.now();
     }
 }

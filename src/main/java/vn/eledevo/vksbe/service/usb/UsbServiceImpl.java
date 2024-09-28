@@ -49,7 +49,7 @@ public class UsbServiceImpl implements UsbService {
     AccountRepository accountRepository;
 
     @Override
-    public Result<?> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit) throws ApiException {
+    public Result<UsbResponseFilter> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit) throws ApiException {
         if (usbRequest.getFromDate() == null) {
             usbRequest.setFromDate(LocalDate.of(1900, 1, 1));
         }
@@ -104,25 +104,25 @@ public class UsbServiceImpl implements UsbService {
         return null;
     }
 
-    private void downloadFile() throws IOException, ApiException {
-        String fileUrl = "https://jenkins.eledevo.com/download/app_usb.zip";
-        String saveDirectory = "./src/AppUsb/";
-        String fileName = "app_usb.zip";
-
-        URL url = new URL(fileUrl);
-        URLConnection urlConnection = url.openConnection();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-        try (InputStream inputStream = urlConnection.getInputStream()) {
-            Path file = Paths.get(saveDirectory + fileName);
-            Files.copy(inputStream, file);
-        } catch (IOException e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
-        }
-    }
+//    private void downloadFile() throws IOException, ApiException {
+//        String fileUrl = "https://jenkins.eledevo.com/download/app_usb.zip";
+//        String saveDirectory = "./src/AppUsb/";
+//        String fileName = "app_usb.zip";
+//
+//        URL url = new URL(fileUrl);
+//        URLConnection urlConnection = url.openConnection();
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//
+//        try (InputStream inputStream = urlConnection.getInputStream()) {
+//            Path file = Paths.get(saveDirectory + fileName);
+//            Files.copy(inputStream, file);
+//        } catch (IOException e) {
+//            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
+//        }
+//    }
 
     private void unzipFile() throws IOException {
         String zipFilePath = "./src/AppUsb/app_usb.zip";

@@ -24,10 +24,10 @@ public class MindmapTemplate {
     String name;
     String data;
     String url;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    String createBy;
-    String updateBy;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    String createdBy;
+    String updatedBy;
 
     @ManyToOne
     @JoinColumn(name = "departmentId", nullable = false)
@@ -35,13 +35,13 @@ public class MindmapTemplate {
 
     @PrePersist
     public void prePersist() {
-        this.createAt = LocalDateTime.now();
-        this.createBy = SecurityUtils.getUserName();
+        this.createdAt = LocalDateTime.now();
+        this.createdBy = SecurityUtils.getUserName();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateAt = LocalDateTime.now();
-        this.updateBy = SecurityUtils.getUserName();
+        this.updatedAt = LocalDateTime.now();
+        this.updatedBy = SecurityUtils.getUserName();
     }
 }

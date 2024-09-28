@@ -13,6 +13,6 @@ import vn.eledevo.vksbe.dto.request.DataChange;
 @Builder
 public class Token2FAResponse {
     DataChange hasString;
-    long createTokenTime;
-    long expireTime;
+    long createdTokenTime;
+    long expiredTime;
 }

@@ -19,7 +19,7 @@ public class CasePerson {
     Long id;
 
     String type;
-    Boolean isDelete;
+    Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caseId", nullable = false)

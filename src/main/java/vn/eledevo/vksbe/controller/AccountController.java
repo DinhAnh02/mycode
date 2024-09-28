@@ -27,10 +27,15 @@ import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccResponse;
+import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
+import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
+import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
@@ -70,7 +75,7 @@ public class AccountController {
 
     @PostMapping()
     @Operation(summary = "Xem danh sách tài khoản")
-    public ApiResponse<?> getAccountList(
+    public ApiResponse<ResponseFilter<AccountResponseByFilter>> getAccountList(
             @RequestBody AccountRequest req,
             @RequestParam(defaultValue = "1") Integer currentPage,
             @RequestParam(defaultValue = "10") Integer limit)
@@ -81,7 +86,7 @@ public class AccountController {
 
     @PatchMapping("/{accountId}/inactivate")
     @Operation(summary = "Khóa tài khoản")
-    public ApiResponse<?> lockAccount(@PathVariable Long accountId) throws ApiException {
+    public ApiResponse<String> lockAccount(@PathVariable Long accountId) throws ApiException {
         if (accountId == null) {
             throw new ApiException(FIELD_INVALID);
         }
@@ -97,7 +102,7 @@ public class AccountController {
 
     @PatchMapping("/connect-computer/{id}/computers")
     @Operation(summary = "Kết nối tài khoản với thiết bị máy tính", description = "Kết nối tài khoản với thiết bị")
-    public ApiResponse<Result<?>> connectComputers(
+    public ApiResponse<Result<ConnectComputerResponse>> connectComputers(
             @PathVariable("id") Long accountId,
             @RequestBody @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
             throws ApiException {
@@ -106,8 +111,9 @@ public class AccountController {
 
     @PatchMapping("/remove-usb/{accountId}/usb/{usbId}")
     @Operation(summary = "Gỡ USB kết nối với tài khoản")
-    public ApiResponse<?> removeUsb(@PathVariable Long accountId, @PathVariable Long usbId) throws ApiException {
-        return ApiResponse.ok(accountService.removeUSB(accountId, usbId));
+    public ApiResponse<AccountResponse> removeUsb(@PathVariable Long accountId, @PathVariable Long usbId)
+            throws ApiException {
+        return ApiResponse.ok(accountService.removeConnectUSB(accountId, usbId));
     }
 
     @PatchMapping("/{idAccount}/activate")
@@ -120,8 +126,8 @@ public class AccountController {
 
     @PatchMapping("/swap-account-status/{employeeId}/{requesterId}")
     @Operation(summary = "Hoán đổi vị trí trưởng phòng/viện trưởng")
-    public ApiResponse<?> swapAccountSattus(@PathVariable Long employeeId, @PathVariable Long requesterId)
-            throws ApiException {
+    public ApiResponse<ObjectSwapResponse> swapAccountSattus(
+            @PathVariable Long employeeId, @PathVariable Long requesterId) throws ApiException {
         return ApiResponse.ok(accountService.swapStatus(employeeId, requesterId));
     }
 
@@ -148,9 +154,9 @@ public class AccountController {
 
     @GetMapping("/{accountId}/remove-computer/{computerId}")
     @Operation(summary = "Gỡ thiết bị máy tính đã liên kết với tài khoản")
-    public ResponseEntity<ApiResponse<String>> removeComputer(
-            @PathVariable Long accountId, @PathVariable Long computerId) throws ApiException {
-        return ResponseEntity.ok(accountService.removeConnectComputer(accountId, computerId));
+    public ApiResponse<String> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
+            throws ApiException {
+        return ApiResponse.ok(accountService.removeConnectComputer(accountId, computerId));
     }
 
     @PatchMapping("/update-info")

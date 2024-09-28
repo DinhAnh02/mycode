@@ -7,12 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.entity.Accounts;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
@@ -20,10 +19,10 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     Optional<Accounts> findAccountInSystem(String username);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter("
+            "SELECT new vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter("
                     + "a.id, a.username, p.fullName, r.name, r.code, r.id, d.id, d.name, o.id,"
                     + "o.name, a.status, a.isConnectComputer, "
-                    + "a.isConnectUsb, a.createAt, a.updateAt, false , false, false , false) "
+                    + "a.isConnectUsb, a.createdAt, a.updatedAt, false , false, false , false) "
                     + "FROM Accounts a "
                     + "LEFT JOIN Profiles p ON p.accounts.id = a.id "
                     + "LEFT JOIN Roles r ON r.id = a.roles.id "
@@ -36,9 +35,9 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
                     + "AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId}) "
                     + "AND (:#{#filter.organizationId} = 0 OR o.id = :#{#filter.organizationId}) "
                     + "AND (:#{#filter.status} IS NULL OR a.status LIKE %:#{#filter.status}%) "
-                    + "AND a.createAt >= :#{#filter.fromDate.atStartOfDay()} "
-                    + "AND a.createAt <= :#{#filter.toDate.atTime(23, 59, 59)}")
-    Page<AccountResponseByFilter> getAccountList(AccountRequest filter, Boolean isBoss, Pageable pageable);
+                    + "AND a.createdAt >= :#{#filter.fromDate.atStartOfDay()} "
+                    + "AND a.createdAt <= :#{#filter.toDate.atTime(23, 59, 59)}")
+    Page<AccountQueryToFilter> getAccountList(AccountRequest filter, Boolean isBoss, Pageable pageable);
 
     Accounts findAccountsByUsername(String username);
 

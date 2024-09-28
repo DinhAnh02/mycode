@@ -15,8 +15,8 @@ public class UsbResponse {
     String name;
     String keyUsb;
     String status;
-    Long createAt;
-    Long updateAt;
-    String createBy;
-    String updateBy;
+    Long createdAt;
+    Long updatedAt;
+    String createdBy;
+    String updatedBy;
 }

@@ -39,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
+import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
@@ -46,7 +47,6 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
-import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.*;
@@ -115,8 +115,8 @@ public class AccountServiceImpl implements AccountService {
         accounts.setPin(null);
         accounts.setIsConditionLogin1(false);
         accounts.setIsConditionLogin2(false);
-        accounts.setUpdateBy(getUserName());
-        accounts.setUpdateAt(LocalDateTime.now());
+        accounts.setUpdatedBy(getUserName());
+        accounts.setUpdatedAt(LocalDateTime.now());
         accountRepository.save(accounts);
         tokenRepository.deleteByAccounts_Id(id);
         return ResponseMessage.RESET_PASSWORD_SUCCESS;
@@ -124,8 +124,7 @@ public class AccountServiceImpl implements AccountService {
 
     private Boolean isBoss(Accounts accSecurity) {
         return switch (accSecurity.getRoles().getCode()) {
-            case IT_ADMIN, VIEN_TRUONG -> true;
-            case VIEN_PHO -> true;
+            case IT_ADMIN, VIEN_TRUONG, VIEN_PHO -> true;
             default -> false;
         };
     }
@@ -155,50 +154,66 @@ public class AccountServiceImpl implements AccountService {
             accountRequest.setDepartmentId(accSecurity.getDepartments().getId());
         }
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
-        Page<AccountResponseByFilter> page =
+        Page<AccountQueryToFilter> page =
                 accountRepository.getAccountList(accountRequest, isBoss(accSecurity), pageable);
-
-        page.getContent().forEach(account -> {
+        Page<AccountResponseByFilter> filters = page.map(account -> {
             checkRoleToShowLockOrUnlockButton(account, accSecurity);
+            return AccountResponseByFilter.builder()
+                    .id(account.getId())
+                    .username(account.getUsername())
+                    .fullName(account.getFullName())
+                    .roleName(account.getRoleName())
+                    .departmentName(account.getDepartmentName())
+                    .organizationName(account.getOrganizationName())
+                    .status(account.getStatus())
+                    .createdAt(account.getCreatedAt())
+                    .updatedAt(account.getUpdatedAt())
+                    .isShowUnlockButton(account.getIsShowUnlockButton())
+                    .isEnabledUnlockButton(account.getIsEnabledUnlockButton())
+                    .isShowLockButton(account.getIsShowLockButton())
+                    .isEnabledLockButton(account.getIsEnabledLockButton())
+                    .build();
         });
         return new ResponseFilter<>(
-                page.getContent(),
-                (int) page.getTotalElements(),
-                page.getSize(),
-                page.getNumber(),
-                page.getTotalPages());
+                filters.getContent(),
+                (int) filters.getTotalElements(),
+                filters.getSize(),
+                filters.getNumber(),
+                filters.getTotalPages());
     }
 
-    private void checkRoleToShowLockOrUnlockButton(AccountResponseByFilter account, Accounts accSecurity) {
+    private void checkRoleToShowLockOrUnlockButton(AccountQueryToFilter account, Accounts accSecurity) {
         Role viewedAccRole = Role.valueOf(account.getRoleCode());
         Role loginAccRole = Role.valueOf(accSecurity.getRoles().getCode());
-        if (account.getStatus().equals("ACTIVE") && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)) {
+        if (account.getStatus().equals(Status.ACTIVE.name())
+                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)) {
             account.setIsShowLockButton(true);
-            account.setIsEnableLockButton(true);
+            account.setIsEnabledLockButton(true);
         }
-        if ((account.getStatus().equals("INACTIVE") || account.getStatus().equals("INITIAL"))
-                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
-                && account.getIsConnectComputer()
-                && account.getIsConnectUsb()) {
+        if (Boolean.TRUE.equals((account.getStatus().equals(Status.INACTIVE.name())
+                                || account.getStatus().equals(Status.INITIAL.name()))
+                        && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
+                        && account.getIsConnectComputer())
+                && Boolean.TRUE.equals(account.getIsConnectUsb())) {
             account.setIsShowUnlockButton(true);
-            account.setIsEnableUnlockButton(true);
+            account.setIsEnabledUnlockButton(true);
         }
         if ((loginAccRole.equals(Role.TRUONG_PHONG) || loginAccRole.equals(Role.PHO_PHONG))
                 && accSecurity.getDepartments().getId().equals(account.getDepartmentId())
-                && account.getStatus().equals("ACTIVE")
+                && account.getStatus().equals(Status.ACTIVE.name())
                 && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)) {
             account.setIsShowLockButton(true);
-            account.setIsEnableLockButton(true);
+            account.setIsEnabledLockButton(true);
         }
 
         if ((loginAccRole.equals(Role.TRUONG_PHONG) || loginAccRole.equals(Role.PHO_PHONG))
-                && (account.getStatus().equals("INACTIVE")
-                        || account.getStatus().equals("INITIAL")
+                && (account.getStatus().equals(Status.INACTIVE.name())
+                        || account.getStatus().equals(Status.INITIAL.name())
                                 && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
                                 && account.getIsConnectComputer()
                                 && account.getIsConnectUsb())) {
             account.setIsShowUnlockButton(true);
-            account.setIsEnableUnlockButton(true);
+            account.setIsEnabledUnlockButton(true);
         }
     }
 
@@ -207,7 +222,7 @@ public class AccountServiceImpl implements AccountService {
         String loginAccountName = getUserName();
         Accounts accSecurity = accountRepository.findAccountsByUsername(loginAccountName);
         Accounts account = validAccount(accountId);
-        Organizations organizations = organizationRepository.findById(1L).get();
+        Organizations organizations = organizationRepository.findById(1L).orElseThrow();
         AccountDetailResponse detailResponse = AccountDetailResponse.builder()
                 .id(account.getId())
                 .username(account.getUsername())
@@ -225,7 +240,7 @@ public class AccountServiceImpl implements AccountService {
                 .isShowEditButton(false)
                 .isEnabledLockButton(false)
                 .isShowLockButton(false)
-                .isEnableResetPasswordButton(false)
+                .isEnabledResetPasswordButton(false)
                 .isShowResetPasswordButton(false)
                 .isEnabledActivateButton(false)
                 .isShowActivateButton(false)
@@ -311,34 +326,29 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public ApiResponse<String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
-        try {
-            Accounts accounts =
-                    accountRepository.findById(accountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
-            Computers computers =
-                    computerRepository.findById(computerId).orElseThrow(() -> new ApiException(COMPUTER_NOT_FOUND));
-            String STATUS_COMPUTER_DISCONNECTED = "DISCONNECTED";
-            if (!computers.getAccounts().getId().equals(accountId)) {
-                throw new ApiException(COMPUTER_NOT_CONNECT_TO_ACCOUNT);
-            }
-            computers.setAccounts(null);
-            computers.setStatus(STATUS_COMPUTER_DISCONNECTED);
-            computerRepository.save(computers);
-            int soThietBiKetNoi = accounts.getComputers().size();
-            if (Objects.equals(soThietBiKetNoi, 1)) {
-                accounts.setIsConnectComputer(false);
-                accounts.setStatus("INACTIVE");
-                accountRepository.save(accounts);
-            }
-            // gỡ usb token
-            Optional<Usbs> usb = usbRepository.findByAccounts_Id(accountId);
-            if (usb.isPresent()) {
-                removeUSB(accountId, usb.get().getId());
-            }
-            return ApiResponse.ok("Gỡ liên kết máy tính với tài khoản thành công");
-        } catch (Exception e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+    public String removeConnectComputer(Long accountId, Long computerId) throws ApiException {
+        Accounts accounts =
+                accountRepository.findById(accountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        Computers computers =
+                computerRepository.findById(computerId).orElseThrow(() -> new ApiException(COMPUTER_NOT_FOUND));
+        if (!computers.getAccounts().getId().equals(accountId)) {
+            throw new ApiException(COMPUTER_NOT_CONNECT_TO_ACCOUNT);
         }
+        computers.setAccounts(null);
+        computers.setStatus(Status.DISCONNECTED.name());
+        computerRepository.save(computers);
+        int soThietBiKetNoi = accounts.getComputers().size();
+        if (Objects.equals(soThietBiKetNoi, 1)) {
+            accounts.setIsConnectComputer(false);
+            accounts.setStatus("INACTIVE");
+            accountRepository.save(accounts);
+        }
+        // gỡ usb token
+        Optional<Usbs> usb = usbRepository.findByAccounts_Id(accountId);
+        if (usb.isPresent()) {
+            removeUSB(accountId, usb.get().getId());
+        }
+        return REMOVE_CONNECT_COMPUTER_SUCCESS;
     }
 
     @Override
@@ -353,7 +363,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Result<?> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
+    public Result<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
         Accounts accounts = validAccount(id);
         List<ConnectComputerResponse> computerResponses = new ArrayList<>();
         if (!CollectionUtils.isEmpty(computerIds)) {
@@ -372,6 +382,7 @@ public class AccountServiceImpl implements AccountService {
                                 .id(computer.getId())
                                 .name(computer.getName())
                                 .code(computer.getCode())
+                                .isConnected(false)
                                 .message("Thiết bị đã được kết nối với tài khoản khác")
                                 .build());
                     } else {
@@ -379,12 +390,13 @@ public class AccountServiceImpl implements AccountService {
                                 .id(computer.getId())
                                 .name(computer.getName())
                                 .code(computer.getCode())
+                                .isConnected(true)
                                 .message("Kết nối thiết bị thành công")
                                 .build());
                         computer.setAccounts(accounts);
                         computer.setStatus(Const.CONNECTED);
-                        computer.setUpdateAt(LocalDateTime.now());
-                        computer.setUpdateBy(nameUpdate);
+                        computer.setUpdatedAt(LocalDateTime.now());
+                        computer.setUpdatedBy(nameUpdate);
                         connectedComputers.add(computer);
                         Optional<Usbs> usb = usbRepository.findByAccounts_Id(id);
                         if (usb.isPresent()) {
@@ -396,6 +408,7 @@ public class AccountServiceImpl implements AccountService {
                             .id(computerId)
                             .name(null)
                             .code(null)
+                            .isConnected(false)
                             .message("Không tồn tại thiết bị")
                             .build());
                 }
@@ -410,18 +423,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public ApiResponse<?> removeUSB(Long accountID, Long usbID) throws ApiException {
-        Accounts accounts =
-                accountRepository.findById(accountID).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
-
-        if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
-            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
-        }
-        accounts.setUsb(null);
-        accounts.setIsConnectUsb(false);
-        Accounts accRemove = accountRepository.save(accounts);
-        AccountResponse accountResponse = accountMapper.toResponse(accRemove);
-        return ApiResponse.ok(accountResponse);
+    public AccountResponse removeConnectUSB(Long accountID, Long usbID) throws ApiException {
+        return removeUSB(accountID, usbID);
     }
 
     @Override
@@ -455,23 +458,12 @@ public class AccountServiceImpl implements AccountService {
                 return ActivedAccountResponse.builder().oldPositionAccInfo(old).build();
             } else {
                 activedAcc.setStatus(Const.ACTIVE);
-                activedAcc.setUpdateAt(LocalDateTime.now());
-                activedAcc.setUpdateBy(SecurityUtils.getUserName());
+                activedAcc.setUpdatedAt(LocalDateTime.now());
+                activedAcc.setUpdatedBy(SecurityUtils.getUserName());
                 accountRepository.save(activedAcc);
             }
         }
         return ActivedAccountResponse.builder().message(ACTIVE_ACCOUNT_SUCCESS).build();
-    }
-
-    private int priorityRoles(Role role) {
-        return switch (role) {
-            case IT_ADMIN -> 11;
-            case VIEN_TRUONG -> 10;
-            case VIEN_PHO -> 9;
-            case TRUONG_PHONG -> 8;
-            case PHO_PHONG -> 7;
-            default -> 0;
-        };
     }
 
     @Override
@@ -534,6 +526,63 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.toResponse(savedAccount);
     }
 
+    @Override
+    public String uploadAvatar(MultipartFile file) throws ApiException, IOException {
+        validateAvatarFile(file);
+
+        Path uploadPath = Files.createDirectories(Paths.get(uploadDir));
+        String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
+        Path filePath = uploadPath.resolve(uniqueFileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return appHost + AVATAR_URI + uniqueFileName;
+    }
+
+    @Override
+    public byte[] downloadAvatar(String fileName) throws ApiException, IOException {
+        if (fileName == null || fileName.isEmpty()) {
+            throw new ApiException(AVATAR_NOT_FOUND);
+        }
+        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+        return Files.readAllBytes(filePath);
+    }
+
+    @Override
+    @Transactional
+    public AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) {
+        Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
+        if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
+                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
+            accountToUpdate(req, updatedAccId, updateAccRole);
+            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+        }
+        OldPositionAccInfo oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
+        if (oldPositionAccInfo.getId() == null) {
+            accountToUpdate(req, updatedAccId, updateAccRole);
+            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+        }
+        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+            return AccResponse.builder().account(oldPositionAccInfo).build();
+        }
+        Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
+        accountLead.setStatus(Status.INACTIVE.name());
+        Accounts account = accountToUpdate(req, updatedAccId, updateAccRole);
+        account.setStatus(Status.ACTIVE.name());
+        return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+    }
+
+    private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
+        Accounts accounts =
+                accountRepository.findById(accountID).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+
+        if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
+            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+        }
+        accounts.setUsb(null);
+        accounts.setIsConnectUsb(false);
+        Accounts accRemove = accountRepository.save(accounts);
+        return accountMapper.toResponse(accRemove);
+    }
+
     private void validateRoleForViewButton(
             AccountDetailResponse detailResponse, Accounts accSecurity, Accounts account) {
         Role loginAcc = Role.valueOf(accSecurity.getRoles().getCode());
@@ -542,7 +591,7 @@ public class AccountServiceImpl implements AccountService {
         if (loginAcc.equals(Role.IT_ADMIN)) {
             detailResponse.setIsEnabledEditButton(true);
             detailResponse.setIsShowEditButton(true);
-            detailResponse.setIsEnableResetPasswordButton(true);
+            detailResponse.setIsEnabledResetPasswordButton(true);
             detailResponse.setIsShowResetPasswordButton(true);
         }
 
@@ -581,7 +630,7 @@ public class AccountServiceImpl implements AccountService {
             return false;
         }
 
-        Departments curLoginDepartment = departmentRepository.findByAccountId(curLoginAcc.getId());
+        Departments curLoginDepartment = departmentRepository.findByAccounts_Id(curLoginAcc.getId());
         return Objects.equals(curLoginDepartment.getCode(), DepartmentCode.PB_KY_THUAT.name());
     }
 
@@ -702,52 +751,6 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    @Override
-    public String uploadAvatar(MultipartFile file) throws ApiException, IOException {
-        validateAvatarFile(file);
-
-        Path uploadPath = Files.createDirectories(Paths.get(uploadDir));
-        String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
-        Path filePath = uploadPath.resolve(uniqueFileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        return appHost + AVATAR_URI + uniqueFileName;
-    }
-
-    @Override
-    public byte[] downloadAvatar(String fileName) throws ApiException, IOException {
-        if (fileName == null || fileName.isEmpty()) {
-            throw new ApiException(AVATAR_NOT_FOUND);
-        }
-        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-        return Files.readAllBytes(filePath);
-    }
-
-    @Override
-    @Transactional
-    public AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) {
-        Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
-        if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
-            accountToUpdate(req, updatedAccId, updateAccRole);
-            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
-
-        }
-        OldPositionAccInfo oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
-        if (oldPositionAccInfo.getId() == null) {
-            accountToUpdate(req, updatedAccId, updateAccRole);
-            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
-        }
-        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
-            return AccResponse.builder().account(oldPositionAccInfo).build();
-        }
-        Accounts accountLead =
-                accountRepository.findById(req.getSwappedAccId()).orElseThrow();
-        accountLead.setStatus(Status.INACTIVE.name());
-        Accounts account = accountToUpdate(req, updatedAccId, updateAccRole);
-        account.setStatus(Status.ACTIVE.name());
-        return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
-    }
-
     private Accounts accountToUpdate(AccountUpdateRequest req, Long updatedAccId, Roles updateAccRole) {
         Profiles profile = profileRepository.findByAccounts_Id(updatedAccId);
         Accounts updatedAcc = accountRepository.findById(updatedAccId).orElseThrow();
@@ -781,11 +784,23 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(ErrorCode.AVATAR_MAX_SIZE, msg);
         }
     }
+
+    private int priorityRoles(Role role) {
+        return switch (role) {
+            case IT_ADMIN -> 11;
+            case VIEN_TRUONG -> 10;
+            case VIEN_PHO -> 9;
+            case TRUONG_PHONG -> 8;
+            case PHO_PHONG -> 7;
+            default -> 0;
+        };
+    }
+
     @Override
     public UserInfo userInfo() throws ApiException {
-        Long userId =  SecurityUtils.getUserId();
+        Long userId = SecurityUtils.getUserId();
         Optional<UserInfo> userDetail = accountRepository.findAccountProfileById(userId);
-        if(userDetail.isEmpty()){
+        if (userDetail.isEmpty()) {
             throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_EXISTS);
         }
         return userDetail.get();

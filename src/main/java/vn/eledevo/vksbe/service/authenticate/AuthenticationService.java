@@ -16,10 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
-import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.constant.ResponseMessage;
-import vn.eledevo.vksbe.constant.Role;
-import vn.eledevo.vksbe.constant.TokenType;
+import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
@@ -67,7 +64,7 @@ public class AuthenticationService {
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            if (!account.getStatus().equals("ACTIVE")) {
+            if (!account.getStatus().equals(Status.ACTIVE.name())) {
                 throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
             }
             Boolean isCheck = checkRoleItAdmin(account.getRoles().getCode());
@@ -110,7 +107,7 @@ public class AuthenticationService {
                 .accounts(account)
                 .token(jwtToken)
                 .tokenType(type)
-                .isExpireTime(false)
+                .isExpiredTime(false)
                 .build();
 
         // Lưu đối tượng Token vào cơ sở dữ liệu
@@ -134,7 +131,7 @@ public class AuthenticationService {
         String username = SecurityUtils.getUserName();
         Accounts account =
                 accountRepository.findAccountInSystem(username).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
-        if (!account.getStatus().equals("ACTIVE")) {
+        if (!account.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
         }
         if (Boolean.FALSE.equals(account.getIsConditionLogin2())) {
@@ -155,7 +152,7 @@ public class AuthenticationService {
         String userName = SecurityUtils.getUserName();
         Accounts accountRequest =
                 accountRepository.findAccountInSystem(userName).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
-        if (!accountRequest.getStatus().equals("ACTIVE")) {
+        if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
         }
         if (Boolean.FALSE.equals(accountRequest.getIsConditionLogin1())) {
@@ -180,7 +177,7 @@ public class AuthenticationService {
             throws Exception {
         String employeeCode = SecurityUtils.getUserName();
         Token2FAResponse responseTokenUsb = ChangeData.decrypt(request.getTokenUsb(), Token2FAResponse.class);
-        if (responseTokenUsb.getExpireTime() > System.currentTimeMillis()) {
+        if (responseTokenUsb.getExpiredTime() > System.currentTimeMillis()) {
             throw new ApiException(ErrorCode.TOKEN_EXPIRE);
         }
         Optional<Accounts> accounts = accountRepository.findAccountInSystem(employeeCode);

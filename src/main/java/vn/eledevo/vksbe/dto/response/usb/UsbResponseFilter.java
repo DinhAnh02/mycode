@@ -14,6 +14,6 @@ public class UsbResponseFilter {
     Long id;
     String status;
     String name;
-    String createByAccountName;
-    LocalDateTime createAt;
+    String createdByAccountName;
+    LocalDateTime createdAt;
 }

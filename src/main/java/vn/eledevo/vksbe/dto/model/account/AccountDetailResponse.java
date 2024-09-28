@@ -34,7 +34,7 @@ public class AccountDetailResponse {
     Boolean isShowEditButton;
 
     /** Trạng thái nút RESET MẬT KHẨU */
-    Boolean isEnableResetPasswordButton;
+    Boolean isEnabledResetPasswordButton;
 
     Boolean isShowResetPasswordButton;
 
