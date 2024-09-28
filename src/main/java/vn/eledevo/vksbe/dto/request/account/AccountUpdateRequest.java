@@ -50,4 +50,6 @@ public class AccountUpdateRequest {
     @NotBlank(message = PHONE_NUMBER_REQUIRE)
     @Pattern(regexp = RegexPattern.PHONE_NUMBER, message = PHONE_NUMBER_INVALID)
     String phoneNumber;
+
+    Long swappedAccId;
 }
