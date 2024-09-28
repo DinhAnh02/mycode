@@ -37,8 +37,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
+import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
@@ -778,5 +780,14 @@ public class AccountServiceImpl implements AccountService {
             String msg = MessageFormat.format(ErrorCode.AVATAR_MAX_SIZE.getMessage(), MAX_AVATAR_SIZE);
             throw new ApiException(ErrorCode.AVATAR_MAX_SIZE, msg);
         }
+    }
+    @Override
+    public UserInfo userInfo() throws ApiException {
+        Long userId =  SecurityUtils.getUserId();
+        Optional<UserInfo> userDetail = accountRepository.findAccountProfileById(userId);
+        if(userDetail.isEmpty()){
+            throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_EXISTS);
+        }
+        return userDetail.get();
     }
 }

@@ -212,8 +212,6 @@ public class AuthenticationService {
         if (Boolean.FALSE.equals(isCheck)) {
             checkComputerForAccount(request.getCurrentDeviceId(), accounts.get().getId());
         }
-        UserInfo userInfo =
-                accountRepository.findAccountProfileById(accounts.get().getId());
         var jwtToken = jwtService.generateToken(
                 accounts.get(),
                 UUID.fromString(usbToken.get().getKeyUsb()),
@@ -225,7 +223,6 @@ public class AuthenticationService {
         // Trả về đối tượng AuthenticationResponse chứa các token
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
-                .userInfo(userInfo)
                 .build();
     }
 
