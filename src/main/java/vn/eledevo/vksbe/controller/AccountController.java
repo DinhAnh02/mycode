@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
+import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
@@ -160,5 +161,10 @@ public class AccountController {
             throws ApiException {
         organizationalStructureUtilsService.validateUpdate(req);
         return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, req));
+    }
+    @GetMapping("/get-user-info")
+    @Operation(summary = "Thông tin chi tiết theo tài khoản")
+    public ApiResponse<UserInfo> userDetail () throws ApiException {
+        return ApiResponse.ok(accountService.userInfo());
     }
 }
