@@ -24,23 +24,23 @@ public class CaseStatus {
 
     String name;
     String description;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    String createBy;
-    String updateBy;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    String createdBy;
+    String updatedBy;
 
     @OneToMany(mappedBy = "case_status", orphanRemoval = true, fetch = FetchType.LAZY)
     List<Cases> cases;
 
     @PrePersist
     public void prePersist() {
-        this.createAt = LocalDateTime.now();
-        this.createBy = SecurityUtils.getUserName();
+        this.createdAt = LocalDateTime.now();
+        this.createdBy = SecurityUtils.getUserName();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateAt = LocalDateTime.now();
-        this.updateBy = SecurityUtils.getUserName();
+        this.updatedAt = LocalDateTime.now();
+        this.updatedBy = SecurityUtils.getUserName();
     }
 }

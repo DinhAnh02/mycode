@@ -1,15 +1,14 @@
 package vn.eledevo.vksbe.mapper;
 
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import vn.eledevo.vksbe.dto.response.AccountResponse;
+import vn.eledevo.vksbe.entity.Accounts;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import vn.eledevo.vksbe.dto.response.AccountResponse;
-import vn.eledevo.vksbe.entity.Accounts;
 
 @Component
 public class AccountMapper {
@@ -27,10 +26,10 @@ public class AccountMapper {
         accountResponse.setIsConditionLogin2(e.getIsConditionLogin2());
         accountResponse.setIsConnectComputer(e.getIsConnectComputer());
         accountResponse.setIsConnectUsb(e.getIsConnectUsb());
-        accountResponse.setCreateAt(e.getCreateAt());
-        accountResponse.setUpdateAt(e.getUpdateAt());
-        accountResponse.setCreateBy(e.getCreateBy());
-        accountResponse.setUpdateBy(e.getUpdateBy());
+        accountResponse.setCreatedAt(e.getCreatedAt());
+        accountResponse.setUpdatedAt(e.getUpdatedAt());
+        accountResponse.setCreatedBy(e.getCreatedBy());
+        accountResponse.setUpdatedBy(e.getUpdatedBy());
 
         return accountResponse;
     }
@@ -40,7 +39,7 @@ public class AccountMapper {
             return Collections.emptyList();
         }
 
-        List<AccountResponse> list = new ArrayList<AccountResponse>(eList.size());
+        List<AccountResponse> list = new ArrayList<>(eList.size());
         for (Accounts accounts : eList) {
             list.add(toResponse(accounts));
         }

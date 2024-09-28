@@ -19,8 +19,8 @@ public class ComputerResponse {
     String brand;
     String type;
     String note;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    String createBy;
-    String updateBy;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    String createdBy;
+    String updatedBy;
 }

@@ -23,12 +23,12 @@ public class History {
 
     String action;
     String impact;
-    LocalDateTime createAt;
-    String createBy;
+    LocalDateTime createdAt;
+    String createdBy;
 
     @PrePersist
     public void prePersist() {
-        this.createAt = LocalDateTime.now();
-        this.createBy = SecurityUtils.getUserName();
+        this.createdAt = LocalDateTime.now();
+        this.createdBy = SecurityUtils.getUserName();
     }
 }

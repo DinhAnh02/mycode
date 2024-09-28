@@ -21,6 +21,7 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.usb.UsbService;
 
@@ -33,9 +34,9 @@ public class UsbController {
 
     UsbService usbService;
 
-    @PostMapping("/all")
+    @PostMapping("")
     @Operation(summary = "Xem danh sách thiết bị USB")
-    public ApiResponse<Result> getUsbDeviceList(
+    public ApiResponse<Result<UsbResponseFilter>> getUsbDeviceList(
             @RequestBody UsbRequest usbRequest,
             @RequestParam(required = false, defaultValue = "1") Integer currentPage,
             @RequestParam(required = false, defaultValue = "10") Integer limit)

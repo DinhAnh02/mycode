@@ -22,7 +22,7 @@ import vn.eledevo.vksbe.service.category.CategoryService;
 public class CategoryController {
     final CategoryService service;
 
-    @GetMapping("/getAll")
+    @GetMapping("")
     @Operation(summary = "Category")
     public ResponseEntity<ApiResponse<InformationResponse>> getAllInformation() {
         return ResponseEntity.ok(service.getAllInformation());

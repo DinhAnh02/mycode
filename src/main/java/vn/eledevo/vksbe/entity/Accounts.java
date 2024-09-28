@@ -41,10 +41,10 @@ public class Accounts implements UserDetails {
 
     Boolean isConnectComputer;
     Boolean isConnectUsb;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    String createBy;
-    String updateBy;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    String createdBy;
+    String updatedBy;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
@@ -99,13 +99,13 @@ public class Accounts implements UserDetails {
 
     @PrePersist
     public void prePersist() {
-        this.createAt = LocalDateTime.now();
-        this.createBy = SecurityUtils.getUserName();
+        this.createdAt = LocalDateTime.now();
+        this.createdBy = SecurityUtils.getUserName();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateAt = LocalDateTime.now();
-        this.createBy = SecurityUtils.getUserName();
+        this.updatedAt = LocalDateTime.now();
+        this.createdBy = SecurityUtils.getUserName();
     }
 }

@@ -42,10 +42,10 @@ public class ComputerMapper {
         computerResponse.brand(e.getBrand());
         computerResponse.type(e.getType());
         computerResponse.note(e.getNote());
-        computerResponse.createAt(e.getCreateAt());
-        computerResponse.updateAt(e.getUpdateAt());
-        computerResponse.createBy(e.getCreateBy());
-        computerResponse.updateBy(e.getUpdateBy());
+        computerResponse.createdAt(e.getCreatedAt());
+        computerResponse.updatedAt(e.getUpdatedAt());
+        computerResponse.createdBy(e.getCreatedBy());
+        computerResponse.updatedBy(e.getUpdatedBy());
 
         return computerResponse.build();
     }

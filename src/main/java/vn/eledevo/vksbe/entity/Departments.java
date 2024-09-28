@@ -24,10 +24,10 @@ public class Departments {
 
     String name;
     String code;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    String createBy;
-    String updateBy;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    String createdBy;
+    String updatedBy;
 
     @OneToMany(mappedBy = "departments", orphanRemoval = true, fetch = FetchType.EAGER)
     List<Accounts> accounts;
@@ -40,13 +40,13 @@ public class Departments {
 
     @PrePersist
     public void prePersist() {
-        this.createAt = LocalDateTime.now();
-        this.createBy = SecurityUtils.getUserName();
+        this.createdAt = LocalDateTime.now();
+        this.createdBy = SecurityUtils.getUserName();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateAt = LocalDateTime.now();
-        this.updateBy = SecurityUtils.getUserName();
+        this.updatedAt = LocalDateTime.now();
+        this.updatedBy = SecurityUtils.getUserName();
     }
 }

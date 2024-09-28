@@ -13,5 +13,6 @@ public class ConnectComputerResponse {
     Long id;
     String name;
     String code;
+    Boolean isConnected;
     String message;
 }

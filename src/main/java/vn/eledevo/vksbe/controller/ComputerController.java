@@ -18,7 +18,9 @@ import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.computer.ComputerService;
@@ -33,7 +35,7 @@ public class ComputerController {
 
     @GetMapping("/disconnected")
     @Operation(summary = "Lấy danh sách máy tính không liên kết với tài khoản")
-    public ApiResponse<Result> getComputerDisconnectedList(@RequestParam(required = false) String textSearch) {
+    public ApiResponse<Result<ComputerResponse>> getComputerDisconnectedList(@RequestParam(required = false) String textSearch) {
         return ApiResponse.ok(computerService.getDisconnectedComputers(textSearch));
     }
 
@@ -54,13 +56,13 @@ public class ComputerController {
 
     @PostMapping("/create/computer-info")
     @Operation(summary = "Tạo mới thiết bị máy tính")
-    public ApiResponse<?> createComputer(@Valid @RequestBody ComputerRequestForCreate request) throws ApiException {
+    public ApiResponse<String> createComputer(@Valid @RequestBody ComputerRequestForCreate request) throws ApiException {
         return ApiResponse.ok(computerService.createComputer(request));
     }
 
     @PostMapping("")
     @Operation(summary = "Xem danh sách thiết bị máy tính")
-    public ApiResponse<Result<?>> getComputerList(
+    public ApiResponse<Result<ComputerResponseFilter>> getComputerList(
             @RequestParam(required = false, defaultValue = "1") Integer currentPage,
             @RequestParam(required = false, defaultValue = "10") Integer limit,
             @RequestBody ComputerRequest computerRequest)

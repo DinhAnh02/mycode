@@ -28,7 +28,7 @@ public class AuthenticationController {
     final AuthenticationService service;
 
     @PostMapping("/authenticate")
-    @Operation(summary = "Đăng nhập")
+    @Operation(summary = "Đăng nhập bước 1 bằng tài khoản và mật khẩu")
     public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request)
             throws ApiException {
         return ApiResponse.ok(service.authenticate(request));
@@ -40,6 +40,7 @@ public class AuthenticationController {
     //    }
 
     @PostMapping("/2FA")
+    @Operation(summary = "Đăng nhập xác thực bước 2")
     public ApiResponse<AuthenticationResponse> twoFactorAuthentication(
             @RequestBody TwoFactorAuthenticationRequest request) throws Exception {
         return ApiResponse.ok(service.twoFactorAuthenticationRequest(request));
@@ -57,7 +58,8 @@ public class AuthenticationController {
         return ApiResponse.ok(service.changePassword(request));
     }
 
-    @PostMapping("/createAccountTest")
+    @PostMapping("/create-account-test")
+    @Operation(summary = "API test để tạo mật khẩu và mã pin mẫu")
     public ApiResponse<CreateAccountTest> createAccountTest(@RequestBody CreateAccountTest createAccountTest) {
         return ApiResponse.ok(service.createAccountTest(createAccountTest));
     }

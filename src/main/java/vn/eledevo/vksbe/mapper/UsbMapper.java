@@ -13,8 +13,8 @@ import vn.eledevo.vksbe.entity.Usbs;
 
 @Mapper(componentModel = "spring")
 public interface UsbMapper {
-    @Mapping(source = "createAt", target = "createAt", qualifiedByName = "mapLocalDateTimeToLong")
-    @Mapping(source = "updateAt", target = "updateAt", qualifiedByName = "mapLocalDateTimeToLong")
+    @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "mapLocalDateTimeToLong")
+    @Mapping(source = "updatedAt", target = "updatedAt", qualifiedByName = "mapLocalDateTimeToLong")
     UsbResponse toTarget(Usbs source);
 
     List<UsbResponse> toTarget(List<Usbs> listEntity);
