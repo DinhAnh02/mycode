@@ -38,9 +38,9 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(new HashMap<String, Object>() {
             {
-                put("result", result);
-                put("message", displayMessage);
                 put("code", errorCode.getCode());  // Đảm bảo `code` là String
+                put("message", displayMessage);
+                put("result", result);
             }
         });
     }

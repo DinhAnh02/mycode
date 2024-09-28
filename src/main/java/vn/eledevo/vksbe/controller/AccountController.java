@@ -1,25 +1,16 @@
 package vn.eledevo.vksbe.controller;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
-import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -30,7 +21,6 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.account.AccResponse;
-import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
@@ -41,6 +31,13 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructureService;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
+import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -113,7 +110,8 @@ public class AccountController {
     @Operation(summary = "Gỡ USB kết nối với tài khoản")
     public ApiResponse<AccountResponse> removeUsb(@PathVariable Long accountId, @PathVariable Long usbId)
             throws ApiException {
-        return ApiResponse.ok(accountService.removeConnectUSB(accountId, usbId));
+        accountService.removeConnectUSB(accountId, usbId);
+        return new ApiResponse<>();
     }
 
     @PatchMapping("/{idAccount}/activate")
@@ -152,11 +150,12 @@ public class AccountController {
         return ApiResponse.ok(accountService.createAccountInfo(request));
     }
 
-    @GetMapping("/{accountId}/remove-computer/{computerId}")
+    @PatchMapping("/{accountId}/remove-computer/{computerId}")
     @Operation(summary = "Gỡ thiết bị máy tính đã liên kết với tài khoản")
     public ApiResponse<String> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
             throws ApiException {
-        return ApiResponse.ok(accountService.removeConnectComputer(accountId, computerId));
+        accountService.removeConnectComputer(accountId, computerId);
+        return new ApiResponse<>();
     }
 
     @PatchMapping("/update-info")

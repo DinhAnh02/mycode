@@ -42,7 +42,7 @@ public interface AccountService {
 
     Result<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 
-    AccountResponse removeConnectUSB(Long accountId, Long usbId) throws ApiException;
+    String removeConnectUSB(Long accountId, Long usbId) throws ApiException;
 
     ActivedAccountResponse activeAccount(Long id) throws ApiException;
 
