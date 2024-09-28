@@ -23,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
@@ -155,10 +156,9 @@ public class AccountController {
     @Operation(summary = "Chỉnh sửa thông tin tài khoản")
     public ApiResponse<AccResponse<Object>> updateAccountInfo(
             @RequestParam(value = "updatedAccId") Long updatedAccId,
-            @RequestParam(value = "swappedAccId", required = false) Long swappedAccId,
-            @Valid @RequestBody AccountCreateRequest req)
+            @Valid @RequestBody AccountUpdateRequest req)
             throws ApiException {
         organizationalStructureUtilsService.validateUpdate(req);
-        return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, swappedAccId, req));
+        return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, req));
     }
 }

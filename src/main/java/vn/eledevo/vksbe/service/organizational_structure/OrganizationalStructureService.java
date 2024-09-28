@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.department.DepartmentService;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
@@ -41,7 +42,7 @@ public class OrganizationalStructureService {
         }
     }
 
-    public void validateUpdate(AccountCreateRequest req) throws ApiException {
+    public void validateUpdate(AccountUpdateRequest req) throws ApiException {
         if (!Objects.equals(req.getRoleName(), "")
                 && Boolean.FALSE.equals(roleService.roleNameChangeDetector(req.getRoleId(), req.getRoleName()))) {
             throw new ApiException(CHECK_ORGANIZATIONAL_STRUCTURE);

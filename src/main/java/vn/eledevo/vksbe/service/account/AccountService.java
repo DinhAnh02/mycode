@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
@@ -52,5 +53,5 @@ public interface AccountService {
 
     byte[] downloadAvatar(String fileName) throws ApiException, IOException;
 
-    AccResponse<Object> updateAccountInfo(Long updatedAccId, Long swappedAccId, AccountCreateRequest req) throws ApiException;
+    AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException;
 }

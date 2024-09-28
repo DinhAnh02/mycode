@@ -42,6 +42,7 @@ import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.request.AccountInactive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
@@ -288,7 +289,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private void handleVienPho(String existingRoleCode) throws ApiException {
-        List<String> restrictedRoles = List.of(IT_ADMIN,VIEN_TRUONG, VIEN_PHO);
+        List<String> restrictedRoles = List.of(IT_ADMIN, VIEN_TRUONG, VIEN_PHO);
         if (restrictedRoles.contains(existingRoleCode)) {
             throw new ApiException(ACCOUNT_NOT_LOCK);
         }
@@ -443,7 +444,8 @@ public class AccountServiceImpl implements AccountService {
         if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
             throw new ApiException(UNAUTHORIZED_ACTIVE_ACCOUNT);
         }
-        boolean isSameDepartment = Objects.equals(activedAcc.getDepartments().getId(),loginAcc.getDepartments().getId());
+        boolean isSameDepartment = Objects.equals(
+                activedAcc.getDepartments().getId(), loginAcc.getDepartments().getId());
         if (activedAccRole.equals(Role.VIEN_TRUONG) || (activedAccRole.equals(Role.TRUONG_PHONG) && isSameDepartment)) {
             OldPositionAccInfo old = accountRepository.getOldPositionAccInfo(
                     activedAcc.getDepartments().getId());
@@ -720,45 +722,44 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccResponse<Object> updateAccountInfo(Long updatedAccId, Long swappedAccId, AccountCreateRequest req)
-            throws ApiException {
-        OldPositionAccInfo oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
-        Accounts updatedAcc =
-                accountRepository.findById(updatedAccId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+    public AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) {
+        Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
+        if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
+                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
+            accountToUpdate(req, updatedAccId, updateAccRole);
+            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
 
-        if (swappedAccId == null) {
-            if (oldPositionAccInfo.getId() == null) {
-                Accounts account = accountToUpdate(req, updatedAcc);
-                accountRepository.save(account);
-                return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
-            } else {
-                return AccResponse.builder().account(oldPositionAccInfo).build();
-            }
-        } else {
-            if (oldPositionAccInfo.getId() != null && oldPositionAccInfo.getId().equals(swappedAccId)) {
-                Accounts account = accountToUpdate(req, updatedAcc);
-                accountRepository.save(account);
-                swap(updatedAccId, swappedAccId);
-                return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
-            } else {
-                return AccResponse.builder().account(oldPositionAccInfo).build();
-            }
         }
+        OldPositionAccInfo oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
+        if (oldPositionAccInfo.getId() == null) {
+            accountToUpdate(req, updatedAccId, updateAccRole);
+            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+        }
+        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+            return AccResponse.builder().account(oldPositionAccInfo).build();
+        }
+        Accounts accountLead =
+                accountRepository.findById(req.getSwappedAccId()).orElseThrow();
+        accountLead.setStatus(Status.INACTIVE.name());
+        Accounts account = accountToUpdate(req, updatedAccId, updateAccRole);
+        account.setStatus(Status.ACTIVE.name());
+        return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
     }
 
-    private Accounts accountToUpdate(AccountCreateRequest req, Accounts updatedAcc) {
-        Profiles profile = profileRepository.findByAccountId(updatedAcc.getId());
+    private Accounts accountToUpdate(AccountUpdateRequest req, Long updatedAccId, Roles updateAccRole) {
+        Profiles profile = profileRepository.findByAccounts_Id(updatedAccId);
+        Accounts updatedAcc = accountRepository.findById(updatedAccId).orElseThrow();
+
+        profile.setFullName(req.getFullName());
         profile.setAvatar(req.getAvatar());
         profile.setPhoneNumber(req.getPhoneNumber());
-        profile.setFullName(req.getFullName());
+        Profiles profileSave = profileRepository.save(profile);
 
-        updatedAcc.setStatus(Status.INACTIVE.name());
-        updatedAcc.setRoles(roleRepository.findById(req.getRoleId()).orElseThrow());
+        updatedAcc.setProfile(profileSave);
+        updatedAcc.setRoles(updateAccRole);
         updatedAcc.setDepartments(
                 departmentRepository.findById(req.getDepartmentId()).orElseThrow());
-        updatedAcc.setProfile(profile);
-
-        return updatedAcc;
+        return accountRepository.save(updatedAcc);
     }
 
     private void validateAvatarFile(MultipartFile file) throws ApiException {
