@@ -12,4 +12,5 @@ public class AccountInactive {
     Long id;
     String roleCode;
     String status;
+    Long departmentId;
 }
