@@ -26,6 +26,7 @@ import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.account.AccResponse;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
@@ -148,5 +149,16 @@ public class AccountController {
     public ResponseEntity<ApiResponse<String>> removeComputer(
             @PathVariable Long accountId, @PathVariable Long computerId) throws ApiException {
         return ResponseEntity.ok(accountService.removeConnectComputer(accountId, computerId));
+    }
+
+    @PatchMapping("/update-info")
+    @Operation(summary = "Chỉnh sửa thông tin tài khoản")
+    public ApiResponse<AccResponse<Object>> updateAccountInfo(
+            @RequestParam(value = "updatedAccId") Long updatedAccId,
+            @RequestParam(value = "swappedAccId", required = false) Long swappedAccId,
+            @Valid @RequestBody AccountCreateRequest req)
+            throws ApiException {
+        organizationalStructureUtilsService.validateUpdate(req);
+        return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, swappedAccId, req));
     }
 }
