@@ -445,7 +445,8 @@ public class AccountServiceImpl implements AccountService {
         if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
             throw new ApiException(UNAUTHORIZED_ACTIVE_ACCOUNT);
         }
-        if (activedAccRole.equals(Role.VIEN_TRUONG) || activedAccRole.equals(Role.TRUONG_PHONG)) {
+        boolean isSameDepartment = Objects.equals(activedAcc.getDepartments().getId(),loginAcc.getDepartments().getId());
+        if (activedAccRole.equals(Role.VIEN_TRUONG) || (activedAccRole.equals(Role.TRUONG_PHONG) && isSameDepartment)) {
             OldPositionAccInfo old = accountRepository.getOldPositionAccInfo(
                     activedAcc.getDepartments().getId());
             if (old.getId() != null) {
