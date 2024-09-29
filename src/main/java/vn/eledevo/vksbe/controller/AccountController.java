@@ -121,10 +121,9 @@ public class AccountController {
 
     @PatchMapping("/remove-usb/{accountId}/usb/{usbId}")
     @Operation(summary = "Gỡ USB kết nối với tài khoản")
-    public ApiResponse<AccountResponse> removeUsb(@PathVariable Long accountId, @PathVariable Long usbId)
+    public ApiResponse<HashMap<String, String>> removeUsb(@PathVariable Long accountId, @PathVariable Long usbId)
             throws ApiException {
-        accountService.removeConnectUSB(accountId, usbId);
-        return new ApiResponse<>();
+        return ApiResponse.ok(accountService.removeConnectUSB(accountId, usbId));
     }
 
     @PatchMapping("/{idAccount}/activate")

@@ -424,9 +424,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public String removeConnectUSB(Long accountID, Long usbID) throws ApiException {
+    public HashMap<String, String> removeConnectUSB(Long accountID, Long usbID) throws ApiException {
         removeUSB(accountID, usbID);
-        return REMOVE_CONNECT_USB_SUCCESS;
+        return new HashMap<>();
     }
 
     @Override
