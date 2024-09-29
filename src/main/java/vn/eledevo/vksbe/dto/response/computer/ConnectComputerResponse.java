@@ -11,8 +11,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConnectComputerResponse {
     Long id;
+    String computerCode;
     String name;
-    String code;
     Boolean isConnected;
-    String message;
+    String reason;
 }

@@ -9,6 +9,7 @@ import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.account.AccResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
@@ -41,7 +42,7 @@ public interface AccountService {
 
     UsbResponse getUsbInfo(Long id) throws ApiException;
 
-    Result<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
+    ResultList<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 
     HashMap<String, String> removeConnectUSB(Long accountId, Long usbId) throws ApiException;
 

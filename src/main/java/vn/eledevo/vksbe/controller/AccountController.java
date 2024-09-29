@@ -18,14 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -33,7 +28,6 @@ import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.*;
 import vn.eledevo.vksbe.dto.response.account.AccResponse;
-import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
@@ -44,13 +38,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructureService;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
-import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -63,7 +50,7 @@ public class AccountController {
 
     @PatchMapping("/reset-password/{id}")
     @Operation(summary = "Reset mật khẩu")
-    public ApiResponse<HashMap<String,String>> resetPassword(
+    public ApiResponse<HashMap<String, String>> resetPassword(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         ;
         return ApiResponse.ok(accountService.resetPassword(id));
@@ -97,7 +84,7 @@ public class AccountController {
 
     @PatchMapping("/{accountId}/inactivate")
     @Operation(summary = "Khóa tài khoản")
-    public ApiResponse<HashMap<String,String>> lockAccount(@PathVariable Long accountId) throws ApiException {
+    public ApiResponse<HashMap<String, String>> lockAccount(@PathVariable Long accountId) throws ApiException {
         if (accountId == null) {
             throw new ApiException(FIELD_INVALID);
         }
@@ -112,8 +99,10 @@ public class AccountController {
     }
 
     @PatchMapping("/connect-computer/{id}/computers")
-    @Operation(summary = "Kết nối tài khoản với thiết bị máy tính", description = "Kết nối tài khoản với thiết bị")
-    public ApiResponse<Result<ConnectComputerResponse>> connectComputers(
+    @Operation(
+            summary = "Thêm liên kết thiết bị với tài khoản (trả về danh sách kết nối)",
+            description = "Kết nối tài khoản với thiết bị")
+    public ApiResponse<ResultList<ConnectComputerResponse>> connectComputers(
             @PathVariable("id") Long accountId,
             @RequestBody @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
             throws ApiException {
@@ -165,23 +154,23 @@ public class AccountController {
 
     @PatchMapping("/{accountId}/remove-computer/{computerId}")
     @Operation(summary = "Gỡ thiết bị máy tính đã liên kết với tài khoản")
-    public ApiResponse<HashMap<String, String>> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
-            throws ApiException {
+    public ApiResponse<HashMap<String, String>> removeComputer(
+            @PathVariable Long accountId, @PathVariable Long computerId) throws ApiException {
         return ApiResponse.ok(accountService.removeConnectComputer(accountId, computerId));
     }
 
     @PatchMapping("/update-info")
     @Operation(summary = "Chỉnh sửa thông tin tài khoản")
     public ApiResponse<AccResponse<Object>> updateAccountInfo(
-            @RequestParam(value = "updatedAccId") Long updatedAccId,
-            @Valid @RequestBody AccountUpdateRequest req)
+            @RequestParam(value = "updatedAccId") Long updatedAccId, @Valid @RequestBody AccountUpdateRequest req)
             throws ApiException {
         organizationalStructureUtilsService.validateUpdate(req);
         return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, req));
     }
+
     @GetMapping("/get-user-info")
     @Operation(summary = "Thông tin cá nhân của tài khoản")
-    public ApiResponse<UserInfo> userDetail () throws ApiException {
+    public ApiResponse<UserInfo> userDetail() throws ApiException {
         return ApiResponse.ok(accountService.userInfo());
     }
 }
