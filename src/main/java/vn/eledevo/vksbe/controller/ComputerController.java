@@ -17,10 +17,7 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
-import vn.eledevo.vksbe.dto.response.ApiResponse;
-import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
-import vn.eledevo.vksbe.dto.response.Result;
-import vn.eledevo.vksbe.dto.response.ResultList;
+import vn.eledevo.vksbe.dto.response.*;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
@@ -65,7 +62,7 @@ public class ComputerController {
 
     @PostMapping("")
     @Operation(summary = "Xem danh sách thiết bị máy tính")
-    public ApiResponse<Result<ComputerResponseFilter>> getComputerList(
+    public ApiResponse<ResponseFilter<ComputerResponseFilter>> getComputerList(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer pageSize,
             @RequestBody ComputerRequest computerRequest)

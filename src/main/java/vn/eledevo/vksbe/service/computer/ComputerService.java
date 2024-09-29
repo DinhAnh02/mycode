@@ -4,6 +4,7 @@ import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
@@ -11,7 +12,7 @@ import vn.eledevo.vksbe.exception.ApiException;
 
 public interface ComputerService {
 
-    Result<ComputerResponseFilter> getComputerList(ComputerRequest computerRequest, Integer currentPage, Integer limit)
+    ResponseFilter<ComputerResponseFilter> getComputerList(ComputerRequest computerRequest, Integer page, Integer pageSize)
             throws ApiException;
 
     String updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException;

@@ -1,33 +1,32 @@
 package vn.eledevo.vksbe.service.computer;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.CREATE_NEW_DEVICE_SUCCESS;
-
-import java.util.List;
-import java.util.Objects;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
-import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.ComputerRepository;
+
+import java.util.List;
+import java.util.Objects;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.CREATE_NEW_DEVICE_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +36,16 @@ public class ComputerServiceImpl implements ComputerService {
     ComputerMapper computerMapper;
 
     @Override
-    public Result<ComputerResponseFilter> getComputerList(
+    public ResponseFilter<ComputerResponseFilter> getComputerList(
             ComputerRequest computerRequest, Integer currentPage, Integer limit) {
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<ComputerResponseFilter> page = computerRepository.getComputerList(computerRequest, pageable);
-        return new Result<>(page.getContent(), (int) page.getTotalElements());
+        return new ResponseFilter<>(
+                page.getContent(),
+                (int) page.getTotalElements(),
+                page.getSize(),
+                page.getNumber(),
+                page.getTotalPages());
     }
 
     @Override

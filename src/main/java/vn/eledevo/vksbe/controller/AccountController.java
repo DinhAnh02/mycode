@@ -133,7 +133,7 @@ public class AccountController {
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload avatar")
-    public ApiResponse<String> uploadAvatar(@RequestParam("file") MultipartFile file) throws ApiException, IOException {
+    public ApiResponse<ResultUrl> uploadAvatar(@RequestParam("file") MultipartFile file) throws ApiException, IOException {
         return ApiResponse.ok(accountService.uploadAvatar(file));
     }
 
@@ -159,10 +159,10 @@ public class AccountController {
         return ApiResponse.ok(accountService.removeConnectComputer(accountId, computerId));
     }
 
-    @PatchMapping("/update-info")
+    @PatchMapping("/{updatedAccId}/update-info")
     @Operation(summary = "Chỉnh sửa thông tin tài khoản")
     public ApiResponse<AccResponse<Object>> updateAccountInfo(
-            @RequestParam(value = "updatedAccId") Long updatedAccId, @Valid @RequestBody AccountUpdateRequest req)
+            @PathVariable(value = "updatedAccId") Long updatedAccId, @Valid @RequestBody AccountUpdateRequest req)
             throws ApiException {
         organizationalStructureUtilsService.validateUpdate(req);
         return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, req));
