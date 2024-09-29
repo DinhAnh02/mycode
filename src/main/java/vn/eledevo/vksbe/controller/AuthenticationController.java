@@ -19,6 +19,8 @@ import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
 
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -54,7 +56,7 @@ public class AuthenticationController {
 
     @PatchMapping("/change-password")
     @Operation(summary = "Đổi mật khẩu thành tài khoản")
-    public ApiResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest request) throws ApiException {
+    public ApiResponse<HashMap<String,String>> changePassword(@RequestBody @Valid ChangePasswordRequest request) throws ApiException {
         return ApiResponse.ok(service.changePassword(request));
     }
 

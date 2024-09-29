@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.service.authenticate;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.*;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
@@ -147,29 +149,29 @@ public class AuthenticationService {
         return ResponseMessage.CREATE_PIN_SUCCESS;
     }
 
-    public String changePassword(ChangePasswordRequest request) throws ApiException {
+    public HashMap<String,String> changePassword(ChangePasswordRequest request) throws ApiException {
         String userName = SecurityUtils.getUserName();
         Accounts accountRequest =
-                accountRepository.findAccountInSystem(userName).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+                accountRepository.findAccountInSystem(userName).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
-            throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
+            throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
-        if (Boolean.FALSE.equals(accountRequest.getIsConditionLogin1())) {
-            return null;
+        if (Boolean.TRUE.equals(accountRequest.getIsConditionLogin1())) {
+            throw new ApiException(AccountErrorCode.CHANGE_PWD_LOGIN);
         }
         if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
-            throw new ApiException(OLD_PASSWORD_FAILURE);
+            throw new ApiException(AccountErrorCode.OLD_PASSWORD_INCORRECT);
         }
         if (request.getOldPassword().equals(request.getNewPassword())) {
-            throw new ApiException(NEW_PASSWORD_FAILURE);
+            throw new ApiException(AccountErrorCode.NEW_PASSWORD_SAME_AS_OLD);
         }
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new ApiException(CONFIRM_PASSWORD_FAILURE);
+            throw new ApiException(AccountErrorCode.CONFIRM_PASSWORD_MISMATCH);
         }
         accountRequest.setPassword(passwordEncoder.encode(request.getConfirmPassword()));
-        accountRequest.setIsConditionLogin1(Boolean.FALSE);
+        accountRequest.setIsConditionLogin1(Boolean.TRUE);
         accountRepository.save(accountRequest);
-        return ResponseMessage.CHANGE_PASSWORD_SUCCESS;
+        return new HashMap<>();
     }
 
     public AuthenticationResponse twoFactorAuthenticationRequest(TwoFactorAuthenticationRequest request)

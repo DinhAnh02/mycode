@@ -46,7 +46,7 @@ public class ResponseMessage {
 
     public static final String PASSWD_SIZE = "Mật khẩu phải có từ 8 kí tự trở lên";
 
-    public static final String PIN_SIZE = "Mã PIN phải có 6 kí";
+    public static final String PIN_SIZE = "Mã PIN phải có 6 kí tự";
 
     public static final String CREATE_PIN_SUCCESS = "Tạo mã PIN thành công";
 
