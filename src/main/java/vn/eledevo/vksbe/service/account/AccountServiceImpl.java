@@ -366,9 +366,15 @@ public class AccountServiceImpl implements AccountService {
         validAccount(id);
         Optional<Usbs> usbEntities = usbRepository.findByAccounts_Id(id);
         if (usbEntities.isPresent()) {
-            return usbMapper.toTarget(usbEntities.get());
+            UsbResponse usbInfo = UsbResponse.builder()
+                    .id(usbEntities.get().getId())
+                    .name(usbEntities.get().getName())
+                    .usbCode(usbEntities.get().getUsbCode())
+                    .usbVendorCode(usbEntities.get().getUsbVendorCode())
+                    .build();
+            return usbInfo;
         } else {
-            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
         }
     }
 
