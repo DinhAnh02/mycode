@@ -43,7 +43,7 @@ public interface AccountService {
 
     Result<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 
-    String removeConnectUSB(Long accountId, Long usbId) throws ApiException;
+    HashMap<String, String> removeConnectUSB(Long accountId, Long usbId) throws ApiException;
 
     ActivedAccountResponse activeAccount(Long id) throws ApiException;
 
