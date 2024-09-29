@@ -272,69 +272,56 @@ public class AccountServiceImpl implements AccountService {
     public HashMap<String, String> inactivateAccount(Long idAccount) throws ApiException {
         String userName = SecurityUtils.getUserName();
         // account đang đăng nhập
-        Optional<AccountActive> accountRequest = accountRepository.findByUsernameActive(userName);
+        Optional<AccountActive> accountLogin = accountRepository.findByUsernameActive(userName);
 
         // check account đang đăng nhập có tồn tại không
-        if (accountRequest.isEmpty()) {
+        if (accountLogin.isEmpty()) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
 
-        Accounts existingAccount = accountRepository
+        Accounts lockAccount = accountRepository
                 .findById(idAccount)
                 .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_LOCK_NOT_FOUND));
 
         // check id request có trùng với người khóa
-        if (existingAccount.getId().equals(accountRequest.get().getId())) {
+        if (lockAccount.getId().equals(accountLogin.get().getId())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_TO_BE_LOCKED_IS_LOGGED_IN);
         }
 
-        if (!existingAccount.getStatus().equals(Status.ACTIVE.name())) {
+        if (!lockAccount.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_IS_LOCK);
         }
         // Role của người đăng nhập
-        String roleCode = accountRequest.get().getRoleCode();
+        String roleCode = accountLogin.get().getRoleCode();
         // Role của người cần khóa
-        String existingRoleCode = existingAccount.getRoles().getCode();
-        boolean sameDepartment = accountRequest
+        String lockAccountRole = lockAccount.getRoles().getCode();
+        boolean sameDepartment = accountLogin
                 .get()
                 .getDepartmentId()
-                .equals(existingAccount.getDepartments().getId());
+                .equals(lockAccount.getDepartments().getId());
 
         switch (roleCode) {
-            case VIEN_TRUONG -> handleVienTruong(existingRoleCode);
-            case VIEN_PHO -> handleVienPho(existingRoleCode);
-            case TRUONG_PHONG -> handleTruongPhong(existingRoleCode, sameDepartment);
-            case PHO_PHONG -> handlePhoPhong(existingRoleCode, sameDepartment);
+            case VIEN_TRUONG,VIEN_PHO,IT_ADMIN -> handleLeader(Role.valueOf(roleCode),Role.valueOf(lockAccountRole));
+            case TRUONG_PHONG,PHO_PHONG -> handleMember(Role.valueOf(roleCode),Role.valueOf(lockAccountRole),sameDepartment);
             default -> throw new ApiException(AccountErrorCode.POSITION_NOT_FOUND);
         }
-        existingAccount.setStatus(Status.INACTIVE.name());
-        accountRepository.save(existingAccount);
+        lockAccount.setStatus(Status.INACTIVE.name());
+        accountRepository.save(lockAccount);
         return new HashMap<>();
     }
 
-    private void handleVienTruong(String existingRoleCode) throws ApiException {
-        if (existingRoleCode.equals(IT_ADMIN)) {
+    private Void handleLeader(Role roleLogin, Role lockAccountRole) throws ApiException {
+        if (priorityRoles(roleLogin) <= priorityRoles(lockAccountRole)) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
+        return null;
     }
 
-    private void handleVienPho(String existingRoleCode) throws ApiException {
-        List<String> restrictedRoles = List.of(IT_ADMIN, VIEN_TRUONG, VIEN_PHO);
-        if (restrictedRoles.contains(existingRoleCode)) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+    private Void handleMember(Role roleLogin, Role lockAccountRole,boolean sameDepartment) throws ApiException {
+        if ((priorityRoles(roleLogin) > priorityRoles(lockAccountRole)) && sameDepartment) {
+            return null;
         }
-    }
-
-    private void handleTruongPhong(String existingRoleCode, boolean sameDepartment) throws ApiException {
-        if ((!existingRoleCode.equals(PHO_PHONG) && !existingRoleCode.equals(KIEM_SAT_VIEN)) || !sameDepartment) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
-        }
-    }
-
-    private void handlePhoPhong(String existingRoleCode, boolean sameDepartment) throws ApiException {
-        if (!existingRoleCode.equals(KIEM_SAT_VIEN) || !sameDepartment) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
-        }
+        throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
     }
 
     @Override
