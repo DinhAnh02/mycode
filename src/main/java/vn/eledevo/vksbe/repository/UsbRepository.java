@@ -1,17 +1,24 @@
 package vn.eledevo.vksbe.repository;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.data.repository.query.Param;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
+import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
 import vn.eledevo.vksbe.entity.Usbs;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface UsbRepository extends BaseRepository<Usbs, Long> {
-    Optional<Usbs> findByAccounts_Id(Long accountId);
+    Optional<Usbs> findByAccounts_Id(Long id);
+
+    @Query("SELECT new vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse(u.id, u.name, u.usbCode, u.usbVendorCode) "
+    + "FROM Usbs u "
+    + "WHERE u.accounts.id = :accountId")
+    List<UsbConnectedResponse> findUsbConnectedByAccountId(@Param("accountId") Long accountId);
 
     @Query(
             "SELECT new vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter(u.id, u.name, u.usbCode, u.usbVendorCode, u.keyUsb, u.status, u.createdAt, u.updatedAt, u.createdBy, u.updatedBy, p.fullName) "

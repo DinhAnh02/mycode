@@ -23,6 +23,7 @@ import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
+import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
@@ -41,7 +42,7 @@ public interface AccountService {
 
     HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException;
 
-    ResultList<UsbResponse> getUsbInfo(Long id) throws ApiException;
+    ResultList<UsbConnectedResponse> getUsbInfo(Long id) throws ApiException;
 
     ResultList<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 

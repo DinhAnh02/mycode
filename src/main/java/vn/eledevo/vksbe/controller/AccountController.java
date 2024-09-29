@@ -24,6 +24,7 @@ import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
+import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
@@ -55,9 +56,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/devices")
-    @Operation(
-            summary = "Lấy danh sách thiết bị đã liên kết với tài khoản",
-            description = "Retrieves a list of computer devices associated with a specific account")
+    @Operation(summary = "Lấy danh sách thiết bị đã liên kết với tài khoản")
     public ApiResponse<ResultList<ComputerResponse>> getComputerListByAccountId(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getComputersByIdAccount(id));
@@ -90,16 +89,14 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/usb")
-    @Operation(summary = "Lấy thông tin USB liên kết với tài khoản", description = "Get usb by account-id")
-    public ApiResponse<ResultList<UsbResponse>> getUsbInfo(
+    @Operation(summary = "Xem thông tin USB liên kết với tài khoản")
+    public ApiResponse<ResultList<UsbConnectedResponse>> getUsbInfo(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getUsbInfo(id));
     }
 
     @PatchMapping("/connect-computer/{id}/computers")
-    @Operation(
-            summary = "Thêm liên kết thiết bị với tài khoản (trả về danh sách kết nối)",
-            description = "Kết nối tài khoản với thiết bị")
+    @Operation(summary = "Thêm liên kết thiết bị với tài khoản (trả về danh sách kết nối)")
     public ApiResponse<ResultList<ConnectComputerResponse>> connectComputers(
             @PathVariable("id") Long accountId,
             @RequestBody @NotEmpty(message = "Danh sách kết nối không được rỗng") Set<Long> computerIds)
