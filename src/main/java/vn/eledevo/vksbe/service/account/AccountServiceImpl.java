@@ -252,12 +252,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException {
+    public ResultList<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException {
         if (!accountRepository.existsById(accountId)) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
         List<Computers> res = computerRepository.findByAccounts_Id(accountId);
-        List<ComputerResponse> computerResponseList = res.stream()
+        List<ComputerResponse> list = res.stream()
                 .map(computers -> ComputerResponse.builder()
                         .id(computers.getId())
                         .name(computers.getName())
@@ -265,7 +265,7 @@ public class AccountServiceImpl implements AccountService {
                         .type(computers.getType())
                         .build())
                 .toList();
-        return computerResponseList;
+        return new ResultList<>(list);
     }
 
     @Override
@@ -301,8 +301,9 @@ public class AccountServiceImpl implements AccountService {
                 .equals(lockAccount.getDepartments().getId());
 
         switch (roleCode) {
-            case VIEN_TRUONG,VIEN_PHO,IT_ADMIN -> handleLeader(Role.valueOf(roleCode),Role.valueOf(lockAccountRole));
-            case TRUONG_PHONG,PHO_PHONG -> handleMember(Role.valueOf(roleCode),Role.valueOf(lockAccountRole),sameDepartment);
+            case VIEN_TRUONG, VIEN_PHO, IT_ADMIN -> handleLeader(Role.valueOf(roleCode), Role.valueOf(lockAccountRole));
+            case TRUONG_PHONG, PHO_PHONG -> handleMember(
+                    Role.valueOf(roleCode), Role.valueOf(lockAccountRole), sameDepartment);
             default -> throw new ApiException(AccountErrorCode.POSITION_NOT_FOUND);
         }
         lockAccount.setStatus(Status.INACTIVE.name());
@@ -317,7 +318,7 @@ public class AccountServiceImpl implements AccountService {
         return null;
     }
 
-    private Void handleMember(Role roleLogin, Role lockAccountRole,boolean sameDepartment) throws ApiException {
+    private Void handleMember(Role roleLogin, Role lockAccountRole, boolean sameDepartment) throws ApiException {
         if ((priorityRoles(roleLogin) > priorityRoles(lockAccountRole)) && sameDepartment) {
             return null;
         }
@@ -352,17 +353,19 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public UsbResponse getUsbInfo(Long id) throws ApiException {
+    public ResultList<UsbResponse> getUsbInfo(Long id) throws ApiException {
         validAccount(id);
         Optional<Usbs> usbEntities = usbRepository.findByAccounts_Id(id);
         if (usbEntities.isPresent()) {
-            UsbResponse usbInfo = UsbResponse.builder()
+            UsbResponse usbResponse = UsbResponse.builder()
                     .id(usbEntities.get().getId())
                     .name(usbEntities.get().getName())
                     .usbCode(usbEntities.get().getUsbCode())
                     .usbVendorCode(usbEntities.get().getUsbVendorCode())
                     .build();
-            return usbInfo;
+            List<UsbResponse> list = new ArrayList<>();
+            list.add(usbResponse);
+            return new ResultList<>(list);
         } else {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
         }

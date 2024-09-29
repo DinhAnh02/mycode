@@ -58,7 +58,7 @@ public class AccountController {
     @Operation(
             summary = "Lấy danh sách thiết bị đã liên kết với tài khoản",
             description = "Retrieves a list of computer devices associated with a specific account")
-    public ApiResponse<List<ComputerResponse>> getComputerListByAccountId(
+    public ApiResponse<ResultList<ComputerResponse>> getComputerListByAccountId(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getComputersByIdAccount(id));
     }
@@ -91,7 +91,7 @@ public class AccountController {
 
     @GetMapping("/{id}/usb")
     @Operation(summary = "Lấy thông tin USB liên kết với tài khoản", description = "Get usb by account-id")
-    public ApiResponse<UsbResponse> getUsbInfo(
+    public ApiResponse<ResultList<UsbResponse>> getUsbInfo(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getUsbInfo(id));
     }
@@ -123,7 +123,7 @@ public class AccountController {
     }
 
     @PatchMapping("/{accountId}/swap-account-status/{swapAccountId}")
-    @Operation(summary = "Hoán đổi vị trí trưởng phòng/viện trưởng")
+    @Operation(summary = "Swap trạng thái tài khoản")
     public ApiResponse<ObjectSwapResponse> swapAccountSattus(
             @PathVariable Long accountId, @PathVariable Long swapAccountId) throws ApiException {
         return ApiResponse.ok(accountService.swapStatus(accountId, swapAccountId));

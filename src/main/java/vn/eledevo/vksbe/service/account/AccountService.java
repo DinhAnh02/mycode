@@ -35,13 +35,13 @@ public interface AccountService {
 
     AccountDetailResponse getAccountDetail(Long accountId) throws ApiException;
 
-    List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException;
+    ResultList<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException;
 
     HashMap<String, String> inactivateAccount(Long idAccount) throws ApiException;
 
     HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException;
 
-    UsbResponse getUsbInfo(Long id) throws ApiException;
+    ResultList<UsbResponse> getUsbInfo(Long id) throws ApiException;
 
     ResultList<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException;
 
