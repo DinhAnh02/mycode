@@ -54,6 +54,7 @@ import vn.eledevo.vksbe.dto.response.ResultUrl;
 import vn.eledevo.vksbe.dto.response.account.*;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
+import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.entity.*;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -353,22 +354,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ResultList<UsbResponse> getUsbInfo(Long id) throws ApiException {
+    public ResultList<UsbConnectedResponse> getUsbInfo(Long id) throws ApiException {
         validAccount(id);
-        Optional<Usbs> usbEntities = usbRepository.findByAccounts_Id(id);
-        if (usbEntities.isPresent()) {
-            UsbResponse usbResponse = UsbResponse.builder()
-                    .id(usbEntities.get().getId())
-                    .name(usbEntities.get().getName())
-                    .usbCode(usbEntities.get().getUsbCode())
-                    .usbVendorCode(usbEntities.get().getUsbVendorCode())
-                    .build();
-            List<UsbResponse> list = new ArrayList<>();
-            list.add(usbResponse);
-            return new ResultList<>(list);
-        } else {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
-        }
+        return new ResultList<>(usbRepository.findUsbConnectedByAccountId(id));
     }
 
     @Override
