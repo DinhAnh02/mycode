@@ -1,12 +1,46 @@
 package vn.eledevo.vksbe.service.account;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+import vn.eledevo.vksbe.constant.*;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
+import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
+import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
+import vn.eledevo.vksbe.dto.model.account.UserInfo;
+import vn.eledevo.vksbe.dto.request.AccountActive;
+import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
+import vn.eledevo.vksbe.dto.response.AccountResponse;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.ResultList;
+import vn.eledevo.vksbe.dto.response.account.*;
+import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
+import vn.eledevo.vksbe.entity.*;
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
+import vn.eledevo.vksbe.mapper.AccountMapper;
+import vn.eledevo.vksbe.mapper.ComputerMapper;
+import vn.eledevo.vksbe.mapper.UsbMapper;
+import vn.eledevo.vksbe.repository.*;
+import vn.eledevo.vksbe.utils.Const;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,48 +55,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
-import vn.eledevo.vksbe.constant.*;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
-import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
-import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
-import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
-import vn.eledevo.vksbe.dto.model.account.UserInfo;
-import vn.eledevo.vksbe.dto.request.AccountActive;
-import vn.eledevo.vksbe.dto.request.AccountRequest;
-import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
-import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
-import vn.eledevo.vksbe.dto.response.AccountResponse;
-import vn.eledevo.vksbe.dto.response.ResponseFilter;
-import vn.eledevo.vksbe.dto.response.Result;
-import vn.eledevo.vksbe.dto.response.account.*;
-import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
-import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
-import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
-import vn.eledevo.vksbe.entity.*;
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.exception.ValidationException;
-import vn.eledevo.vksbe.mapper.AccountMapper;
-import vn.eledevo.vksbe.mapper.ComputerMapper;
-import vn.eledevo.vksbe.mapper.UsbMapper;
-import vn.eledevo.vksbe.repository.*;
-import vn.eledevo.vksbe.utils.Const;
-import vn.eledevo.vksbe.utils.SecurityUtils;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -366,7 +365,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Result<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
+    public ResultList<ConnectComputerResponse> connectComputers(Long id, Set<Long> computerIds) throws ApiException {
         Accounts accounts = validAccount(id);
         List<ConnectComputerResponse> computerResponses = new ArrayList<>();
         if (!CollectionUtils.isEmpty(computerIds)) {
@@ -384,17 +383,17 @@ public class AccountServiceImpl implements AccountService {
                         computerResponses.add(ConnectComputerResponse.builder()
                                 .id(computer.getId())
                                 .name(computer.getName())
-                                .code(computer.getCode())
+                                .computerCode(computer.getCode())
                                 .isConnected(false)
-                                .message("Thiết bị đã được kết nối với tài khoản khác")
+                                .reason(COMPUTER_CONNECTED_WITH_ANOTHER_ACCOUNT)
                                 .build());
                     } else {
                         computerResponses.add(ConnectComputerResponse.builder()
                                 .id(computer.getId())
                                 .name(computer.getName())
-                                .code(computer.getCode())
+                                .computerCode(computer.getCode())
                                 .isConnected(true)
-                                .message("Kết nối thiết bị thành công")
+                                .reason(COMPUTER_CONNECTED_SUCCESS)
                                 .build());
                         computer.setAccounts(accounts);
                         computer.setStatus(Const.CONNECTED);
@@ -410,9 +409,9 @@ public class AccountServiceImpl implements AccountService {
                     computerResponses.add(ConnectComputerResponse.builder()
                             .id(computerId)
                             .name(null)
-                            .code(null)
+                            .computerCode(null)
                             .isConnected(false)
-                            .message("Không tồn tại thiết bị")
+                            .reason(COMPUTER_NOT_FOUND_SYSTEM)
                             .build());
                 }
             }
@@ -421,7 +420,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        return new Result<>(computerResponses, computerResponses.size());
+        return new ResultList<>(computerResponses);
     }
 
     @Override

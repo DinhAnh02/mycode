@@ -21,6 +21,7 @@ public class ResponseMessage {
     public static final String OLD_PASSWD_BLANK = "Mật khẩu cũ không được để trống";
 
     public static final String NEW_PASSWD_BLANK = "Mật khẩu mới không được để trống";
+
     public static final String USERNAME_REQUIRE = "Mã cán bộ không được để trống";
 
     public static final String USERNAME_SIZE = "Mã cán bộ phải có độ dài từ {min} đến {max} ký tự";
@@ -85,4 +86,10 @@ public class ResponseMessage {
     public static final String CREATE_NEW_DEVICE_SUCCESS = "Tạo mới thông tin máy tính thành công";
 
     public static final String REMOVE_CONNECT_USB_SUCCESS = "Gỡ liên kết USB thành công";
+
+    public static final String COMPUTER_CONNECTED_WITH_ANOTHER_ACCOUNT = "Thiết bị đã được kết nối với tài khoản khác";
+
+    public static final String COMPUTER_CONNECTED_SUCCESS = "Kết nối thiết bị thành công";
+
+    public static final String COMPUTER_NOT_FOUND_SYSTEM = "Thiết bị không tồn tại trong hệ thống";
 }
