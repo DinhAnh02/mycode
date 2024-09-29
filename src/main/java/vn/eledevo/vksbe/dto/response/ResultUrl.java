@@ -7,6 +7,6 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ResultMessage {
-    String message;
+public class ResultUrl {
+    String url;
 }

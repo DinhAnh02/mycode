@@ -27,7 +27,7 @@ public class SecurityConfiguration {
     private static final String[] WHITE_LIST_URL = {
         "/api/v1/auth/authenticate",
         "/api/v1/auth/createAccountTest",
-        "/api/v1/private/categories/getAll",
+        "/api/v1/private/categories",
         "/v2/api-docs",
         "/v3/api-docs",
         "/v3/api-docs/**",
@@ -57,41 +57,30 @@ public class SecurityConfiguration {
                                 Role.VIEN_TRUONG.toString(),
                                 Role.TRUONG_PHONG.toString(),
                                 Role.PHO_PHONG.toString())
-                        //                        .requestMatchers("/api/v1/private/accounts/detail")
-                        //                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG",
-                        // "PHO_PHONG", "IT_ADMIN")
                         .requestMatchers(
                                 "/api/v1/private/accounts",
                                 "/api/v1/private/accounts/detail",
-                                "/api/v1/private/accounts/{id}/usb")
-                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
+                                "/api/v1/private/accounts/{id}/usb",
+                                "/api/v1/private/accounts/{accountId}/inactivate",
+                                "/api/v1/private/accounts/{accountId}/swap-account-status/{swapAccountId}",
+                                "/api/v1/private/accounts/connect-computer/{id}/computers")
+                        .hasAnyAuthority(
+                                Role.VIEN_TRUONG.name(),
+                                Role.VIEN_PHO.name(),
+                                Role.TRUONG_PHONG.name(),
+                                Role.PHO_PHONG.name(),
+                                Role.IT_ADMIN.name())
                         .requestMatchers(
-                                "/api/v1/private/computers/disconnected", "/api/v1/private/accounts/reset-password/**")
-                        .hasAnyAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/computers/update/computer-info/{id}")
-                        .hasAuthority("IT_ADMIN")
-                        .requestMatchers("/api/v1/private/accounts/{accountId}/inactivate")
-                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
-                        .requestMatchers("/api/v1/private/computers/create/computer-info")
-                        .hasAuthority("IT_ADMIN")
-                        .requestMatchers("/api/v1/private/computers**")
-                        .hasAnyAuthority("IT_ADMIN")
-                        .requestMatchers("/api/v1/private/usbs/all")
+                                "/api/v1/private/accounts/reset-password/{id}",
+                                "/api/v1/private/computers/**",
+                                "/api/v1/private/usbs/**",
+                                "/api/v1/private/usbs/download/{username}",
+                                "/api/v1/private/accounts/{accountId}/remove-computer/{computerId}",
+                                "/api/v1/private/accounts/connect-computer/{id}/computers",
+                                "/api/v1/private/accounts/remove-usb/{accountId}/usb/{usbId}",
+                                "/api/v1/private/accounts/create",
+                                "/api/v1/private/accounts/{updatedAccId}/update-info")
                         .hasAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/accounts/{accountId}/swap-account-status/{swapAccountId}")
-                        .hasAnyAuthority("IT_ADMIN", "VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG")
-                        .requestMatchers("/api/v1/private/usbs/download/{username}")
-                        .hasAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/accounts/{accountId}/remove-computer/{computerId}")
-                        .hasAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/accounts/connect-computer/{id}/computers")
-                        .hasAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/accounts/remove-usb/{accountId}/usb/{usbId}")
-                        .hasAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/accounts/create")
-                        .hasAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/accounts/connect-computer/{id}/computers")
-                        .hasAnyAuthority("VIEN_TRUONG", "VIEN_PHO", "TRUONG_PHONG", "PHO_PHONG", "IT_ADMIN")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

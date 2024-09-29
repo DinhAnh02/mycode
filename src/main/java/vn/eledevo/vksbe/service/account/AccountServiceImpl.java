@@ -50,6 +50,7 @@ import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
+import vn.eledevo.vksbe.dto.response.ResultUrl;
 import vn.eledevo.vksbe.dto.response.account.*;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
@@ -547,14 +548,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String uploadAvatar(MultipartFile file) throws ApiException, IOException {
+    public ResultUrl uploadAvatar(MultipartFile file) throws ApiException, IOException {
         validateAvatarFile(file);
 
         Path uploadPath = Files.createDirectories(Paths.get(uploadDir));
         String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
         Path filePath = uploadPath.resolve(uniqueFileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        return appHost + AVATAR_URI + uniqueFileName;
+        return new ResultUrl(appHost + AVATAR_URI + uniqueFileName);
     }
 
     @Override

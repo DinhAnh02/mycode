@@ -3,6 +3,7 @@ package vn.eledevo.vksbe.service.account;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
+import vn.eledevo.vksbe.dto.response.ResultUrl;
 import vn.eledevo.vksbe.dto.response.account.AccResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
@@ -51,7 +53,7 @@ public interface AccountService {
 
     AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException;
 
-    String uploadAvatar(MultipartFile file) throws ApiException, IOException;
+    ResultUrl uploadAvatar(MultipartFile file) throws ApiException, IOException;
 
     byte[] downloadAvatar(String fileName) throws ApiException, IOException;
 
