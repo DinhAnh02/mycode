@@ -9,11 +9,10 @@ import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 
-import java.util.List;
-
 public interface ComputerService {
 
-    Result<ComputerResponseFilter> getComputerList(ComputerRequest computerRequest, Integer currentPage, Integer limit) throws ApiException;
+    Result<ComputerResponseFilter> getComputerList(ComputerRequest computerRequest, Integer currentPage, Integer limit)
+            throws ApiException;
 
     String updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException;
 

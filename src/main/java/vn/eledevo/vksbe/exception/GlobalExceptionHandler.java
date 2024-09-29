@@ -34,17 +34,17 @@ public class GlobalExceptionHandler {
         String displayMessage = (ex instanceof ApiException) ? ex.getMessage() : errorCode.getMessage();
 
         // Lấy kết quả với kiểu dữ liệu `Map<String, String>`
-        Map<String, String> result = errorCode.getResult() instanceof Map ? (Map<String, String>) errorCode.getResult() : new HashMap<>();
+        Map<String, String> result =
+                errorCode.getResult() instanceof Map ? (Map<String, String>) errorCode.getResult() : new HashMap<>();
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(new HashMap<String, Object>() {
             {
-                put("code", errorCode.getCode());  // Đảm bảo `code` là String
+                put("code", errorCode.getCode()); // Đảm bảo `code` là String
                 put("message", displayMessage);
                 put("result", result);
             }
         });
     }
-
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Object> handleApiException(ApiException ex) {
@@ -54,8 +54,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
         Map<String, String> errors = ex.getErrors();
-        ApiResponse<Map<String, String>> response =
-                new ApiResponse<>(SystemErrorCode.BAD_REQUEST_SERVER.getCode(), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
+        ApiResponse<Map<String, String>> response = new ApiResponse<>(
+                SystemErrorCode.BAD_REQUEST_SERVER.getCode(), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
         return ResponseEntity.status(OK).body(response);
     }
 
@@ -92,7 +92,8 @@ public class GlobalExceptionHandler {
             String errorMessage = violation.getMessage();
             errors.put(fieldName, errorMessage);
         });
-        ApiResponse<?> response = new ApiResponse<>(SystemErrorCode.BAD_REQUEST_SERVER.getCode(), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
+        ApiResponse<?> response = new ApiResponse<>(
+                SystemErrorCode.BAD_REQUEST_SERVER.getCode(), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
         return ResponseEntity.ok(response);
     }
 

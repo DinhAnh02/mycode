@@ -1,17 +1,22 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
-import lombok.Getter;
-import org.springframework.http.HttpStatusCode;
-import java.util.HashMap;
-import java.util.Map;
+
 import static org.springframework.http.HttpStatus.OK;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
+
 @Getter
-public enum AccountErrorCode implements BaseErrorCode{
-    NOT_ENOUGH_PERMISSION(OK,"TK-403","Bạn không có đủ quyền sử dụng chức năng này",new HashMap<>()),
+public enum AccountErrorCode implements BaseErrorCode {
+    NOT_ENOUGH_PERMISSION(OK, "TK-403", "Bạn không có đủ quyền sử dụng chức năng này", new HashMap<>()),
     ACCOUNT_NOT_FOUND(OK, "TK-01", "Tài khoản không tồn tại", new HashMap<>()),
     ACCOUNT_ALREADY_EXISTS(OK, "TK-02", "Tài khoản đã tồn tại", new HashMap<>()),
     INVALID_ACCOUNT_OR_PASSWORD(OK, "TK-03", "Sai tài khoản hoặc mật khẩu", new HashMap<>()),
-    ACCOUNT_TO_BE_LOCKED_IS_LOGGED_IN(OK, "TK-04", "Tài khoản cần khóa trùng với tài khoản đang đăng nhập", new HashMap<>()),
+    ACCOUNT_TO_BE_LOCKED_IS_LOGGED_IN(
+            OK, "TK-04", "Tài khoản cần khóa trùng với tài khoản đang đăng nhập", new HashMap<>()),
     ACCOUNT_NOT_LINKED_TO_USB(OK, "TK-05", "Tài khoản chưa được liên kết với USB", new HashMap<>()),
     ACCOUNT_INACTIVE(OK, "TK-06", "Tài khoản không hoạt động", new HashMap<>()),
     ACCOUNT_ALREADY_ACTIVATED(OK, "TK-07", "Tài khoản đã được kích hoạt", new HashMap<>()),
@@ -28,17 +33,19 @@ public enum AccountErrorCode implements BaseErrorCode{
     ACCOUNT_NOT_ACTIVATED(OK, "TK-18", "Tài khoản chưa được kích hoạt", new HashMap<>()),
     CURRENT_POSITION_NOT_CHANGEABLE(OK, "TK-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
     DEPARTMENT_HEAD_INFO_NOT_FOUND(OK, "TK-20", "Không tìm thấy thông tin trưởng phòng", new HashMap<>()),
-    START_TIME_GREATER_THAN_END_TIME(OK, "TK-21", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc", new HashMap<>()),
-    DEPARTMENT_CONFLICT(OK,"TK-22","Bạn khác phòng ban với tài khoản đang chọn",new HashMap<>()),
-    ACCOUNT_LOCK_NOT_FOUND(OK,"TK-23","Tài khoản bạn chọn không tồn tại", new HashMap<>()),
-    ACCOUNT_IS_LOCK(OK,"TK-24","Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
+    START_TIME_GREATER_THAN_END_TIME(
+            OK, "TK-21", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc", new HashMap<>()),
+    DEPARTMENT_CONFLICT(OK, "TK-22", "Bạn khác phòng ban với tài khoản đang chọn", new HashMap<>()),
+    ACCOUNT_LOCK_NOT_FOUND(OK, "TK-23", "Tài khoản bạn chọn không tồn tại", new HashMap<>()),
+    ACCOUNT_IS_LOCK(OK, "TK-24", "Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;
-    private final String code;  // Đảm bảo `code` là String
+    private final String code; // Đảm bảo `code` là String
     private final String message;
     private final Map<String, String> result;
-    AccountErrorCode(HttpStatusCode statusCode, String code, String message, Map<String,String> result) {
+
+    AccountErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, String> result) {
         this.code = code;
         this.message = message;
         this.statusCode = statusCode;

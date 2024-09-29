@@ -1,25 +1,6 @@
 package vn.eledevo.vksbe.service.usb;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.dto.request.AccountActive;
-import vn.eledevo.vksbe.dto.request.DataChange;
-import vn.eledevo.vksbe.dto.request.UsbRequest;
-import vn.eledevo.vksbe.dto.response.Result;
-import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
-import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Computers;
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.repository.AccountRepository;
-import vn.eledevo.vksbe.repository.UsbRepository;
-import vn.eledevo.vksbe.service.ChangeData;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -33,7 +14,27 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import vn.eledevo.vksbe.constant.ErrorCode;
+import vn.eledevo.vksbe.dto.request.AccountActive;
+import vn.eledevo.vksbe.dto.request.DataChange;
+import vn.eledevo.vksbe.dto.request.UsbRequest;
+import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
+import vn.eledevo.vksbe.entity.Accounts;
+import vn.eledevo.vksbe.entity.Computers;
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.repository.AccountRepository;
+import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.service.ChangeData;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +45,8 @@ public class UsbServiceImpl implements UsbService {
     AccountRepository accountRepository;
 
     @Override
-    public Result<UsbResponseFilter> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit) throws ApiException {
+    public Result<UsbResponseFilter> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit)
+            throws ApiException {
         if (usbRequest.getFromDate() == null) {
             usbRequest.setFromDate(LocalDate.of(1900, 1, 1));
         }
@@ -99,25 +101,25 @@ public class UsbServiceImpl implements UsbService {
         return null;
     }
 
-//    private void downloadFile() throws IOException, ApiException {
-//        String fileUrl = "https://jenkins.eledevo.com/download/app_usb.zip";
-//        String saveDirectory = "./src/AppUsb/";
-//        String fileName = "app_usb.zip";
-//
-//        URL url = new URL(fileUrl);
-//        URLConnection urlConnection = url.openConnection();
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-//
-//        try (InputStream inputStream = urlConnection.getInputStream()) {
-//            Path file = Paths.get(saveDirectory + fileName);
-//            Files.copy(inputStream, file);
-//        } catch (IOException e) {
-//            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
-//        }
-//    }
+    //    private void downloadFile() throws IOException, ApiException {
+    //        String fileUrl = "https://jenkins.eledevo.com/download/app_usb.zip";
+    //        String saveDirectory = "./src/AppUsb/";
+    //        String fileName = "app_usb.zip";
+    //
+    //        URL url = new URL(fileUrl);
+    //        URLConnection urlConnection = url.openConnection();
+    //
+    //        HttpHeaders headers = new HttpHeaders();
+    //        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+    //        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+    //
+    //        try (InputStream inputStream = urlConnection.getInputStream()) {
+    //            Path file = Paths.get(saveDirectory + fileName);
+    //            Files.copy(inputStream, file);
+    //        } catch (IOException e) {
+    //            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
+    //        }
+    //    }
 
     private void unzipFile() throws IOException {
         String zipFilePath = "./src/AppUsb/app_usb.zip";

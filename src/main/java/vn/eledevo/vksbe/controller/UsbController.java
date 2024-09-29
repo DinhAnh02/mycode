@@ -38,10 +38,10 @@ public class UsbController {
     @Operation(summary = "Xem danh sách thiết bị USB")
     public ApiResponse<Result<UsbResponseFilter>> getUsbDeviceList(
             @RequestBody UsbRequest usbRequest,
-            @RequestParam(required = false, defaultValue = "1") Integer currentPage,
-            @RequestParam(required = false, defaultValue = "10") Integer limit)
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer pageSize)
             throws ApiException {
-        return ApiResponse.ok(usbService.getUsbByFilter(usbRequest, currentPage, limit));
+        return ApiResponse.ok(usbService.getUsbByFilter(usbRequest, page, pageSize));
     }
 
     @GetMapping("/download/{username}")
