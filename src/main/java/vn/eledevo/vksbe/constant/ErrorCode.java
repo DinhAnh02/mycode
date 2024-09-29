@@ -34,7 +34,7 @@ public enum ErrorCode implements BaseErrorCode {
     CHECK_ORGANIZATIONAL_STRUCTURE(CONFLICT, "4090", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất.", new HashMap<>()),
     DUPLICATE_ACCOUNT(BAD_REQUEST, "5000", "Tài khoản cần khóa trùng với tài khoản đang đăng nhập", new HashMap<>()),
     ACCOUNT_NOT_LOCK(FORBIDDEN, "4030", "Bạn không được phép cập nhật tài khoản này", new HashMap<>()),
-    ACCOUNT_NOT_CONNECT_USB(NOT_FOUND, "4041", "Tài khoản chưa được liên kết với USB", new HashMap<>()),
+     ACCOUNT_NOT_CONNECT_USB(NOT_FOUND, "4041", "Tài khoản chưa được liên kết với USB", new HashMap<>()),
     ACCOUNT_NOT_STATUS_ACTIVE(CONFLICT, "4091", "Tài khoản không hoạt động", new HashMap<>()),
     TOKEN_EXPIRE(UNAUTHORIZED, "4010", "Hết phiên đăng nhập", new HashMap<>()),
     CONFLICT_USB(CONFLICT, "4090", "USB không phải của tài khoản này. Vui lòng kiểm tra lại", new HashMap<>()),
