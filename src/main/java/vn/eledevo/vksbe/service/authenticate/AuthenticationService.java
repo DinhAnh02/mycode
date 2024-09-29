@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.*;
-import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
@@ -218,9 +217,7 @@ public class AuthenticationService {
         // Lưu token truy cập mới vào cơ sở dữ liệu
         saveUserToken(accounts.get(), jwtToken, TokenType.ACCESS.toString());
         // Trả về đối tượng AuthenticationResponse chứa các token
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .build();
+        return AuthenticationResponse.builder().accessToken(jwtToken).build();
     }
 
     private Boolean checkRoleItAdmin(String role) {

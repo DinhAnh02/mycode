@@ -2,17 +2,16 @@ package vn.eledevo.vksbe.constant;
 
 import static org.springframework.http.HttpStatus.*;
 
-import org.springframework.http.HttpStatusCode;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import vn.eledevo.vksbe.constant.ErrorCodes.BaseErrorCode;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
+import vn.eledevo.vksbe.constant.ErrorCodes.BaseErrorCode;
+
 @Getter
-//@RequiredArgsConstructor
+// @RequiredArgsConstructor
 public enum ErrorCode implements BaseErrorCode {
     UNCATEGORIZED_EXCEPTION(INTERNAL_SERVER_ERROR, "500", "INTERNAL_SERVER_ERROR", new HashMap<>()),
     FIELD_INVALID(UNPROCESSABLE_ENTITY, "4200", "Lỗi validate không hợp lệ!", new HashMap<>()),
@@ -23,23 +22,33 @@ public enum ErrorCode implements BaseErrorCode {
     USER_NOT_EXIST(UNAUTHORIZED, "1008", "Tài khoản không tồn tại ", new HashMap<>()),
     DEVICE_NOT_EXIST(NOT_FOUND, "1008", "Thiết bị không tồn tại hoặc đã bị xóa trước đó", new HashMap<>()),
     PASSWORD_FAILURE(OK, "8000", "Sai tài khoản hoặc mật khẩu", new HashMap<>()),
-    KEY_USB_NOT_FOUND(OK, "7000", "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kiểm tra lại", new HashMap<>()),
+    KEY_USB_NOT_FOUND(
+            OK,
+            "7000",
+            "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kiểm tra lại",
+            new HashMap<>()),
     CHECK_USB(CONFLICT, "6000", "Usb không chính xác", new HashMap<>()),
     ACCOUNT_NOT_FOUND(NOT_FOUND, "4040", "Acount không tồn tại trong hệ thống", new HashMap<>()),
     COMPUTER_NOT_FOUND(NOT_FOUND, "4040", "Computer không tồn tại trong hệ thống", new HashMap<>()),
     COMPUTER_NOT_CONNECT_TO_ACCOUNT(NOT_FOUND, "404", "Máy tính chưa được liên kết với tài khoản", new HashMap<>()),
     COMPUTER_HAS_EXISTED(NOT_FOUND, "4000", "Thiết bị đã tồn tại trong hệ thống", new HashMap<>()),
     NAME_COMPUTER_HAS_EXISTED(NOT_FOUND, "4000", "Tên Thiết bị đã tồn tại trong hệ thống", new HashMap<>()),
-    CHECK_FROM_DATE(UNPROCESSABLE_ENTITY, "4220", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc.", new HashMap<>()),
-    CHECK_ORGANIZATIONAL_STRUCTURE(CONFLICT, "4090", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất.", new HashMap<>()),
+    CHECK_FROM_DATE(
+            UNPROCESSABLE_ENTITY, "4220", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc.", new HashMap<>()),
+    CHECK_ORGANIZATIONAL_STRUCTURE(
+            CONFLICT,
+            "4090",
+            "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất.",
+            new HashMap<>()),
     DUPLICATE_ACCOUNT(BAD_REQUEST, "5000", "Tài khoản cần khóa trùng với tài khoản đang đăng nhập", new HashMap<>()),
     ACCOUNT_NOT_LOCK(FORBIDDEN, "4030", "Bạn không được phép cập nhật tài khoản này", new HashMap<>()),
-     ACCOUNT_NOT_CONNECT_USB(NOT_FOUND, "4041", "Tài khoản chưa được liên kết với USB", new HashMap<>()),
+    ACCOUNT_NOT_CONNECT_USB(NOT_FOUND, "4041", "Tài khoản chưa được liên kết với USB", new HashMap<>()),
     ACCOUNT_NOT_STATUS_ACTIVE(CONFLICT, "4091", "Tài khoản không hoạt động", new HashMap<>()),
     TOKEN_EXPIRE(UNAUTHORIZED, "4010", "Hết phiên đăng nhập", new HashMap<>()),
     CONFLICT_USB(CONFLICT, "4090", "USB không phải của tài khoản này. Vui lòng kiểm tra lại", new HashMap<>()),
     ACCOUNT_STATUS_ACTIVE(UNPROCESSABLE_ENTITY, "4222", "Tài khoản đã được kích hoạt ", new HashMap<>()),
-    ACCOUNT_NOT_CONNECT_COMPUTER(UNPROCESSABLE_ENTITY, "4223", "Tài khoản chưa được liên kết với máy tính", new HashMap<>()),
+    ACCOUNT_NOT_CONNECT_COMPUTER(
+            UNPROCESSABLE_ENTITY, "4223", "Tài khoản chưa được liên kết với máy tính", new HashMap<>()),
     ACCOUNT_NOT_PIN(BAD_REQUEST, "4000", "Mã pin nhập lại không trùng khớp", new HashMap<>()),
     OLD_PASSWORD_FAILURE(BAD_REQUEST, "4000", "Mật khẩu cũ không chính xác", new HashMap<>()),
     NEW_PASSWORD_FAILURE(BAD_REQUEST, "4000", "Mật khẩu mới không được giống mật khẩu cũ", new HashMap<>()),
@@ -57,13 +66,13 @@ public enum ErrorCode implements BaseErrorCode {
     LEADER_NOT_FOUND(NOT_FOUND, "4030", "Không tìm thấy thông tin trưởng phòng", new HashMap<>());
 
     // Định nghĩa các biến trong enum
-    private final HttpStatusCode statusCode;  // Đảm bảo rằng bạn đã khai báo biến này
+    private final HttpStatusCode statusCode; // Đảm bảo rằng bạn đã khai báo biến này
     private final String code;
     private final String message;
     private final Map<String, String> result;
 
     ErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, String> result) {
-        this.statusCode = statusCode;  // Gán giá trị cho `statusCode`
+        this.statusCode = statusCode; // Gán giá trị cho `statusCode`
         this.code = code;
         this.message = message;
         this.result = result;
@@ -71,7 +80,7 @@ public enum ErrorCode implements BaseErrorCode {
 
     @Override
     public HttpStatusCode getStatusCode() {
-        return statusCode;  // Sử dụng `statusCode` đã được khai báo
+        return statusCode; // Sử dụng `statusCode` đã được khai báo
     }
 
     @Override
@@ -89,4 +98,3 @@ public enum ErrorCode implements BaseErrorCode {
         return result;
     }
 }
-

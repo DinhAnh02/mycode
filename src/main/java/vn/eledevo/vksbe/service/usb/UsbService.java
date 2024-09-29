@@ -8,5 +8,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 public interface UsbService {
     String createUsbToken(String username) throws Exception;
 
-    Result<UsbResponseFilter> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit) throws ApiException;
+    Result<UsbResponseFilter> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit)
+            throws ApiException;
 }

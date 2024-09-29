@@ -1,10 +1,26 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -15,6 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
@@ -41,27 +63,6 @@ import vn.eledevo.vksbe.mapper.UsbMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -109,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional
-    public HashMap<String,String> resetPassword(Long id) throws ApiException {
+    public HashMap<String, String> resetPassword(Long id) throws ApiException {
         Accounts accounts = validAccount(id);
         accounts.setPassword(passwordEncoder.encode(accounts.getUsername()));
         accounts.setPin(null);
@@ -255,7 +256,7 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
         List<Computers> res = computerRepository.findByAccounts_Id(accountId);
-        List<ComputerResponse> computerResponseList =  res.stream()
+        List<ComputerResponse> computerResponseList = res.stream()
                 .map(computers -> ComputerResponse.builder()
                         .id(computers.getId())
                         .name(computers.getName())
@@ -267,7 +268,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public HashMap<String,String> inactivateAccount(Long idAccount) throws ApiException {
+    public HashMap<String, String> inactivateAccount(Long idAccount) throws ApiException {
         String userName = SecurityUtils.getUserName();
         // account đang đăng nhập
         Optional<AccountActive> accountRequest = accountRepository.findByUsernameActive(userName);
@@ -277,8 +278,9 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
 
-        Accounts existingAccount =
-                accountRepository.findById(idAccount).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_LOCK_NOT_FOUND));
+        Accounts existingAccount = accountRepository
+                .findById(idAccount)
+                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_LOCK_NOT_FOUND));
 
         // check id request có trùng với người khóa
         if (existingAccount.getId().equals(accountRequest.get().getId())) {
@@ -589,8 +591,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
-        Accounts accounts =
-                accountRepository.findById(accountID).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        Accounts accounts = accountRepository
+                .findById(accountID)
+                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
 
         if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
             throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);

@@ -52,7 +52,6 @@ public class AccountController {
     @Operation(summary = "Reset mật khẩu")
     public ApiResponse<HashMap<String, String>> resetPassword(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
-        ;
         return ApiResponse.ok(accountService.resetPassword(id));
     }
 
@@ -75,11 +74,11 @@ public class AccountController {
     @Operation(summary = "Xem danh sách tài khoản")
     public ApiResponse<ResponseFilter<AccountResponseByFilter>> getAccountList(
             @RequestBody AccountRequest req,
-            @RequestParam(defaultValue = "1") Integer currentPage,
-            @RequestParam(defaultValue = "10") Integer limit)
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize)
             throws ApiException {
         organizationalStructureUtilsService.validate(req);
-        return ApiResponse.ok(accountService.getListAccountByFilter(req, currentPage, limit));
+        return ApiResponse.ok(accountService.getListAccountByFilter(req, page, pageSize));
     }
 
     @PatchMapping("/{accountId}/inactivate")
@@ -124,11 +123,11 @@ public class AccountController {
         return ApiResponse.ok(accountService.activeAccount(idAccount));
     }
 
-    @PatchMapping("/swap-account-status/{employeeId}/{requesterId}")
+    @PatchMapping("/{accountId}/swap-account-status/{swapAccountId}")
     @Operation(summary = "Hoán đổi vị trí trưởng phòng/viện trưởng")
     public ApiResponse<ObjectSwapResponse> swapAccountSattus(
-            @PathVariable Long employeeId, @PathVariable Long requesterId) throws ApiException {
-        return ApiResponse.ok(accountService.swapStatus(employeeId, requesterId));
+            @PathVariable Long accountId, @PathVariable Long swapAccountId) throws ApiException {
+        return ApiResponse.ok(accountService.swapStatus(accountId, swapAccountId));
     }
 
     @PostMapping("/upload-image")
