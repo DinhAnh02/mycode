@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
         Map<String, String> errors = ex.getErrors();
         ApiResponse<Map<String, String>> response =
-                new ApiResponse<>(Integer.parseInt(SystemErrorCode.BAD_REQUEST_SERVER.getCode()), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
+                new ApiResponse<>(SystemErrorCode.BAD_REQUEST_SERVER.getCode(), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
         return ResponseEntity.status(OK).body(response);
     }
 
@@ -92,7 +92,7 @@ public class GlobalExceptionHandler {
             String errorMessage = violation.getMessage();
             errors.put(fieldName, errorMessage);
         });
-        ApiResponse<?> response = new ApiResponse<>(Integer.parseInt(SystemErrorCode.BAD_REQUEST_SERVER.getCode()), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
+        ApiResponse<?> response = new ApiResponse<>(SystemErrorCode.BAD_REQUEST_SERVER.getCode(), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
         return ResponseEntity.ok(response);
     }
 
@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
         });
         ApiResponse<?> response =
-                new ApiResponse<>(UNPROCESSABLE_ENTITY.value(), UNPROCESSABLE_ENTITY.getReasonPhrase(), errors);
+                new ApiResponse<>(UNPROCESSABLE_ENTITY.toString(), UNPROCESSABLE_ENTITY.getReasonPhrase(), errors);
         return ResponseEntity.ok(response);
     }
 }

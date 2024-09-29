@@ -13,21 +13,21 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApiResponse<T> {
-    int code;
+    String code;
     String message;
     T result;
 
     public ApiResponse() {
-        this.code = OK.value();
+        this.code = String.valueOf(OK.value());
         this.message = OK.getReasonPhrase();
     }
 
-    public ApiResponse(int code, String message) {
+    public ApiResponse(String code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public ApiResponse(int code, String message, T result) {
+    public ApiResponse(String code, String message, T result) {
         this.code = code;
         this.message = message;
         this.result = result;

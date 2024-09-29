@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
@@ -35,7 +37,7 @@ public class ComputerController {
 
     @GetMapping("/disconnected")
     @Operation(summary = "Lấy danh sách máy tính không liên kết với tài khoản")
-    public ApiResponse<Result<ComputerResponse>> getComputerDisconnectedList(@RequestParam(required = false) String textSearch) {
+    public ApiResponse<ResultList<ComputerResponse>> getComputerDisconnectedList(@RequestParam(required = false) String textSearch) {
         return ApiResponse.ok(computerService.getDisconnectedComputers(textSearch));
     }
 

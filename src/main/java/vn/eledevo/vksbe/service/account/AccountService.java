@@ -21,6 +21,7 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public interface AccountService {
 
     String inactivateAccount(Long idAccount) throws ApiException;
 
-    String removeConnectComputer(Long accountId, Long computerId) throws ApiException;
+    HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException;
 
     UsbResponse getUsbInfo(Long id) throws ApiException;
 

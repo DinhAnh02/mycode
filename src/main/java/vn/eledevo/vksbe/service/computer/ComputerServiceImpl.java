@@ -15,6 +15,7 @@ import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -58,11 +59,11 @@ public class ComputerServiceImpl implements ComputerService {
     }
 
     @Override
-    public Result<ComputerResponse> getDisconnectedComputers(String textSearch) {
+    public ResultList<ComputerResponse> getDisconnectedComputers(String textSearch) {
         String keyword =
                 StringUtils.isBlank(textSearch) ? null : textSearch.trim().toLowerCase();
         List<Computers> computersList = computerRepository.getByTextSearchAndAccountsIsNull(keyword);
-        return new Result<>(computerMapper.toListResponse(computersList), computersList.size());
+        return new ResultList<>(computerMapper.toListResponse(computersList));
     }
 
     @Override
