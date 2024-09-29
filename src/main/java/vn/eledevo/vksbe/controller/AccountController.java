@@ -63,8 +63,9 @@ public class AccountController {
 
     @PatchMapping("/reset-password/{id}")
     @Operation(summary = "Reset mật khẩu")
-    public ApiResponse<String> resetPassword(
+    public ApiResponse<HashMap<String,String>> resetPassword(
             @Parameter(description = "ID of the user", required = true) @PathVariable Long id) throws ApiException {
+        ;
         return ApiResponse.ok(accountService.resetPassword(id));
     }
 
@@ -96,7 +97,7 @@ public class AccountController {
 
     @PatchMapping("/{accountId}/inactivate")
     @Operation(summary = "Khóa tài khoản")
-    public ApiResponse<String> lockAccount(@PathVariable Long accountId) throws ApiException {
+    public ApiResponse<HashMap<String,String>> lockAccount(@PathVariable Long accountId) throws ApiException {
         if (accountId == null) {
             throw new ApiException(FIELD_INVALID);
         }

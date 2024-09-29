@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.dto.request.AccountInactive;
+import vn.eledevo.vksbe.dto.request.AccountActive;
 import vn.eledevo.vksbe.dto.request.DataChange;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
 import vn.eledevo.vksbe.dto.response.Result;
@@ -65,7 +65,7 @@ public class UsbServiceImpl implements UsbService {
         String zipFilePath = "src/AppUsb/setup.zip";
         String unzippedFolderPath = "src/AppUsb/unzipped";
         unzipFile();
-        Optional<AccountInactive> account = accountRepository.findByUsernameActive(username);
+        Optional<AccountActive> account = accountRepository.findByUsernameActive(username);
         if (account.isPresent()) {
             Optional<Accounts> acc = accountRepository.findById(account.get().getId());
             if (acc.isPresent()) {

@@ -43,7 +43,7 @@ import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
-import vn.eledevo.vksbe.dto.request.AccountInactive;
+import vn.eledevo.vksbe.dto.request.AccountActive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
@@ -91,7 +91,7 @@ public class AccountServiceImpl implements AccountService {
     private String appHost;
 
     private Accounts validAccount(Long id) throws ApiException {
-        return accountRepository.findById(id).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+        return accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
     }
 
     /**
@@ -110,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional
-    public String resetPassword(Long id) throws ApiException {
+    public HashMap<String,String> resetPassword(Long id) throws ApiException {
         Accounts accounts = validAccount(id);
         accounts.setPassword(passwordEncoder.encode(accounts.getUsername()));
         accounts.setPin(null);
@@ -120,7 +120,7 @@ public class AccountServiceImpl implements AccountService {
         accounts.setUpdatedAt(LocalDateTime.now());
         accountRepository.save(accounts);
         tokenRepository.deleteByAccounts_Id(id);
-        return ResponseMessage.RESET_PASSWORD_SUCCESS;
+        return new HashMap<>();
     }
 
     private Boolean isBoss(Accounts accSecurity) {
@@ -260,28 +260,30 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String inactivateAccount(Long idAccount) throws ApiException {
+    public HashMap<String,String> inactivateAccount(Long idAccount) throws ApiException {
         String userName = SecurityUtils.getUserName();
-        Optional<AccountInactive> accountRequest = accountRepository.findByUsernameActive(userName);
+        // account đang đăng nhập
+        Optional<AccountActive> accountRequest = accountRepository.findByUsernameActive(userName);
 
-        // check account có tồn tại không
+        // check account đang đăng nhập có tồn tại không
         if (accountRequest.isEmpty()) {
-            throw new ApiException(ACCOUNT_NOT_FOUND);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
 
         Accounts existingAccount =
-                accountRepository.findById(idAccount).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+                accountRepository.findById(idAccount).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_LOCK_NOT_FOUND));
 
         // check id request có trùng với người khóa
         if (existingAccount.getId().equals(accountRequest.get().getId())) {
-            throw new ApiException(DUPLICATE_ACCOUNT);
+            throw new ApiException(AccountErrorCode.ACCOUNT_TO_BE_LOCKED_IS_LOGGED_IN);
         }
 
         if (!existingAccount.getStatus().equals(Status.ACTIVE.name())) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION);
+            throw new ApiException(AccountErrorCode.ACCOUNT_IS_LOCK);
         }
-
+        // Role của người đăng nhập
         String roleCode = accountRequest.get().getRoleCode();
+        // Role của người cần khóa
         String existingRoleCode = existingAccount.getRoles().getCode();
         boolean sameDepartment = accountRequest
                 .get()
@@ -293,35 +295,35 @@ public class AccountServiceImpl implements AccountService {
             case VIEN_PHO -> handleVienPho(existingRoleCode);
             case TRUONG_PHONG -> handleTruongPhong(existingRoleCode, sameDepartment);
             case PHO_PHONG -> handlePhoPhong(existingRoleCode, sameDepartment);
-            default -> throw new ApiException(UNCATEGORIZED_EXCEPTION);
+            default -> throw new ApiException(AccountErrorCode.POSITION_NOT_FOUND);
         }
         existingAccount.setStatus(Status.INACTIVE.name());
         accountRepository.save(existingAccount);
-        return ResponseMessage.LOCK_ACCOUNT_SUCCESS;
+        return new HashMap<>();
     }
 
     private void handleVienTruong(String existingRoleCode) throws ApiException {
         if (existingRoleCode.equals(IT_ADMIN)) {
-            throw new ApiException(ACCOUNT_NOT_LOCK);
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
     }
 
     private void handleVienPho(String existingRoleCode) throws ApiException {
         List<String> restrictedRoles = List.of(IT_ADMIN, VIEN_TRUONG, VIEN_PHO);
         if (restrictedRoles.contains(existingRoleCode)) {
-            throw new ApiException(ACCOUNT_NOT_LOCK);
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
     }
 
     private void handleTruongPhong(String existingRoleCode, boolean sameDepartment) throws ApiException {
         if ((!existingRoleCode.equals(PHO_PHONG) && !existingRoleCode.equals(KIEM_SAT_VIEN)) || !sameDepartment) {
-            throw new ApiException(ACCOUNT_NOT_LOCK);
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
     }
 
     private void handlePhoPhong(String existingRoleCode, boolean sameDepartment) throws ApiException {
         if (!existingRoleCode.equals(KIEM_SAT_VIEN) || !sameDepartment) {
-            throw new ApiException(ACCOUNT_NOT_LOCK);
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
     }
 

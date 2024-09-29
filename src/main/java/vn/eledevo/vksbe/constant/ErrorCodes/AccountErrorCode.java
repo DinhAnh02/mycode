@@ -7,7 +7,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @Getter
 public enum AccountErrorCode implements BaseErrorCode{
-    NOT_ENOUGH_PERMISSION(OK,"TK-403","Bạn không có quyền sử dụng chức năng này",new HashMap<>()),
+    NOT_ENOUGH_PERMISSION(OK,"TK-403","Bạn không có đủ quyền sử dụng chức năng này",new HashMap<>()),
     ACCOUNT_NOT_FOUND(OK, "TK-01", "Tài khoản không tồn tại", new HashMap<>()),
     ACCOUNT_ALREADY_EXISTS(OK, "TK-02", "Tài khoản đã tồn tại", new HashMap<>()),
     INVALID_ACCOUNT_OR_PASSWORD(OK, "TK-03", "Sai tài khoản hoặc mật khẩu", new HashMap<>()),
@@ -29,7 +29,9 @@ public enum AccountErrorCode implements BaseErrorCode{
     CURRENT_POSITION_NOT_CHANGEABLE(OK, "TK-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
     DEPARTMENT_HEAD_INFO_NOT_FOUND(OK, "TK-20", "Không tìm thấy thông tin trưởng phòng", new HashMap<>()),
     START_TIME_GREATER_THAN_END_TIME(OK, "TK-21", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc", new HashMap<>()),
-    DEPARTMENT_CONFLICT(OK,"TK-22","Bạn khác phòng ban với tài khoản đang chọn",new HashMap<>())
+    DEPARTMENT_CONFLICT(OK,"TK-22","Bạn khác phòng ban với tài khoản đang chọn",new HashMap<>()),
+    ACCOUNT_LOCK_NOT_FOUND(OK,"TK-23","Tài khoản bạn chọn không tồn tại", new HashMap<>()),
+    ACCOUNT_IS_LOCK(OK,"TK-24","Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;
