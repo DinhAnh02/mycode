@@ -16,7 +16,7 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<Computers> findByAccounts_Id(Long accountId);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.ComputerResponseFilter(c.id, c.code, c.brand, c.type, c.name, c.status, c.note, p.fullName) "
+            "SELECT new vn.eledevo.vksbe.dto.response.ComputerResponseFilter(c.id, c.name, p.fullName, c.code, c.status, c.brand, c.type, c.note, c.createdAt, c.updatedAt, c.createdBy, c.updatedBy) "
                     + "FROM Computers c "
                     + "LEFT JOIN Accounts a ON c.accounts.id = a.id "
                     + "LEFT JOIN Profiles p ON p.accounts.id = a.id "

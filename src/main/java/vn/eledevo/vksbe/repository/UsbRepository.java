@@ -14,7 +14,7 @@ public interface UsbRepository extends BaseRepository<Usbs, Long> {
     Optional<Usbs> findByAccounts_Id(Long accountId);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter(u.id, u.status, u.name, p.fullName, u.createdAt) "
+            "SELECT new vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter(u.id, u.name, u.usbCode, u.usbVendorCode, u.keyUsb, u.status, u.createdAt, u.updatedAt, u.createdBy, u.updatedBy, p.fullName) "
                     + "FROM Usbs u "
                     + "LEFT JOIN Accounts a ON a.id = u.accounts.id "
                     + "LEFT JOIN Profiles p ON a.id = p.accounts.id "

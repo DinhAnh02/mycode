@@ -1,6 +1,25 @@
 package vn.eledevo.vksbe.service.usb;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import vn.eledevo.vksbe.constant.ErrorCode;
+import vn.eledevo.vksbe.dto.request.AccountActive;
+import vn.eledevo.vksbe.dto.request.DataChange;
+import vn.eledevo.vksbe.dto.request.UsbRequest;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
+import vn.eledevo.vksbe.entity.Accounts;
+import vn.eledevo.vksbe.entity.Computers;
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.repository.AccountRepository;
+import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.service.ChangeData;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,27 +33,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.dto.request.AccountActive;
-import vn.eledevo.vksbe.dto.request.DataChange;
-import vn.eledevo.vksbe.dto.request.UsbRequest;
-import vn.eledevo.vksbe.dto.response.Result;
-import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
-import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Computers;
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.repository.AccountRepository;
-import vn.eledevo.vksbe.repository.UsbRepository;
-import vn.eledevo.vksbe.service.ChangeData;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class UsbServiceImpl implements UsbService {
     AccountRepository accountRepository;
 
     @Override
-    public Result<UsbResponseFilter> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit)
+    public ResponseFilter<UsbResponseFilter> getUsbByFilter(UsbRequest usbRequest, Integer currentPage, Integer limit)
             throws ApiException {
         if (usbRequest.getFromDate() == null) {
             usbRequest.setFromDate(LocalDate.of(1900, 1, 1));
@@ -59,7 +58,12 @@ public class UsbServiceImpl implements UsbService {
         Pageable pageable = PageRequest.of(currentPage - 1, limit);
         Page<UsbResponseFilter> page = usbRepository.getUsbDeviceList(usbRequest, pageable);
 
-        return new Result<>(page.getContent(), (int) page.getTotalElements());
+        return new ResponseFilter<>(
+                page.getContent(),
+                (int) page.getTotalElements(),
+                page.getSize(),
+                page.getNumber(),
+                page.getTotalPages());
     }
 
     @Override
