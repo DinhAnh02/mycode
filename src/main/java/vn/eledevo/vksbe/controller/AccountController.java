@@ -56,7 +56,7 @@ public class AccountController {
         return ApiResponse.ok(accountService.resetPassword(id));
     }
 
-    @GetMapping("/accounts/{id}/devices")
+    @GetMapping("/{id}/devices")
     @Operation(
             summary = "Lấy danh sách thiết bị đã liên kết với tài khoản",
             description = "Retrieves a list of computer devices associated with a specific account")

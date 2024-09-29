@@ -252,10 +252,18 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException {
         if (!accountRepository.existsById(accountId)) {
-            throw new ApiException(ACCOUNT_NOT_FOUND);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
         List<Computers> res = computerRepository.findByAccounts_Id(accountId);
-        return computerMapper.toListResponse(res);
+        List<ComputerResponse> computerResponseList =  res.stream()
+                .map(computers -> ComputerResponse.builder()
+                        .id(computers.getId())
+                        .name(computers.getName())
+                        .code(computers.getCode())
+                        .type(computers.getType())
+                        .build())
+                .toList();
+        return computerResponseList;
     }
 
     @Override
