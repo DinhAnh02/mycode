@@ -83,4 +83,6 @@ public class ResponseMessage {
     public static final String REMOVE_CONNECT_COMPUTER_SUCCESS = "Gỡ liên kết máy tính với tài khoản thành công";
 
     public static final String CREATE_NEW_DEVICE_SUCCESS = "Tạo mới thông tin máy tính thành công";
+
+    public static final String REMOVE_CONNECT_USB_SUCCESS = "Gỡ liên kết USB thành công";
 }

@@ -1,6 +1,7 @@
 package vn.eledevo.vksbe.service.account;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
 import static vn.eledevo.vksbe.constant.FileConst.*;
 import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 import static vn.eledevo.vksbe.constant.RoleCodes.*;
@@ -340,7 +341,7 @@ public class AccountServiceImpl implements AccountService {
         int soThietBiKetNoi = accounts.getComputers().size();
         if (Objects.equals(soThietBiKetNoi, 1)) {
             accounts.setIsConnectComputer(false);
-            accounts.setStatus("INACTIVE");
+            accounts.setStatus(Status.ACTIVE.name());
             accountRepository.save(accounts);
         }
         // gỡ usb token
@@ -423,8 +424,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse removeConnectUSB(Long accountID, Long usbID) throws ApiException {
-        return removeUSB(accountID, usbID);
+    public String removeConnectUSB(Long accountID, Long usbID) throws ApiException {
+        removeUSB(accountID, usbID);
+        return REMOVE_CONNECT_USB_SUCCESS;
     }
 
     @Override
@@ -554,7 +556,7 @@ public class AccountServiceImpl implements AccountService {
         if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
                 && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
             accountToUpdate(req, updatedAccId, updateAccRole);
-            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+            return AccResponse.builder().build();
         }
         OldPositionAccInfo oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
         if (oldPositionAccInfo.getId() == null) {
@@ -573,10 +575,10 @@ public class AccountServiceImpl implements AccountService {
 
     private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
         Accounts accounts =
-                accountRepository.findById(accountID).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+                accountRepository.findById(accountID).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
 
         if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
-            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+            throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
         }
         accounts.setUsb(null);
         accounts.setIsConnectUsb(false);
