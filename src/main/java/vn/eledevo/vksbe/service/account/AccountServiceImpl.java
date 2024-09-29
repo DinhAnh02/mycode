@@ -531,7 +531,7 @@ public class AccountServiceImpl implements AccountService {
         Accounts curLoginAcc = SecurityUtils.getUser();
 
         if (!isAllowedToCreateAccount(curLoginAcc)) {
-            throw new ApiException(PERMISSION_DENIED);
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
         Map<String, String> errors = validateAccountCreateRequest(request);
@@ -543,7 +543,7 @@ public class AccountServiceImpl implements AccountService {
         Accounts account = createAccount(request, profile);
 
         Accounts savedAccount = accountRepository.save(account);
-        return accountMapper.toResponse(savedAccount);
+        return AccountResponse.builder().id(savedAccount.getId()).build();
     }
 
     @Override
@@ -727,8 +727,8 @@ public class AccountServiceImpl implements AccountService {
                 .departments(
                         departmentRepository.findById(request.getDepartmentId()).orElseThrow())
                 .password(passwordEncoder.encode(request.getUsername()))
-                .isConditionLogin1(true)
-                .isConditionLogin2(true)
+                .isConditionLogin1(false)
+                .isConditionLogin2(false)
                 .isConnectComputer(false)
                 .isConnectUsb(false)
                 .status(Status.INITIAL.name())
@@ -790,19 +790,19 @@ public class AccountServiceImpl implements AccountService {
 
     private void validateAvatarFile(MultipartFile file) throws ApiException {
         if (file == null || file.isEmpty()) {
-            throw new ApiException(AVATAR_EMPTY);
+            return;
         }
 
         String fileExtension = getFileExtension(file.getOriginalFilename());
         if (!isAllowedExtension(fileExtension, AVATAR_ALLOWED_EXTENSIONS)) {
             String msg = MessageFormat.format(
-                    ErrorCode.AVATAR_EXTENSION_INVALID.getMessage(), String.join(", ", AVATAR_ALLOWED_EXTENSIONS));
-            throw new ApiException(ErrorCode.AVATAR_EXTENSION_INVALID, msg);
+                    AccountErrorCode.AVATAR_INVALID_FORMAT.getMessage(), String.join(", ", AVATAR_ALLOWED_EXTENSIONS));
+            throw new ApiException(AccountErrorCode.AVATAR_INVALID_FORMAT, msg);
         }
 
         if (file.getSize() > MAX_AVATAR_SIZE * BYTES_IN_MB) {
-            String msg = MessageFormat.format(ErrorCode.AVATAR_MAX_SIZE.getMessage(), MAX_AVATAR_SIZE);
-            throw new ApiException(ErrorCode.AVATAR_MAX_SIZE, msg);
+            String msg = MessageFormat.format(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT.getMessage(), MAX_AVATAR_SIZE);
+            throw new ApiException(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT, msg);
         }
     }
 

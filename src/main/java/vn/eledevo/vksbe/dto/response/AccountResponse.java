@@ -2,13 +2,14 @@ package vn.eledevo.vksbe.dto.response;
 
 import java.time.LocalDateTime;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountResponse {
     Long id;

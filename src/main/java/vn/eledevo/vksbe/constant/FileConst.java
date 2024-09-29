@@ -6,7 +6,7 @@ public class FileConst {
 
     public static final long BYTES_IN_MB = 1024L * 1024L;
 
-    public static final long MAX_AVATAR_SIZE = 10L; // 10MB
+    public static final long MAX_AVATAR_SIZE = 3L; // 10MB
 
     public static final String[] AVATAR_ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"};
 

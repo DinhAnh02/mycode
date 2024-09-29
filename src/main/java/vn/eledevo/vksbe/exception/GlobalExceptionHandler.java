@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
         Map<String, String> errors = ex.getErrors();
         ApiResponse<Map<String, String>> response = new ApiResponse<>(
-                SystemErrorCode.BAD_REQUEST_SERVER.getCode(), SystemErrorCode.BAD_REQUEST_SERVER.getMessage(), errors);
+                SystemErrorCode.VALIDATE_FORM.getCode(), SystemErrorCode.VALIDATE_FORM.getMessage(), errors);
         return ResponseEntity.status(OK).body(response);
     }
 
@@ -103,9 +103,10 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
         });
         ApiResponse<?> response =
-                new ApiResponse<>(UNPROCESSABLE_ENTITY.toString(), UNPROCESSABLE_ENTITY.getReasonPhrase(), errors);
+                new ApiResponse<>(SystemErrorCode.VALIDATE_FORM.getCode(), SystemErrorCode.VALIDATE_FORM.getMessage(), errors);
         return ResponseEntity.ok(response);
     }
 }
