@@ -25,8 +25,8 @@ public enum AccountErrorCode implements BaseErrorCode {
     OLD_PASSWORD_INCORRECT(OK, "TK-10", "Mật khẩu cũ không chính xác", new HashMap<>()),
     NEW_PASSWORD_SAME_AS_OLD(OK, "TK-11", "Mật khẩu mới không được trùng với mật khẩu cũ", new HashMap<>()),
     CONFIRM_PASSWORD_MISMATCH(OK, "TK-12", "Mật khẩu nhập lại không được trùng với mật khẩu mới", new HashMap<>()),
-    AVATAR_SIZE_EXCEEDS_LIMIT(OK, "TK-13", "Ảnh đại diện không được vượt quá 3MB", new HashMap<>()),
-    AVATAR_INVALID_FORMAT(OK, "TK-14", "Ảnh đại diện chỉ chấp nhận định dạng .png, .jpg, .jpeg", new HashMap<>()),
+    AVATAR_SIZE_EXCEEDS_LIMIT(OK, "TK-13", "Ảnh đại diện không được vượt quá {0}", new HashMap<>()),
+    AVATAR_INVALID_FORMAT(OK, "TK-14", "Ảnh đại diện chỉ chấp nhận định dạng {0}", new HashMap<>()),
     AVATAR_NOT_FOUND(OK, "TK-15", "Không tìm thấy ảnh đại diện", new HashMap<>()),
     POSITION_NOT_FOUND(OK, "TK-16", "Chức vụ không tồn tại", new HashMap<>()),
     DIRECTORY_NOT_FOUND(OK, "TK-17", "Không tìm thấy thư mục", new HashMap<>()),
@@ -38,6 +38,7 @@ public enum AccountErrorCode implements BaseErrorCode {
     DEPARTMENT_CONFLICT(OK, "TK-22", "Bạn khác phòng ban với tài khoản đang chọn", new HashMap<>()),
     ACCOUNT_LOCK_NOT_FOUND(OK, "TK-23", "Tài khoản bạn chọn không tồn tại", new HashMap<>()),
     ACCOUNT_IS_LOCK(OK, "TK-24", "Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
+    ACCOUNT_ACTIVE(OK,"TK-25","Tài khoản đang hoạt", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

@@ -11,6 +11,7 @@ import java.util.Set;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -130,7 +131,7 @@ public class AccountController {
         return ApiResponse.ok(accountService.swapStatus(accountId, swapAccountId));
     }
 
-    @PostMapping("/upload-image")
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload avatar")
     public ApiResponse<String> uploadAvatar(@RequestParam("file") MultipartFile file) throws ApiException, IOException {
         return ApiResponse.ok(accountService.uploadAvatar(file));
