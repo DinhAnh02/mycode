@@ -1,5 +1,20 @@
 package vn.eledevo.vksbe.controller;
 
+import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
+import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,11 +31,9 @@ import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
-import vn.eledevo.vksbe.dto.response.AccountResponse;
-import vn.eledevo.vksbe.dto.response.ApiResponse;
-import vn.eledevo.vksbe.dto.response.ResponseFilter;
-import vn.eledevo.vksbe.dto.response.Result;
+import vn.eledevo.vksbe.dto.response.*;
 import vn.eledevo.vksbe.dto.response.account.AccResponse;
+import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
 import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
@@ -152,10 +165,9 @@ public class AccountController {
 
     @PatchMapping("/{accountId}/remove-computer/{computerId}")
     @Operation(summary = "Gỡ thiết bị máy tính đã liên kết với tài khoản")
-    public ApiResponse<String> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
+    public ApiResponse<HashMap<String, String>> removeComputer(@PathVariable Long accountId, @PathVariable Long computerId)
             throws ApiException {
-        accountService.removeConnectComputer(accountId, computerId);
-        return new ApiResponse<>();
+        return ApiResponse.ok(accountService.removeConnectComputer(accountId, computerId));
     }
 
     @PatchMapping("/update-info")

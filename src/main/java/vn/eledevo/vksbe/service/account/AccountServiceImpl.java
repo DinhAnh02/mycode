@@ -327,7 +327,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public String removeConnectComputer(Long accountId, Long computerId) throws ApiException {
+    public HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
         Accounts accounts =
                 accountRepository.findById(accountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         Computers computers =
@@ -349,7 +349,7 @@ public class AccountServiceImpl implements AccountService {
         if (usb.isPresent()) {
             removeUSB(accountId, usb.get().getId());
         }
-        return REMOVE_CONNECT_COMPUTER_SUCCESS;
+        return new HashMap<>();
     }
 
     @Override
