@@ -1,27 +1,17 @@
 package vn.eledevo.vksbe.controller;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
-import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -39,6 +29,14 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructureService;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
+import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -65,8 +63,8 @@ public class AccountController {
         return ApiResponse.ok(accountService.getComputersByIdAccount(id));
     }
 
-    @GetMapping("/detail/{id}")
-    @Operation(summary = "Xem chi tiết thông tin tài khoản")
+    @GetMapping("/{id}/detail")
+    @Operation(summary = "Xem chi tiết thông tin tài khoản từ danh sách tài khoản")
     public ApiResponse<AccountDetailResponse> getAccountDetail(@PathVariable Long id) throws ApiException {
         return ApiResponse.ok(accountService.getAccountDetail(id));
     }
@@ -133,7 +131,8 @@ public class AccountController {
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload avatar")
-    public ApiResponse<ResultUrl> uploadAvatar(@RequestParam("file") MultipartFile file) throws ApiException, IOException {
+    public ApiResponse<ResultUrl> uploadAvatar(@RequestParam("file") MultipartFile file)
+            throws ApiException, IOException {
         return ApiResponse.ok(accountService.uploadAvatar(file));
     }
 
@@ -169,7 +168,7 @@ public class AccountController {
     }
 
     @GetMapping("/get-user-info")
-    @Operation(summary = "Thông tin cá nhân của tài khoản")
+    @Operation(summary = "Thông tin cá nhân của tài khoản đăng nhập")
     public ApiResponse<UserInfo> userDetail() throws ApiException {
         return ApiResponse.ok(accountService.userInfo());
     }

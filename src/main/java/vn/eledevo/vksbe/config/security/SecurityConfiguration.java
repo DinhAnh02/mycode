@@ -59,7 +59,7 @@ public class SecurityConfiguration {
                                 Role.PHO_PHONG.toString())
                         .requestMatchers(
                                 "/api/v1/private/accounts",
-                                "/api/v1/private/accounts/detail",
+                                "/api/v1/private/accounts/{id}/detail",
                                 "/api/v1/private/accounts/{id}/usb",
                                 "/api/v1/private/accounts/{accountId}/inactivate",
                                 "/api/v1/private/accounts/{accountId}/swap-account-status/{swapAccountId}",
