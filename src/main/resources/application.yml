@@ -3,7 +3,7 @@ spring:
     active: dev
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
-    enabled: true
+    enabled: false
   jackson:
     default-property-inclusion: non_null
   mvc:

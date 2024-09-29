@@ -432,22 +432,22 @@ public class AccountServiceImpl implements AccountService {
         Accounts activedAcc = validAccount(id);
         Accounts loginAcc = validAccount(SecurityUtils.getUserId());
         if (activedAcc.getStatus().equals(Const.ACTIVE)) {
-            throw new ApiException(ACCOUNT_STATUS_ACTIVE);
+            throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_ACTIVATED);
         }
 
         if (Boolean.FALSE.equals(activedAcc.getIsConnectComputer())) {
-            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_COMPUTER);
         }
 
         if (Boolean.FALSE.equals(activedAcc.getIsConnectUsb())) {
-            throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
         }
 
         Role loginAccRole = Role.valueOf(loginAcc.getRoles().getCode());
         Role activedAccRole = Role.valueOf(activedAcc.getRoles().getCode());
 
         if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
-            throw new ApiException(UNAUTHORIZED_ACTIVE_ACCOUNT);
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
         boolean isSameDepartment = Objects.equals(
                 activedAcc.getDepartments().getId(), loginAcc.getDepartments().getId());
@@ -461,9 +461,10 @@ public class AccountServiceImpl implements AccountService {
                 activedAcc.setUpdatedAt(LocalDateTime.now());
                 activedAcc.setUpdatedBy(SecurityUtils.getUserName());
                 accountRepository.save(activedAcc);
+                return new ActivedAccountResponse();
             }
         }
-        return ActivedAccountResponse.builder().message(ACTIVE_ACCOUNT_SUCCESS).build();
+        throw new ApiException(AccountErrorCode.DEPARTMENT_CONFLICT);
     }
 
     @Override
