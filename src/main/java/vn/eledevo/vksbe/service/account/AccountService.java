@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface AccountService {
-    String resetPassword(Long id) throws ApiException;
+    HashMap<String,String> resetPassword(Long id) throws ApiException;
 
     ResponseFilter<AccountResponseByFilter> getListAccountByFilter(
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException;
@@ -35,7 +35,7 @@ public interface AccountService {
 
     List<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException;
 
-    String inactivateAccount(Long idAccount) throws ApiException;
+    HashMap<String,String> inactivateAccount(Long idAccount) throws ApiException;
 
     HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException;
 

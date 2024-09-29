@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
-import vn.eledevo.vksbe.dto.request.AccountInactive;
+import vn.eledevo.vksbe.dto.request.AccountActive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.entity.Accounts;
@@ -41,9 +41,9 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
 
     Accounts findAccountsByUsername(String username);
 
-    @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountInactive(a.id, a.roles.code,"
+    @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountActive(a.id, a.roles.code,"
             + "a.status,a.departments.id) from Accounts a where a.username =:username")
-    Optional<AccountInactive> findByUsernameActive(String username);
+    Optional<AccountActive> findByUsernameActive(String username);
 
     @Query(
             "SELECT a from Accounts  a where a.roles.code=:roleCode and a.departments.id=:departmentId and a.status=:accountStatus")

@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @Builder
-public class AccountInactive {
+public class AccountActive {
     Long id;
     String roleCode;
     String status;
