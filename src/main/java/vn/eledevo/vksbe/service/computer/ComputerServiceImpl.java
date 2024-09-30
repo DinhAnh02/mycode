@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
@@ -26,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.DEVICE_NOT_EXIST;
 import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.*;
 
 @Service
