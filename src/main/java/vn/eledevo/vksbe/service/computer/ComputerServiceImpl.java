@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.DEVICE_NOT_EXIST;
-import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.PC_CODE_ALREADY_EXISTS;
-import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.PC_NAME_ALREADY_EXISTS;
+import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -51,19 +50,19 @@ public class ComputerServiceImpl implements ComputerService {
     }
 
     @Override
-    public String updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException {
-        Computers exitstingComputer =
-                computerRepository.findById(computerId).orElseThrow(() -> new ApiException(DEVICE_NOT_EXIST));
-        if (computerRepository.existsByName(computerRequest.getName())) {
-            throw new ApiException(DEVICE_NOT_EXIST);
+    public HashMap<String, String> updateComputer(Long requestId, ComputersModel computerRequest) throws ApiException {
+        Computers computer = computerRepository.findById(requestId).orElseThrow(() -> new ApiException(PC_NOT_FOUND));
+        Computers computerByName = computerRepository.findByName(computerRequest.getName());
+        if (computerRepository.existsByName(computerRequest.getName()) && !computerByName.getId().equals(requestId)) {
+            throw new ApiException(PC_NAME_ALREADY_EXISTS);
         }
 
-        exitstingComputer.setName(computerRequest.getName());
-        exitstingComputer.setBrand(computerRequest.getBrand());
-        exitstingComputer.setType(computerRequest.getType());
-        exitstingComputer.setNote(computerRequest.getNote());
-        computerRepository.save(exitstingComputer);
-        return ResponseMessage.UPDATE_COMPUTER_INFOR_SUCCESS;
+        computer.setName(computerRequest.getName());
+        computer.setBrand(computerRequest.getBrand());
+        computer.setType(computerRequest.getType());
+        computer.setNote(computerRequest.getNote());
+        computerRepository.save(computer);
+        return new HashMap<>();
     }
 
     @Override

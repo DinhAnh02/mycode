@@ -41,7 +41,7 @@ public class ComputerController {
 
     @PatchMapping("/update/computer-info/{id}")
     @Operation(summary = "Chỉnh sửa thông tin máy tính")
-    public ApiResponse<String> updateComputer(
+    public ApiResponse<HashMap<String, String>> updateComputer(
             @Valid @PathVariable("id") Long id,
             @Valid @RequestBody ComputersModel computerRequest,
             BindingResult result)

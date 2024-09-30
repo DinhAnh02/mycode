@@ -37,4 +37,7 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     boolean existsByName(String name);
 
     List<Computers> findByIdIn(Set<Long> ids);
+
+    Computers findByName(String name);
+    
 }

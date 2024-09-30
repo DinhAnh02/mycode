@@ -49,7 +49,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL)
                         .permitAll()
-                        .requestMatchers("/api/v1/auth/**")
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/private/accounts/get-user-info")
                         .hasAnyAuthority(
                                 Role.IT_ADMIN.toString(),
                                 Role.KIEM_SAT_VIEN.toString(),
@@ -63,7 +63,7 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/{id}/usb",
                                 "/api/v1/private/accounts/{accountId}/inactivate",
                                 "/api/v1/private/accounts/{accountId}/swap-account-status/{swapAccountId}",
-                                "/api/v1/private/accounts/connect-computer/{id}/computers")
+                                "/api/v1/private/accounts/{id}/devices")
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
                                 Role.VIEN_PHO.name(),
@@ -79,7 +79,8 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/connect-computer/{id}/computers",
                                 "/api/v1/private/accounts/remove-usb/{accountId}/usb/{usbId}",
                                 "/api/v1/private/accounts/create",
-                                "/api/v1/private/accounts/{updatedAccId}/update-info")
+                                "/api/v1/private/accounts/{updatedAccId}/update-info",
+                                "/api/v1/private/accounts/connect-computer/{id}/computers")
                         .hasAuthority(Role.IT_ADMIN.name())
                         .anyRequest()
                         .authenticated())
