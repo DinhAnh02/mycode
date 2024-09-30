@@ -120,6 +120,7 @@ public class AccountServiceImpl implements AccountService {
         accounts.setIsConditionLogin2(false);
         accounts.setUpdatedBy(getUserName());
         accounts.setUpdatedAt(LocalDateTime.now());
+        accounts.setStatus(String.valueOf(Status.INACTIVE));
         accountRepository.save(accounts);
         tokenRepository.deleteByAccounts_Id(id);
         return new HashMap<>();

@@ -18,7 +18,7 @@ public interface ComputerService {
     ResponseFilter<ComputerResponseFilter> getComputerList(ComputerRequest computerRequest, Integer page, Integer pageSize)
             throws ApiException;
 
-    String updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException;
+    HashMap<String, String> updateComputer(Long computerId, ComputersModel computerRequest) throws ApiException;
 
     ResultList<ComputerResponse> getDisconnectedComputers(String textSearch);
 
