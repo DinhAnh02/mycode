@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.dto.request.account;
 
+import static vn.eledevo.vksbe.constant.RegexPattern.ACCOUNT_FULL_NAME;
 import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -20,32 +21,26 @@ import vn.eledevo.vksbe.constant.RegexPattern;
 public class AccountCreateRequest {
 
     @NotBlank(message = USERNAME_REQUIRE)
-    @Size(min = 1, max = 255, message = USERNAME_SIZE)
+    @Size(min = 8, max = 8, message = USERNAME_SIZE)
     String username;
 
     @NotBlank(message = FULL_NAME_REQUIRE)
-    @Size(min = 1, max = 255, message = FULL_NAME_SIZE)
+    @Pattern(regexp = ACCOUNT_FULL_NAME, message = FULL_NAME_SIZE)
+    @Size(max = 255, message = FULL_NAME_SIZE)
     String fullName;
 
     String avatar;
 
-    @NotNull(message = ROLE_ID_REQUIRE)
+    @NotNull(message = ROLE_NAME_REQUIRE)
     Long roleId;
-
-    @NotBlank(message = ROLE_NAME_REQUIRE)
-    @Size(min = 1, max = 255, message = ROLE_CODE_SIZE)
     String roleName;
 
-    @NotNull(message = DEPARTMENT_REQUIRE)
+    @NotNull(message = DEPARTMENT_NAME_REQUIRE)
     Long departmentId;
-
-    @NotBlank(message = DEPARTMENT_NAME_REQUIRE)
     String departmentName;
 
-    @NotNull(message = ORGANIZATION_REQUIRE)
+    @NotNull(message = ORGANIZATION_NAME_REQUIRE)
     Long organizationId;
-
-    @NotBlank(message = ORGANIZATION_NAME_REQUIRE)
     String organizationName;
 
     @NotBlank(message = PHONE_NUMBER_REQUIRE)
