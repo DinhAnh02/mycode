@@ -26,6 +26,20 @@ pipeline {
         }
       }
     }
+    stage('Create folder AppUsb') {
+      steps {
+          // Tạo thư mục nếu chưa có và xóa file ZIP nếu tồn tại
+                sh '''
+                  mkdir -p src/AppUsb
+                  rm -f src/AppUsb/app_usb.zip
+                '''
+          }
+        }
+    stage('Download AppUsb') {
+           steps {
+                sh 'cp /var/lib/jenkins/workspace/app-usb/dist/app_usb.zip src/AppUsb/'
+        }
+    }
     stage('Build image') {
       steps {
         sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
