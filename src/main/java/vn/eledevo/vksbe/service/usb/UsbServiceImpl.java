@@ -116,6 +116,9 @@ public class UsbServiceImpl implements UsbService {
     }
 
     private void unzipFile(String zipFilePath, String destDirectory) throws IOException {
+        log.info("Unzip path: {}", zipFilePath);
+        log.info("Unzip folder: {}", destDirectory);
+
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             zipFile.stream().forEach(zipEntry -> {
                 try {

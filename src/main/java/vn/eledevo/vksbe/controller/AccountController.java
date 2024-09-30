@@ -25,7 +25,6 @@ import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
-import vn.eledevo.vksbe.dto.response.usb.UsbResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.account.AccountService;
@@ -33,7 +32,6 @@ import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructure
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;

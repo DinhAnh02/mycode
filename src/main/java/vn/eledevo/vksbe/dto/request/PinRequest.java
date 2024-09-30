@@ -12,9 +12,9 @@ import vn.eledevo.vksbe.constant.ResponseMessage;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class pinRequest {
+public class PinRequest {
     @NotBlank(message = ResponseMessage.EXITS_PIN)
-    @Size(min = 6, message = ResponseMessage.PASSWD_SIZE)
+    @Size(min = 6, max = 6, message = ResponseMessage.PIN_SIZE)
     String pin;
 
     String pin2;
