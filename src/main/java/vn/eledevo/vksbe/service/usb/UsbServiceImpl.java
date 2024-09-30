@@ -103,7 +103,7 @@ public class UsbServiceImpl implements UsbService {
                 writeToFile(encryptedData);
 
                 // zip file
-                zipFiles();
+                zipFiles(unzippedFolderPath,zipFilePath);
 
                 // delete folder unzipped
                 deleteDirectory(Paths.get(unzippedFolderPath));

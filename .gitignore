@@ -36,5 +36,6 @@ build/
 
 ### folder test
 **/src/test
+**/src/AppUsb
 
 src/main/resources/storage/
