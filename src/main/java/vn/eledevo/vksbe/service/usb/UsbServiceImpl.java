@@ -71,6 +71,7 @@ public class UsbServiceImpl implements UsbService {
 
     @Override
     public String createUsbToken(String username) throws Exception {
+        log.info("da vao tao usb chua");
         String zipFilePath = "src/AppUsb/app_usb.zip";
         String unzippedFolderPath = "src/AppUsb/unzipped";
         unzipFile(zipFilePath, unzippedFolderPath);
@@ -109,6 +110,7 @@ public class UsbServiceImpl implements UsbService {
     }
 
     private void unzipFile(String zipFilePath, String destDirectory) throws IOException {
+        log.info("da vao unzip file chua");
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             zipFile.stream().forEach(zipEntry -> {
                 try {
@@ -124,6 +126,7 @@ public class UsbServiceImpl implements UsbService {
     }
 
     private void zipFiles() throws IOException {
+        log.info("da vao zip file chua");
         String sourceFolder = "src/AppUsb/unzipped";
         String zipFilePath = "src/AppUsb/app_usb.zip";
 
@@ -157,6 +160,7 @@ public class UsbServiceImpl implements UsbService {
     }
 
     private void writeToFile(String data) throws ApiException {
+        log.info("da vao ghi file chua");
         File file = getFile();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
             writer.write(data);
@@ -167,6 +171,7 @@ public class UsbServiceImpl implements UsbService {
     }
 
     private File getFile() throws ApiException {
+        log.info("da vao get file chua");
         String resourcePath = "src/AppUsb/unzipped/";
 
         File directory = new File(resourcePath);
@@ -178,6 +183,7 @@ public class UsbServiceImpl implements UsbService {
     }
 
     private void deleteDirectory(Path path) throws IOException {
+        log.info("da vao chua delete ");
         if (Files.exists(path)) {
             try (Stream<Path> paths = Files.walk(path)) {
                 paths.sorted((p1, p2) -> p2.compareTo(p1)).forEach(p -> {
