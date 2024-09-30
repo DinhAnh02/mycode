@@ -19,14 +19,5 @@ public interface TokenRepository extends BaseRepository<AuthTokens, Long> {
 
     Optional<AuthTokens> findByToken(String token);
 
-    @Query(
-            value =
-                    """
-			select t from AuthTokens t inner join Accounts u\s
-			on t.accounts.id = u.id\s
-			where u.id = :id \s
-			""")
-    List<AuthTokens> findAllTokenByUser(Long id);
-
     void deleteByAccounts_Id(Long accountId);
 }
