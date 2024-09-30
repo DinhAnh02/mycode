@@ -20,7 +20,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     Optional<Accounts> findAccountInSystem(String username);
 
     @Query("SELECT new vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter("
-            + "a.id, a.username, p.fullName, r.name, r.code, r.id, d.id, d.name, o.id,"
+            + "a.id, a.username, p.fullName, r.name, r.code, r.id, d.id, d.name, o.id, "
             + "o.name, a.status, a.isConnectComputer, "
             + "a.isConnectUsb, a.createdAt, a.updatedAt, false , false, false , false) "
             + "FROM Accounts a "
@@ -29,14 +29,14 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
             + "AND (:isBoss = true OR (r.code = 'TRUONG_PHONG' OR r.code = 'PHO_PHONG' OR r.code = 'KIEM_SAT_VIEN')) "
             + "LEFT JOIN Departments d ON d.id = a.departments.id "
             + "LEFT JOIN Organizations o ON 1=1 "
-            + "WHERE (:#{#filter.username} IS NULL OR a.username LIKE %:#{#filter.username}%) "
-            + "AND (:#{#filter.fullName} IS NULL OR p.fullName LIKE %:#{#filter.fullName}%) "
+            + "WHERE (:#{#filter.username} IS NULL OR :#{#filter.username} = '' OR a.username LIKE %:#{#filter.username}%) "
+            + "AND (:#{#filter.fullName} IS NULL OR :#{#filter.fullName} = '' OR p.fullName LIKE %:#{#filter.fullName}%) "
             + "AND (:#{#filter.roleId} = 0 OR a.roles.id = :#{#filter.roleId}) "
             + "AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId}) "
             + "AND (:#{#filter.organizationId} = 0 OR o.id = :#{#filter.organizationId}) "
-            + "AND (:#{#filter.status} IS NULL OR a.status = :#{#filter.status}) "
-            + "AND a.createdAt >= :#{#filter.fromDate.atStartOfDay()} "
-            + "AND a.createdAt <= :#{#filter.toDate.atTime(23, 59, 59)}")
+            + "AND (:#{#filter.status} IS NULL OR :#{#filter.status} = '' OR a.status = :#{#filter.status}) "
+            + "AND (:#{#filter.fromDate} IS NULL OR a.createdAt >= :#{#filter.fromDate.atStartOfDay()}) "
+            + "AND (:#{#filter.toDate} IS NULL OR a.createdAt <= :#{#filter.toDate.atTime(23, 59, 59)})")
     Page<AccountQueryToFilter> getAccountList(AccountRequest filter, Boolean isBoss, Pageable pageable);
 
     Accounts findAccountsByUsername(String username);
