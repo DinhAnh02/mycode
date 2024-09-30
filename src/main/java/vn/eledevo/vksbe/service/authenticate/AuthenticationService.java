@@ -19,6 +19,9 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
@@ -61,12 +64,12 @@ public class AuthenticationService {
         try {
             var account = accountRepository
                     .findAccountInSystem(request.getUsername())
-                    .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
+                    .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             if (!account.getStatus().equals(Status.ACTIVE.name())) {
-                throw new ApiException(ErrorCode.CHECK_ACTIVE_ACCOUNT);
+                throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
             }
             Boolean isCheck = checkRoleItAdmin(account.getRoles().getCode());
             if (Boolean.FALSE.equals(isCheck)) {
@@ -74,7 +77,7 @@ public class AuthenticationService {
             }
             Optional<Usbs> universalSerialBus = usbRepository.findByAccounts_Id(account.getId());
             if (universalSerialBus.isEmpty()) {
-                throw new ApiException(ACCOUNT_NOT_CONNECT_USB);
+                throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
             }
             var jwtToken = jwtService.generateToken(
                     account,
@@ -91,7 +94,7 @@ public class AuthenticationService {
                     .usbVendorCode(universalSerialBus.get().getUsbVendorCode())
                     .build();
         } catch (BadCredentialsException e) {
-            throw new ApiException(ErrorCode.PASSWORD_FAILURE);
+            throw new ApiException(AccountErrorCode.INVALID_ACCOUNT_OR_PASSWORD);
         }
     }
 
@@ -128,25 +131,25 @@ public class AuthenticationService {
         validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
     }
 
-    public String createPin(pinRequest pinRequest) throws ApiException {
+    public HashMap<String,String> createPin(pinRequest pinRequest) throws ApiException {
         String username = SecurityUtils.getUserName();
         Accounts account =
-                accountRepository.findAccountInSystem(username).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+                accountRepository.findAccountInSystem(username).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         if (!account.getStatus().equals(Status.ACTIVE.name())) {
-            throw new ApiException(ACCOUNT_NOT_STATUS_ACTIVE);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
         }
-        if (Boolean.FALSE.equals(account.getIsConditionLogin2())) {
+        if (Boolean.TRUE.equals(account.getIsConditionLogin2())) {
             return null;
         }
         if (!pinRequest.getPin().equals(pinRequest.getPin2())) {
-            throw new ApiException(ErrorCode.ACCOUNT_NOT_PIN);
+            throw new ApiException(AccountErrorCode.PIN_CODE_MISMATCH);
         }
         String hashedPin = passwordEncoder.encode(pinRequest.getPin2());
         account.setPin(hashedPin);
-        account.setIsConditionLogin2(Boolean.FALSE);
+        account.setIsConditionLogin2(Boolean.TRUE);
         accountRepository.save(account);
 
-        return ResponseMessage.CREATE_PIN_SUCCESS;
+        return new HashMap<>();
     }
 
     public HashMap<String,String> changePassword(ChangePasswordRequest request) throws ApiException {
@@ -179,32 +182,32 @@ public class AuthenticationService {
         String employeeCode = SecurityUtils.getUserName();
         Token2FAResponse responseTokenUsb = ChangeData.decrypt(request.getTokenUsb(), Token2FAResponse.class);
         if (responseTokenUsb.getExpiredTime() > System.currentTimeMillis()) {
-            throw new ApiException(ErrorCode.TOKEN_EXPIRE);
+            throw new ApiException(SystemErrorCode.UNAUTHORIZED_SERVER);
         }
         Optional<Accounts> accounts = accountRepository.findAccountInSystem(employeeCode);
         if (accounts.isEmpty()) {
-            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
         if (!accounts.get().getStatus().equals("ACTIVE")) {
-            throw new ApiException(CHECK_ACTIVE_ACCOUNT);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
         }
         Optional<Usbs> usbToken =
                 usbRepository.usbByAccountAndConnect(accounts.get().getId());
         if (usbToken.isEmpty()) {
-            throw new ApiException(ErrorCode.CONFLICT_USB);
+            throw new ApiException(UsbErrorCode.USB_NOT_BELONG_TO_ACCOUNT);
         }
         if (!request.getCurrentUsbCode().equals(responseTokenUsb.getHasString().getUsbCode())) {
-            throw new ApiException(ErrorCode.CHECK_USB);
+            throw new ApiException(UsbErrorCode.USB_NOT_BELONG_TO_ACCOUNT);
         }
         if (!request.getCurrentUsbCode().equals(usbToken.get().getUsbCode())) {
-            throw new ApiException(ErrorCode.CHECK_USB);
+            throw new ApiException(UsbErrorCode.USB_NOT_BELONG_TO_ACCOUNT);
         }
         if (!request.getCurrentUsbVendorCode()
                 .equals(responseTokenUsb.getHasString().getUsbVendorCode())) {
-            throw new ApiException(ErrorCode.CHECK_USB);
+            throw new ApiException(UsbErrorCode.USB_NOT_BELONG_TO_ACCOUNT);
         }
         if (!request.getCurrentUsbVendorCode().equals(usbToken.get().getUsbVendorCode())) {
-            throw new ApiException(ErrorCode.CHECK_USB);
+            throw new ApiException(UsbErrorCode.USB_NOT_BELONG_TO_ACCOUNT);
         }
         Boolean isCheck = checkRoleItAdmin(accounts.get().getRoles().getCode());
         if (Boolean.FALSE.equals(isCheck)) {
@@ -229,13 +232,13 @@ public class AuthenticationService {
     private void checkComputerForAccount(String deviceCode, Long accountId) throws ApiException {
         Boolean isValid = computerRepository.existsByCode(deviceCode);
         if (Boolean.FALSE.equals(isValid)) {
-            throw new ApiException(ErrorCode.COMPUTER_NOT_FOUND);
+            throw new ApiException(ComputerErrorCode.PC_NOT_FOUND);
         }
         List<Computers> computersList = computerRepository.findByAccounts_Id(accountId);
         boolean deviceExists =
                 computersList.stream().anyMatch(computer -> computer.getCode().equals(deviceCode));
         if (Boolean.FALSE.equals(deviceExists)) {
-            throw new ApiException(ErrorCode.COMPUTER_NOT_CONNECT_TO_ACCOUNT);
+            throw new ApiException(ComputerErrorCode.PC_NOT_LINKED_TO_ACCOUNT);
         }
     }
 

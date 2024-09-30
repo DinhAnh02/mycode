@@ -50,7 +50,7 @@ public class AuthenticationController {
 
     @PatchMapping("/create-pin")
     @Operation(summary = "Tạo mã PIN khi đăng nhật lần đầu")
-    public ApiResponse<String> createPin(@RequestBody @Valid pinRequest pinRequest) throws ApiException {
+    public ApiResponse<HashMap<String,String>> createPin(@RequestBody @Valid pinRequest pinRequest) throws ApiException {
         return ApiResponse.ok(service.createPin(pinRequest));
     }
 
