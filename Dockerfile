@@ -11,7 +11,7 @@ RUN unlink /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/local
 COPY --from=build src/target/vks-be-0.0.1-SNAPSHOT.jar /run/vks-be-0.0.1-SNAPSHOT.jar
 
 # Copy file app_usb.zip từ build stage (nếu có)
-COPY --from=build src/AppUsb/app_usb.zip /run/AppUsb/app_usb.zip
+#COPY --from=build src/AppUsb/app_usb.zip /run/AppUsb/app_usb.zip
 
 EXPOSE 8081
 
