@@ -120,7 +120,7 @@ public class UsbServiceImpl implements UsbService {
         log.info("Unzip folder: {}", destDirectory);
 
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
-            log.info("test" , zipFile);
+            log.info("test: {}", zipFile);
             zipFile.stream().forEach(zipEntry -> {
                 try {
                     InputStream inputStream = zipFile.getInputStream(zipEntry);
@@ -128,6 +128,7 @@ public class UsbServiceImpl implements UsbService {
                     Files.createDirectories(outputPath.getParent());
                     Files.copy(inputStream, outputPath);
                 } catch (IOException e) {
+                    log.error("loi thi vao day");
                     e.printStackTrace();
                 }
             });
