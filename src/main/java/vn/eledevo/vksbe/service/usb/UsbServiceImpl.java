@@ -68,7 +68,7 @@ public class UsbServiceImpl implements UsbService {
 
     @Override
     public String createUsbToken(String username) throws Exception {
-        String zipFilePath = "src/AppUsb/setup.zip";
+        String zipFilePath = "src/AppUsb/app_usb.zip";
         String unzippedFolderPath = "src/AppUsb/unzipped";
         unzipFile();
         Optional<AccountActive> account = accountRepository.findByUsernameActive(username);
@@ -146,7 +146,7 @@ public class UsbServiceImpl implements UsbService {
     private void zipFiles() throws IOException {
 
         String sourceFolder = "src/AppUsb/unzipped";
-        String zipFilePath = "src/AppUsb/setup.zip";
+        String zipFilePath = "src/AppUsb/app_usb.zip";
 
         try (FileOutputStream fos = new FileOutputStream(zipFilePath);
                 ZipOutputStream zipOut = new ZipOutputStream(fos)) {
