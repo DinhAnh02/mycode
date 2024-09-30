@@ -1,5 +1,5 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS build
-WORKDIR ./src
+WORKDIR /src
 COPY . .
 RUN mvn install -DskipTests=true
 
