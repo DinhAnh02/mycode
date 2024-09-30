@@ -310,6 +310,7 @@ public class AccountServiceImpl implements AccountService {
         }
         lockAccount.setStatus(Status.INACTIVE.name());
         accountRepository.save(lockAccount);
+        tokenRepository.deleteByAccounts_Id(idAccount);
         return new HashMap<>();
     }
 
