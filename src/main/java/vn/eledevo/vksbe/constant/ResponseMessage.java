@@ -24,11 +24,11 @@ public class ResponseMessage {
 
     public static final String USERNAME_REQUIRE = "Mã cán bộ không được để trống";
 
-    public static final String USERNAME_SIZE = "Mã cán bộ phải có độ dài từ {min} đến {max} ký tự";
+    public static final String USERNAME_SIZE = "Mã cán bộ phải có đúng 8 ký tự";
 
     public static final String FULL_NAME_REQUIRE = "Họ và Tên cán bộ không được để trống";
 
-    public static final String FULL_NAME_SIZE = "Họ và Tên cán bộ phải có độ dài từ {min} đến {max} ký tự";
+    public static final String FULL_NAME_SIZE = "Họ và tên chỉ bao gồm chữ, dấu cách và tối đa 255 ký tự";
 
     public static final String ROLE_ID_REQUIRE = "Chức vụ không được để trống";
 
