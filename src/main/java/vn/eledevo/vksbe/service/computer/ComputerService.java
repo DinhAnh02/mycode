@@ -9,6 +9,9 @@ import vn.eledevo.vksbe.dto.response.Result;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
+
+import java.util.HashMap;
 
 public interface ComputerService {
 
@@ -19,5 +22,5 @@ public interface ComputerService {
 
     ResultList<ComputerResponse> getDisconnectedComputers(String textSearch);
 
-    String createComputer(ComputerRequestForCreate request) throws ApiException;
+    HashMap<String, String> createComputer(ComputerRequestForCreate request) throws ApiException, ValidationException;
 }

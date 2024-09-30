@@ -91,5 +91,13 @@ public class ResponseMessage {
 
     public static final String COMPUTER_CONNECTED_SUCCESS = "Kết nối thiết bị thành công";
 
-    public static final String COMPUTER_NOT_FOUND_SYSTEM = "Thiết bị không tồn tại trong hệ thống";
+    public static final String COMPUTER_NOT_FOUND_SYSTEM = "Máy tính không tồn tại trong hệ thống";
+
+    public static final String COMPUTER_NAME_NOT_SAME = "Tên máy tính đã tồn tại trong hệ thống";
+
+    public static final String COMPUTER_CODE_NOT_SAME = "Mã máy tính đã tồn tại trong hệ thống";
+
+    public static final String COMPUTER_BRAND_NOT_FOUND = "Tên hãng máy tính không được để trống";
+
+    public static final String COMPUTER_TYPE_NOT_FOUND = "Loại máy tính không được để trống";
 }

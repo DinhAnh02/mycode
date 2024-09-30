@@ -22,11 +22,13 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.CREATE_NEW_DEVICE_SUCCESS;
+import static vn.eledevo.vksbe.constant.ErrorCode.DEVICE_NOT_EXIST;
+import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.PC_CODE_ALREADY_EXISTS;
+import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.PC_NAME_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -74,16 +76,17 @@ public class ComputerServiceImpl implements ComputerService {
 
     @Override
     @Transactional
-    public String createComputer(ComputerRequestForCreate request) throws ApiException {
+    public HashMap<String, String> createComputer(ComputerRequestForCreate request) throws ApiException {
         Boolean computerExist = computerRepository.existsByCode(request.getCode());
         if (Objects.equals(computerExist, Boolean.TRUE)) {
-            throw new ApiException(COMPUTER_HAS_EXISTED);
+            throw new ApiException(PC_CODE_ALREADY_EXISTS);
         }
         if (computerRepository.existsByName(request.getName())) {
-            throw new ApiException(NAME_COMPUTER_HAS_EXISTED);
+            throw new ApiException(PC_NAME_ALREADY_EXISTS);
         }
+
         Computers computersCreate = computerRepository.save(computerMapper.toResource(request));
         computerMapper.toResponse(computersCreate);
-        return CREATE_NEW_DEVICE_SUCCESS;
+        return new HashMap<>();
     }
 }
