@@ -5,8 +5,11 @@ RUN mvn install -DskipTests=true
 
 FROM openjdk:21-jdk
 
-RUN unlink /etc/localtime;ln -s  /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
+RUN unlink /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 COPY --from=build src/target/vks-be-0.0.1-SNAPSHOT.jar /run/vks-be-0.0.1-SNAPSHOT.jar
+
+# Kiểm tra xem AppUsb có tồn tại trong project hay không
+RUN jar -tf /run/vks-be-0.0.1-SNAPSHOT.jar | grep -q "AppUsb" || (echo "AppUsb không tồn tại trong project!" && exit 1)
 
 EXPOSE 8081
 
