@@ -35,16 +35,16 @@ pipeline {
                 '''
           }
         }
-//     stage('Download AppUsb') {
-//            steps {
-//                 sh 'cp /var/lib/jenkins/workspace/app-usb/dist/app_usb.zip src/AppUsb/'
-//         }
-//     }
-//     stage('Build image') {
-//       steps {
-//         sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
-//       }
-//     }
+    stage('Download AppUsb') {
+           steps {
+                sh 'cp /var/lib/jenkins/workspace/app-usb/dist/app_usb.zip src/AppUsb/'
+        }
+    }
+    stage('Build image') {
+      steps {
+        sh "docker build -t ${NAME_BACKEND}:$DOCKER_TAG ."
+      }
+    }
 //     stage('Save image') {
 //       steps {
 //         sh "docker save ${NAME_BACKEND}:$DOCKER_TAG | gzip > ${NAME_BACKEND}.tar.gz"
