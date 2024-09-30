@@ -13,7 +13,7 @@ import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
-import vn.eledevo.vksbe.dto.request.pinRequest;
+import vn.eledevo.vksbe.dto.request.PinRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -50,7 +50,7 @@ public class AuthenticationController {
 
     @PatchMapping("/create-pin")
     @Operation(summary = "Tạo mã PIN khi đăng nhật lần đầu")
-    public ApiResponse<HashMap<String,String>> createPin(@RequestBody @Valid pinRequest pinRequest) throws ApiException {
+    public ApiResponse<HashMap<String,String>> createPin(@RequestBody @Valid PinRequest pinRequest) throws ApiException {
         return ApiResponse.ok(service.createPin(pinRequest));
     }
 

@@ -1,7 +1,5 @@
 package vn.eledevo.vksbe.service.authenticate;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +24,7 @@ import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
-import vn.eledevo.vksbe.dto.request.pinRequest;
+import vn.eledevo.vksbe.dto.request.PinRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.dto.response.Token2FAResponse;
 import vn.eledevo.vksbe.entity.Accounts;
@@ -131,7 +129,7 @@ public class AuthenticationService {
         validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
     }
 
-    public HashMap<String,String> createPin(pinRequest pinRequest) throws ApiException {
+    public HashMap<String,String> createPin(PinRequest pinRequest) throws ApiException {
         String username = SecurityUtils.getUserName();
         Accounts account =
                 accountRepository.findAccountInSystem(username).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
