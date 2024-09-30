@@ -31,7 +31,7 @@ public enum ErrorCode implements BaseErrorCode {
     ACCOUNT_NOT_FOUND(NOT_FOUND, "4040", "Acount không tồn tại trong hệ thống", new HashMap<>()),
     COMPUTER_NOT_FOUND(NOT_FOUND, "4040", "Computer không tồn tại trong hệ thống", new HashMap<>()),
     COMPUTER_NOT_CONNECT_TO_ACCOUNT(NOT_FOUND, "404", "Máy tính chưa được liên kết với tài khoản", new HashMap<>()),
-    COMPUTER_HAS_EXISTED(NOT_FOUND, "4000", "Thiết bị đã tồn tại trong hệ thống", new HashMap<>()),
+    COMPUTER_HAS_EXISTED(NOT_FOUND, "4000", "Mã thiết bị đã tồn tại trong hệ thống", new HashMap<>()),
     NAME_COMPUTER_HAS_EXISTED(NOT_FOUND, "4000", "Tên Thiết bị đã tồn tại trong hệ thống", new HashMap<>()),
     CHECK_FROM_DATE(
             UNPROCESSABLE_ENTITY, "4220", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc.", new HashMap<>()),

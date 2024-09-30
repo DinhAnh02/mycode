@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -55,8 +56,8 @@ public class ComputerController {
 
     @PostMapping("/create/computer-info")
     @Operation(summary = "Tạo mới thiết bị máy tính")
-    public ApiResponse<String> createComputer(@Valid @RequestBody ComputerRequestForCreate request)
-            throws ApiException {
+    public ApiResponse<HashMap<String, String>> createComputer(@Valid @RequestBody ComputerRequestForCreate request)
+            throws ApiException, ValidationException {
         return ApiResponse.ok(computerService.createComputer(request));
     }
 
