@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
@@ -14,6 +15,7 @@ public enum UsbErrorCode implements BaseErrorCode {
             "Thu hồi thất bại do key usb chưa được tạo cho kết nối này. Vui lòng kiểm tra lại",
             new HashMap<>()),
     USB_NOT_BELONG_TO_ACCOUNT(OK, "USB-02", "USB không phải của tài khoản này. Vui lòng kiểm tra lại", new HashMap<>()),
+    FOLDER_NOT_FOUND(OK, "USB-03", "Không tìm thấy thư mục.", new HashMap<>()),
     ;
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
