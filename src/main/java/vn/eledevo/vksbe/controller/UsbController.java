@@ -55,7 +55,7 @@ public class UsbController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(zipFile));
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=unzipped_files.zip");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=app_usb.zip");
 
         return ResponseEntity.ok()
                 .headers(headers)

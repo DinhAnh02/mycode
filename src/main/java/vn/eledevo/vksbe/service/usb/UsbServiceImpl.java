@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.constant.ErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
 import vn.eledevo.vksbe.dto.request.AccountActive;
 import vn.eledevo.vksbe.dto.request.DataChange;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
@@ -70,14 +73,14 @@ public class UsbServiceImpl implements UsbService {
     public String createUsbToken(String username) throws Exception {
         String zipFilePath = "src/AppUsb/app_usb.zip";
         String unzippedFolderPath = "src/AppUsb/unzipped";
-        unzipFile();
+        unzipFile(zipFilePath, unzippedFolderPath);
         Optional<AccountActive> account = accountRepository.findByUsernameActive(username);
         if (account.isPresent()) {
             Optional<Accounts> acc = accountRepository.findById(account.get().getId());
             if (acc.isPresent()) {
                 List<Computers> computers = acc.get().getComputers();
                 String[] computerNames =
-                        computers.stream().map(Computers::getName).toArray(String[]::new);
+                        computers.stream().map(Computers::getCode).toArray(String[]::new);
                 DataChange usbInfoToEncrypt = DataChange.builder()
                         .maPin(acc.get().getPin())
                         .keyUsb(acc.get().getUsb().getKeyUsb())
@@ -100,35 +103,12 @@ public class UsbServiceImpl implements UsbService {
                 return zipFilePath;
             }
         } else {
-            throw new ApiException(USER_NOT_EXIST);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
         return null;
     }
 
-    //    private void downloadFile() throws IOException, ApiException {
-    //        String fileUrl = "https://jenkins.eledevo.com/download/app_usb.zip";
-    //        String saveDirectory = "./src/AppUsb/";
-    //        String fileName = "app_usb.zip";
-    //
-    //        URL url = new URL(fileUrl);
-    //        URLConnection urlConnection = url.openConnection();
-    //
-    //        HttpHeaders headers = new HttpHeaders();
-    //        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-    //        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-    //
-    //        try (InputStream inputStream = urlConnection.getInputStream()) {
-    //            Path file = Paths.get(saveDirectory + fileName);
-    //            Files.copy(inputStream, file);
-    //        } catch (IOException e) {
-    //            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
-    //        }
-    //    }
-
-    private void unzipFile() throws IOException {
-        String zipFilePath = "./src/AppUsb/app_usb.zip";
-        String destDirectory = "./src/AppUsb/unzipped/";
-
+    private void unzipFile(String zipFilePath, String destDirectory) throws IOException {
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             zipFile.stream().forEach(zipEntry -> {
                 try {
@@ -144,7 +124,6 @@ public class UsbServiceImpl implements UsbService {
     }
 
     private void zipFiles() throws IOException {
-
         String sourceFolder = "src/AppUsb/unzipped";
         String zipFilePath = "src/AppUsb/app_usb.zip";
 
@@ -183,7 +162,7 @@ public class UsbServiceImpl implements UsbService {
             writer.write(data);
             writer.flush();
         } catch (IOException e) {
-            throw new ApiException(UNCATEGORIZED_EXCEPTION, e.getMessage());
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
     }
 
@@ -193,7 +172,7 @@ public class UsbServiceImpl implements UsbService {
         File directory = new File(resourcePath);
 
         if (!directory.exists()) {
-            throw new ApiException(FOLDER_NOT_FOUND);
+            throw new ApiException(UsbErrorCode.FOLDER_NOT_FOUND);
         }
         return new File(directory, "setup.vks");
     }
