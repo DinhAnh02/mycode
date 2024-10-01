@@ -73,7 +73,7 @@ public class UsbServiceImpl implements UsbService {
     @Override
     public String createUsbToken(String username) throws Exception {
         log.info("da vao tao usb chua");
-        String userHome = System.getProperty("user.home");
+        String userHome = System.getProperty("user.dir");
         Path absolutePath = Paths.get(userHome, "src/AppUsb/app_usb.zip");
         String zipFilePath = absolutePath.toAbsolutePath().toString();
         log.info("day la a: {}", userHome);
@@ -148,9 +148,6 @@ public class UsbServiceImpl implements UsbService {
 
     private void zipFiles(String sourceFolder, String zipFilePath) throws IOException {
         log.info("da vao zip file chua");
-        //        String sourceFolder = "src/AppUsb/unzipped";
-        //        String zipFilePath = "src/AppUsb/app_usb.zip";
-
         try (FileOutputStream fos = new FileOutputStream(zipFilePath);
                 ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
@@ -195,11 +192,10 @@ public class UsbServiceImpl implements UsbService {
         log.info("da vao get file chua");
         Path absolutePath = Paths.get("src/AppUsb/unzipped/").toAbsolutePath();
         String resourcePath = absolutePath.toString();
-        log.info(resourcePath, "day la getfile");
         //        String resourcePath = "src/AppUsb/unzipped/";
 
         File directory = new File(resourcePath);
-
+        log.info("day la get file: {}",directory);
         if (!directory.exists()) {
             throw new ApiException(UsbErrorCode.FOLDER_NOT_FOUND);
         }
