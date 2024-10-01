@@ -45,6 +45,7 @@ public enum AccountErrorCode implements BaseErrorCode {
     OLD_PIN_INCORRECT(OK, "TK-29", "Mã PIN cũ không chính xác", new HashMap<>()),
     NEW_PIN_SAME_AS_OLD(OK, "TK-30", "Mã PIN mới không được trùng với mã PIN cũ", new HashMap<>()),
     CONFIRM_PIN_MISMATCH(OK, "TK-31", "Mã PIN nhập lại không được trùng với mã PIN mới", new HashMap<>()),
+    URL_NOT_FOUND(OK, "TK-32", "Đường dẫn ảnh không hợp lệ", new HashMap<>());
     ;
 
     private final HttpStatusCode statusCode;
