@@ -76,15 +76,31 @@ public class UsbServiceImpl implements UsbService {
 
     @Override
     public String createUsbToken(String username) throws Exception {
-        log.info("da vao tao usb chua");
-        String userHome = System.getProperty("user.dir");
-        Path absolutePath = Paths.get(userHome, "src/AppUsb/app_usb.zip");
-        String zipFilePath = absolutePath.toAbsolutePath().toString();
-        log.info("day la a: {}", userHome);
-        Path absolutePathFolder = Paths.get(userHome, "src/AppUsb/unzipped");
-        String unzippedFolderPath = absolutePathFolder.toAbsolutePath().toString();
-        log.info("day la b: {}", unzippedFolderPath);
-        unzipFile(zipFilePath, unzippedFolderPath);
+        log.info("Đã vào tạo USB chưa");
+
+        // Lấy đường dẫn tuyệt đối tới thư mục gốc của dự án
+        Path projectRootPath = Paths.get("").toAbsolutePath();
+
+        // Tạo đường dẫn tới file app_usb.zip trong thư mục src/AppUsb
+        Path zipFilePath = projectRootPath.resolve("src/main/resources/AppUsb/app_usb.zip");
+        log.info("Đường dẫn tới file zip: {}", zipFilePath.toAbsolutePath());
+
+        // Kiểm tra xem file zip có tồn tại không
+        if (!zipFilePath.toFile().exists()) {
+            throw new FileNotFoundException("File zip không tồn tại tại đường dẫn: " + zipFilePath.toAbsolutePath());
+        }
+
+        // Tạo đường dẫn tới thư mục unzipped trong src/AppUsb
+        Path unzippedFolderPath = projectRootPath.resolve("src/main/resources/AppUsb/unzipped");
+        log.info("Đường dẫn tới thư mục unzipped: {}", unzippedFolderPath.toAbsolutePath());
+
+        // Tiến hành tạo thư mục nếu chưa tồn tại
+        if (!unzippedFolderPath.toFile().exists()) {
+            Files.createDirectories(unzippedFolderPath);
+            log.info("Đã tạo thư mục: {}", unzippedFolderPath.toAbsolutePath());
+        }
+
+        unzipFile(zipFilePath.toString(), unzippedFolderPath.toString());
         Optional<AccountActive> account = accountRepository.findByUsernameActive(username);
         if (account.isPresent()) {
             Optional<Accounts> acc = accountRepository.findById(account.get().getId());
@@ -107,11 +123,11 @@ public class UsbServiceImpl implements UsbService {
                 writeToFile(encryptedData);
 
                 // zip file
-                zipFiles(unzippedFolderPath, zipFilePath);
+                zipFiles(unzippedFolderPath.toString(), zipFilePath.toString());
 
                 // delete folder unzipped
-                deleteDirectory(Paths.get(unzippedFolderPath));
-                return zipFilePath;
+                deleteDirectory(Paths.get(unzippedFolderPath.toString()));
+                return zipFilePath.toString();
             }
         } else {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
@@ -184,7 +200,7 @@ public class UsbServiceImpl implements UsbService {
     private File getFile() throws ApiException {
         log.info("da vao get file chua");
         String userHome = System.getProperty("user.dir");
-        Path absolutePath = Paths.get(userHome,"src/AppUsb/unzipped/");
+        Path absolutePath = Paths.get(userHome,"src/main/resources/AppUsb/unzipped/");
         String resourcePath = absolutePath.toAbsolutePath().toString();
         File directory = new File(resourcePath);
         log.info("day la get file: {}",directory);
