@@ -22,9 +22,9 @@ import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
+import vn.eledevo.vksbe.dto.request.PinRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
-import vn.eledevo.vksbe.dto.request.PinRequest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.dto.response.Token2FAResponse;
 import vn.eledevo.vksbe.entity.Accounts;
@@ -129,10 +129,11 @@ public class AuthenticationService {
         validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
     }
 
-    public HashMap<String,String> createPin(PinRequest pinRequest) throws ApiException {
+    public HashMap<String, String> createPin(PinRequest pinRequest) throws ApiException {
         String username = SecurityUtils.getUserName();
-        Accounts account =
-                accountRepository.findAccountInSystem(username).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        Accounts account = accountRepository
+                .findAccountInSystem(username)
+                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         if (!account.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
         }
@@ -150,10 +151,11 @@ public class AuthenticationService {
         return new HashMap<>();
     }
 
-    public HashMap<String,String> changePassword(ChangePasswordRequest request) throws ApiException {
+    public HashMap<String, String> changePassword(ChangePasswordRequest request) throws ApiException {
         String userName = SecurityUtils.getUserName();
-        Accounts accountRequest =
-                accountRepository.findAccountInSystem(userName).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        Accounts accountRequest = accountRepository
+                .findAccountInSystem(userName)
+                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }

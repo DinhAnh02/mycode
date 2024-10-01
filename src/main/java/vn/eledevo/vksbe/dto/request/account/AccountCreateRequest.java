@@ -33,14 +33,17 @@ public class AccountCreateRequest {
 
     @NotNull(message = ROLE_NAME_REQUIRE)
     Long roleId;
+
     String roleName;
 
     @NotNull(message = DEPARTMENT_NAME_REQUIRE)
     Long departmentId;
+
     String departmentName;
 
     @NotNull(message = ORGANIZATION_NAME_REQUIRE)
     Long organizationId;
+
     String organizationName;
 
     @NotBlank(message = PHONE_NUMBER_REQUIRE)

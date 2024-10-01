@@ -105,8 +105,8 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        ApiResponse<?> response =
-                new ApiResponse<>(SystemErrorCode.VALIDATE_FORM.getCode(), SystemErrorCode.VALIDATE_FORM.getMessage(), errors);
+        ApiResponse<?> response = new ApiResponse<>(
+                SystemErrorCode.VALIDATE_FORM.getCode(), SystemErrorCode.VALIDATE_FORM.getMessage(), errors);
         return ResponseEntity.ok(response);
     }
 }

@@ -1,11 +1,11 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.OK;
+import org.springframework.http.HttpStatusCode;
 
 public enum ComputerErrorCode implements BaseErrorCode {
     PC_NOT_FOUND(OK, "PC-01", "Thiết bị máy tính không tồn tại", new HashMap<>()),
