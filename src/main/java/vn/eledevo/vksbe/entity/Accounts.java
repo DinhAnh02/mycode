@@ -30,6 +30,7 @@ public class Accounts implements UserDetails {
 
     String username;
     String password;
+    String gender;
     String status;
     String pin;
     Boolean isConditionLogin1;

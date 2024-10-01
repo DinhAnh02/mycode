@@ -13,6 +13,7 @@ public class AccountDetailResponse {
     Long id;
     String username;
     String fullName;
+    String gender;
     Long departmentId;
     String departmentName;
     Long roleId;

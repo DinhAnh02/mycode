@@ -233,6 +233,7 @@ public class AccountServiceImpl implements AccountService {
                 .id(account.getId())
                 .username(account.getUsername())
                 .fullName(account.getProfile().getFullName())
+                .gender(account.getGender())
                 .status(account.getStatus())
                 .phoneNumber(account.getProfile().getPhoneNumber())
                 .avatar(account.getProfile().getAvatar())
