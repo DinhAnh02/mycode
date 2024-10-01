@@ -76,30 +76,30 @@ pipeline {
         }
       }
     }
-    stage('Send to tester') {
-      steps {
-        sshagent(credentials: ['jenkins-ssh-key']) {
-          sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
-        }
-      }
-    }
-    stage('Deploy to tester') {
-      steps {
-        script {
-          def deployFile = "deploy-${NAME_BACKEND}.sh"
-          def deploying = '''#!/bin/bash
-            docker rm -f ${NAME_BACKEND} || true  # Xóa container nếu nó tồn tại
-            cd /home/docker-image
-            docker load -i ${NAME_BACKEND}.tar.gz
-            docker run --name ${NAME_BACKEND} -dp 8082:8082 -e "SPRING_PROFILES_ACTIVE=test" ${NAME_BACKEND}:$DOCKER_TAG
-          '''
-          sshagent(credentials: ['jenkins-ssh-key']) {
-            sh """
-                ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo '${deploying}' > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
-            """
-          }
-        }
-      }
-    }
+    // stage('Send to tester') {
+    //   steps {
+    //     sshagent(credentials: ['jenkins-ssh-key']) {
+    //       sh "scp -o StrictHostKeyChecking=no -i jenkins-ssh-key ${NAME_BACKEND}.tar.gz root@${TESTER_HOST}:/home/docker-image"
+    //     }
+    //   }
+    // }
+    // stage('Deploy to tester') {
+    //   steps {
+    //     script {
+    //       def deployFile = "deploy-${NAME_BACKEND}.sh"
+    //       def deploying = '''#!/bin/bash
+    //         docker rm -f ${NAME_BACKEND} || true  # Xóa container nếu nó tồn tại
+    //         cd /home/docker-image
+    //         docker load -i ${NAME_BACKEND}.tar.gz
+    //         docker run --name ${NAME_BACKEND} -dp 8082:8082 -e "SPRING_PROFILES_ACTIVE=test" ${NAME_BACKEND}:$DOCKER_TAG
+    //       '''
+    //       sshagent(credentials: ['jenkins-ssh-key']) {
+    //         sh """
+    //             ssh -o StrictHostKeyChecking=no -i jenkins-ssh-key root@${TESTER_HOST} "echo '${deploying}' > ${deployFile} && chmod +x ${deployFile} && ./${deployFile}"
+    //         """
+    //       }
+    //     }
+    //   }
+    // }
   }
 }

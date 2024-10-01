@@ -1,14 +1,21 @@
 package vn.eledevo.vksbe.service.computer;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
@@ -20,12 +27,6 @@ import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.ComputerRepository;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
-import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +52,8 @@ public class ComputerServiceImpl implements ComputerService {
     public HashMap<String, String> updateComputer(Long requestId, ComputersModel computerRequest) throws ApiException {
         Computers computer = computerRepository.findById(requestId).orElseThrow(() -> new ApiException(PC_NOT_FOUND));
         Computers computerByName = computerRepository.findByName(computerRequest.getName());
-        if (computerRepository.existsByName(computerRequest.getName()) && !computerByName.getId().equals(requestId)) {
+        if (computerRepository.existsByName(computerRequest.getName())
+                && !computerByName.getId().equals(requestId)) {
             throw new ApiException(PC_NAME_ALREADY_EXISTS);
         }
 

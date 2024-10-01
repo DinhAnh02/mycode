@@ -21,8 +21,6 @@ import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
-import vn.eledevo.vksbe.dto.response.Result;
-import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.usb.UsbService;

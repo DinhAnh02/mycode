@@ -1,6 +1,5 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;

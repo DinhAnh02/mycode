@@ -38,8 +38,8 @@ public enum AccountErrorCode implements BaseErrorCode {
     DEPARTMENT_CONFLICT(OK, "TK-22", "Bạn khác phòng ban với tài khoản đang chọn", new HashMap<>()),
     ACCOUNT_LOCK_NOT_FOUND(OK, "TK-23", "Tài khoản bạn chọn không tồn tại", new HashMap<>()),
     ACCOUNT_IS_LOCK(OK, "TK-24", "Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
-    ACCOUNT_ACTIVE(OK,"TK-25","Tài khoản đang hoạt", new HashMap<>()),
-    CHANGE_PWD_LOGIN(OK,"TK-26","Chức năng này chỉ khả dụng khi bạn đăng nhập lần đầu", new HashMap<>()),
+    ACCOUNT_ACTIVE(OK, "TK-25", "Tài khoản đang hoạt", new HashMap<>()),
+    CHANGE_PWD_LOGIN(OK, "TK-26", "Chức năng này chỉ khả dụng khi bạn đăng nhập lần đầu", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

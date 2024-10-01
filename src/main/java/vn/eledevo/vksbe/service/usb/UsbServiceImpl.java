@@ -1,13 +1,28 @@
 package vn.eledevo.vksbe.service.usb;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
@@ -23,20 +38,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.service.ChangeData;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -73,12 +74,12 @@ public class UsbServiceImpl implements UsbService {
     public String createUsbToken(String username) throws Exception {
         log.info("da vao tao usb chua");
         String userHome = System.getProperty("user.home");
-        Path absolutePath = Paths.get(userHome,"src/AppUsb/app_usb.zip");
+        Path absolutePath = Paths.get(userHome, "src/AppUsb/app_usb.zip");
         String zipFilePath = absolutePath.toAbsolutePath().toString();
-        log.info("day la a: {}",userHome);
-        Path absolutePathFolder = Paths.get(userHome,"src/AppUsb/unzipped");
+        log.info("day la a: {}", userHome);
+        Path absolutePathFolder = Paths.get(userHome, "src/AppUsb/unzipped");
         String unzippedFolderPath = absolutePathFolder.toAbsolutePath().toString();
-        log.info("day la b: {}",unzippedFolderPath);
+        log.info("day la b: {}", unzippedFolderPath);
         unzipFile(zipFilePath, unzippedFolderPath);
         Optional<AccountActive> account = accountRepository.findByUsernameActive(username);
         if (account.isPresent()) {
@@ -117,7 +118,18 @@ public class UsbServiceImpl implements UsbService {
     private void unzipFile(String zipFilePath, String destDirectory) throws IOException {
         log.info("Unzip path: {}", zipFilePath);
         log.info("Unzip folder: {}", destDirectory);
+        File file = new File(zipFilePath);
+        if (!file.exists()) {
+            log.error("Zip file không tồn tại tại đường dẫn: {}", zipFilePath);
+            return;
+        }
 
+        // Kiểm tra xem thư mục đích có tồn tại, nếu không thì tạo mới
+        Path destDirPath = Paths.get(destDirectory);
+        if (!Files.exists(destDirPath)) {
+            Files.createDirectories(destDirPath);
+            log.info("Tạo thư mục đích: {}", destDirectory);
+        }
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             log.info("test: {}", zipFile);
             zipFile.stream().forEach(zipEntry -> {
@@ -134,10 +146,10 @@ public class UsbServiceImpl implements UsbService {
         }
     }
 
-    private void zipFiles(String sourceFolder,String zipFilePath ) throws IOException {
+    private void zipFiles(String sourceFolder, String zipFilePath) throws IOException {
         log.info("da vao zip file chua");
-//        String sourceFolder = "src/AppUsb/unzipped";
-//        String zipFilePath = "src/AppUsb/app_usb.zip";
+        //        String sourceFolder = "src/AppUsb/unzipped";
+        //        String zipFilePath = "src/AppUsb/app_usb.zip";
 
         try (FileOutputStream fos = new FileOutputStream(zipFilePath);
                 ZipOutputStream zipOut = new ZipOutputStream(fos)) {
@@ -183,8 +195,8 @@ public class UsbServiceImpl implements UsbService {
         log.info("da vao get file chua");
         Path absolutePath = Paths.get("src/AppUsb/unzipped/").toAbsolutePath();
         String resourcePath = absolutePath.toString();
-        log.info(resourcePath,"day la getfile");
-//        String resourcePath = "src/AppUsb/unzipped/";
+        log.info(resourcePath, "day la getfile");
+        //        String resourcePath = "src/AppUsb/unzipped/";
 
         File directory = new File(resourcePath);
 

@@ -1,5 +1,7 @@
 package vn.eledevo.vksbe.controller;
 
+import java.util.HashMap;
+
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
@@ -11,15 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
+import vn.eledevo.vksbe.dto.request.PinRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
-import vn.eledevo.vksbe.dto.request.PinRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
-
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -50,13 +50,15 @@ public class AuthenticationController {
 
     @PatchMapping("/create-pin")
     @Operation(summary = "Tạo mã PIN khi đăng nhật lần đầu")
-    public ApiResponse<HashMap<String,String>> createPin(@RequestBody @Valid PinRequest pinRequest) throws ApiException {
+    public ApiResponse<HashMap<String, String>> createPin(@RequestBody @Valid PinRequest pinRequest)
+            throws ApiException {
         return ApiResponse.ok(service.createPin(pinRequest));
     }
 
     @PatchMapping("/change-password")
     @Operation(summary = "Đổi mật khẩu thành tài khoản")
-    public ApiResponse<HashMap<String,String>> changePassword(@RequestBody @Valid ChangePasswordRequest request) throws ApiException {
+    public ApiResponse<HashMap<String, String>> changePassword(@RequestBody @Valid ChangePasswordRequest request)
+            throws ApiException {
         return ApiResponse.ok(service.changePassword(request));
     }
 

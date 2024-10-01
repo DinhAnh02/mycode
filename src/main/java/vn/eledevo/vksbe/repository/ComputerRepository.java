@@ -39,5 +39,4 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<Computers> findByIdIn(Set<Long> ids);
 
     Computers findByName(String name);
-    
 }
