@@ -1,6 +1,7 @@
 package vn.eledevo.vksbe.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -37,6 +38,8 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     boolean existsByName(String name);
 
     List<Computers> findByIdIn(Set<Long> ids);
+
+    Optional<Computers> findComputersByCode(String code);
 
     Computers findByName(String name);
 }

@@ -22,4 +22,6 @@ public interface ComputerService {
     ResultList<ComputerResponse> getDisconnectedComputers(String textSearch);
 
     HashMap<String, String> createComputer(ComputerRequestForCreate request) throws ApiException, ValidationException;
+
+    HashMap<String, String> checkExistComputer(String computerCode) throws ApiException;
 }
