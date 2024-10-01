@@ -62,6 +62,7 @@ import java.util.stream.Collectors;
 
 import static vn.eledevo.vksbe.constant.ErrorCode.*;
 import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.URL_NOT_FOUND;
 import static vn.eledevo.vksbe.constant.FileConst.*;
 import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 import static vn.eledevo.vksbe.constant.RoleCodes.*;
@@ -626,8 +627,14 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private String getPathImg(String url) {
-        return uploadDir + "/" + url.substring((appHost + AVATAR_URI).length());
+    private String getPathImg(String url) throws ApiException {
+        String prefix = appHost + AVATAR_URI;
+        if (url.startsWith(prefix)) {
+            return uploadDir + "/" + url.substring(prefix.length());
+        } else {
+            // Xử lý trường hợp url không đúng format mong đợi
+            throw new ApiException(AccountErrorCode.URL_NOT_FOUND);
+        }
     }
 
     private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
