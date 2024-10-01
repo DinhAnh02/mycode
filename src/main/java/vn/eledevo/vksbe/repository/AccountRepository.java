@@ -59,7 +59,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
                     + "WHERE a.id = :accountId")
     Optional<UserInfo> findAccountProfileById(@Param("accountId") Long accountId);
 
-    @Query("SELECT new vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo(a.id, p.fullName, a.username) "
+    @Query("SELECT new vn.eledevo.vksbe.dto.response.account.AccountSwapResponse(a.id, p.fullName, a.username) "
             + "FROM Accounts a "
             + "JOIN a.profile p "
             + "WHERE a.departments.id = :departmentId "

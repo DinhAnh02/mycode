@@ -547,6 +547,16 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException {
+        Accounts accountLogin = SecurityUtils.getUser();
+        Accounts accountUpdate = validAccount(updatedAccId);
+
+        int priorityRoleUpdate = priorityRoles(Role.valueOf(accountUpdate.getRoles().getCode()));
+        int priorityRoleLogin = priorityRoles(Role.valueOf(accountLogin.getRoles().getCode()));
+
+        if (priorityRoleLogin <= priorityRoleUpdate){
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+        }
+
         Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
         if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
                 && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
@@ -554,7 +564,7 @@ public class AccountServiceImpl implements AccountService {
             return AccountSwapResponse.builder().build();
         }
         AccountSwapResponse oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
-        if (oldPositionAccInfo.getId() == null) {
+        if (Objects.equals(oldPositionAccInfo, null)) {
             accountToUpdate(req, updatedAccId, updateAccRole);
             return AccountSwapResponse.builder().build();
         }
