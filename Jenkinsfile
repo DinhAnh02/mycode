@@ -30,14 +30,14 @@ pipeline {
       steps {
           // Tạo thư mục nếu chưa có và xóa file ZIP nếu tồn tại
                 sh '''
-                  mkdir -p src/AppUsb
-                  rm -f src/AppUsb/app_usb.zip
+                  mkdir -p src/main/resources/AppUsb
+                  rm -f src/main/resources/AppUsb/app_usb.zip
                 '''
           }
         }
     stage('Download AppUsb') {
            steps {
-                sh 'cp /var/lib/jenkins/workspace/app-usb/dist/app_usb.zip src/AppUsb/'
+                sh 'cp /var/lib/jenkins/workspace/app-usb/dist/app_usb.zip src/main/resources/AppUsb/'
         }
     }
     stage('Build image') {
