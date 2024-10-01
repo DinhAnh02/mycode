@@ -701,6 +701,7 @@ public class AccountServiceImpl implements AccountService {
                 .fullName(request.getFullName())
                 .avatar(request.getAvatar())
                 .phoneNumber(request.getPhoneNumber())
+                .gender(request.getGender())
                 .build();
     }
 
