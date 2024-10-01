@@ -100,4 +100,12 @@ public class ResponseMessage {
     public static final String COMPUTER_BRAND_NOT_FOUND = "Tên hãng máy tính không được để trống";
 
     public static final String COMPUTER_TYPE_NOT_FOUND = "Loại máy tính không được để trống";
+
+    public static final String ROLE_ID_NOT_NULL = "Tên chức vụ không được để trống";
+
+    public static final String DEPARTMENT_ID_NOT_NULL = "Tên phòng ban không được để trống";
+
+    public static final String ORGANIZATION_ID_NOT_NULL = "Tên đơn vị không được để trống";
+
+    public static final String GENDER_REQUIRE = "Giới tính không được để trống";
 }
