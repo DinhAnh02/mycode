@@ -1,19 +1,9 @@
 package vn.eledevo.vksbe.service.usb;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +28,20 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.service.ChangeData;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +107,7 @@ public class UsbServiceImpl implements UsbService {
                 writeToFile(encryptedData);
 
                 // zip file
-                zipFiles(unzippedFolderPath,zipFilePath);
+                zipFiles(unzippedFolderPath, zipFilePath);
 
                 // delete folder unzipped
                 deleteDirectory(Paths.get(unzippedFolderPath));
@@ -118,6 +122,7 @@ public class UsbServiceImpl implements UsbService {
     private void unzipFile(String zipFilePath, String destDirectory) throws IOException {
         log.info("Unzip path: {}", zipFilePath);
         log.info("Unzip folder: {}", destDirectory);
+
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             log.info("test: {}", zipFile);
             zipFile.stream().forEach(zipEntry -> {

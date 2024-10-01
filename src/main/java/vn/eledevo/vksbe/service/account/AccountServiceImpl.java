@@ -553,7 +553,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) {
+    public AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException {
         Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
         if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
                 && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
@@ -573,6 +573,22 @@ public class AccountServiceImpl implements AccountService {
         Accounts account = accountToUpdate(req, updatedAccId, updateAccRole);
         account.setStatus(Status.ACTIVE.name());
         return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+    }
+
+    private void clearPathImg(String path) {
+        Path filePath = Paths.get(getPathImg(path));
+        try {
+            if (Files.exists(filePath)) {
+                // Xóa tệp nếu tồn tại
+                Files.delete(filePath);
+            }
+        } catch (IOException e) {
+            System.err.println("Lỗi khi xóa tệp: " + e.getMessage());
+        }
+    }
+
+    private String getPathImg(String url) {
+        return uploadDir + "/" + url.substring((appHost + AVATAR_URI).length());
     }
 
     private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
@@ -758,13 +774,22 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private Accounts accountToUpdate(AccountUpdateRequest req, Long updatedAccId, Roles updateAccRole) {
+    private Accounts accountToUpdate(AccountUpdateRequest req, Long updatedAccId, Roles updateAccRole)
+            throws ApiException {
         Profiles profile = profileRepository.findByAccounts_Id(updatedAccId);
         Accounts updatedAcc = accountRepository.findById(updatedAccId).orElseThrow();
 
         profile.setFullName(req.getFullName());
-        profile.setAvatar(req.getAvatar());
         profile.setPhoneNumber(req.getPhoneNumber());
+        profile.setGender(req.getGender());
+        if (Objects.nonNull(req.getAvatar()) && !req.getAvatar().equals(profile.getAvatar())) {
+            clearPathImg(profile.getAvatar());
+            String pathFile = getPathImg(req.getAvatar());
+            if (!Files.exists(Paths.get(pathFile))) {
+                throw new ApiException(AccountErrorCode.PATH_AVATAR_NOT_FOUND);
+            }
+            profile.setAvatar(req.getAvatar());
+        }
         Profiles profileSave = profileRepository.save(profile);
 
         updatedAcc.setProfile(profileSave);

@@ -46,4 +46,7 @@ public class AccountUpdateRequest {
     String phoneNumber;
 
     Long swappedAccId;
+
+    @NotBlank(message = GENDER_NOT_BLANK)
+    String gender;
 }

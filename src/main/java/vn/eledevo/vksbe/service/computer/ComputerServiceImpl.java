@@ -1,6 +1,5 @@
 package vn.eledevo.vksbe.service.computer;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.*;
 
 import java.util.HashMap;
