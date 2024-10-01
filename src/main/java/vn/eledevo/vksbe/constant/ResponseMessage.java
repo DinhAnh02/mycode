@@ -108,4 +108,6 @@ public class ResponseMessage {
     public static final String ORGANIZATION_ID_NOT_NULL = "Tên đơn vị không được để trống";
 
     public static final String GENDER_REQUIRE = "Giới tính không được để trống";
+
+    public static final String GENDER_NOT_BLANK = "Giới tính không được để trống";
 }

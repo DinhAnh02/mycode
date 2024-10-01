@@ -40,6 +40,7 @@ public enum AccountErrorCode implements BaseErrorCode {
     ACCOUNT_IS_LOCK(OK, "TK-24", "Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
     ACCOUNT_ACTIVE(OK, "TK-25", "Tài khoản đang hoạt", new HashMap<>()),
     CHANGE_PWD_LOGIN(OK, "TK-26", "Chức năng này chỉ khả dụng khi bạn đăng nhập lần đầu", new HashMap<>()),
+    PATH_AVATAR_NOT_FOUND(OK, "TK-27", "Không tồn tại đường dẫn avatar ", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;
