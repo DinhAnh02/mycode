@@ -118,18 +118,6 @@ public class UsbServiceImpl implements UsbService {
     private void unzipFile(String zipFilePath, String destDirectory) throws IOException {
         log.info("Unzip path: {}", zipFilePath);
         log.info("Unzip folder: {}", destDirectory);
-        File file = new File(zipFilePath);
-        if (!file.exists()) {
-            log.error("Zip file không tồn tại tại đường dẫn: {}", zipFilePath);
-            return;
-        }
-
-        // Kiểm tra xem thư mục đích có tồn tại, nếu không thì tạo mới
-        Path destDirPath = Paths.get(destDirectory);
-        if (!Files.exists(destDirPath)) {
-            Files.createDirectories(destDirPath);
-            log.info("Tạo thư mục đích: {}", destDirectory);
-        }
         try (ZipFile zipFile = new ZipFile(zipFilePath)) {
             log.info("test: {}", zipFile);
             zipFile.stream().forEach(zipEntry -> {
@@ -139,7 +127,7 @@ public class UsbServiceImpl implements UsbService {
                     Files.createDirectories(outputPath.getParent());
                     Files.copy(inputStream, outputPath);
                 } catch (IOException e) {
-                    log.error("loi thi vao day");
+                    log.error("loi thi vao day: {}",e.getMessage());
                     e.printStackTrace();
                 }
             });
@@ -191,10 +179,8 @@ public class UsbServiceImpl implements UsbService {
     private File getFile() throws ApiException {
         log.info("da vao get file chua");
         String userHome = System.getProperty("user.dir");
-        Path absolutePath = Paths.get(userHome,"src/AppUsb/unzipped/").toAbsolutePath();
-        String resourcePath = absolutePath.toString();
-        //        String resourcePath = "src/AppUsb/unzipped/";
-
+        Path absolutePath = Paths.get(userHome,"src/AppUsb/unzipped/");
+        String resourcePath = absolutePath.toAbsolutePath().toString();
         File directory = new File(resourcePath);
         log.info("day la get file: {}",directory);
         if (!directory.exists()) {
