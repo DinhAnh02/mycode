@@ -190,7 +190,8 @@ public class UsbServiceImpl implements UsbService {
 
     private File getFile() throws ApiException {
         log.info("da vao get file chua");
-        Path absolutePath = Paths.get("src/AppUsb/unzipped/").toAbsolutePath();
+        String userHome = System.getProperty("user.dir");
+        Path absolutePath = Paths.get(userHome,"src/AppUsb/unzipped/").toAbsolutePath();
         String resourcePath = absolutePath.toString();
         //        String resourcePath = "src/AppUsb/unzipped/";
 
