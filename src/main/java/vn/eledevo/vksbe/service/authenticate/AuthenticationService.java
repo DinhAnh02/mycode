@@ -1,25 +1,21 @@
 package vn.eledevo.vksbe.service.authenticate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
-import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
+import vn.eledevo.vksbe.constant.Role;
+import vn.eledevo.vksbe.constant.Status;
+import vn.eledevo.vksbe.constant.TokenType;
 import vn.eledevo.vksbe.dto.request.AuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.ChangePasswordRequest;
 import vn.eledevo.vksbe.dto.request.PinRequest;
@@ -38,6 +34,11 @@ import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.service.ChangeData;
 import vn.eledevo.vksbe.utils.SecurityUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -138,7 +139,7 @@ public class AuthenticationService {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
         }
         if (Boolean.TRUE.equals(account.getIsConditionLogin2())) {
-            return null;
+            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
         }
         if (!pinRequest.getPin().equals(pinRequest.getPin2())) {
             throw new ApiException(AccountErrorCode.PIN_CODE_MISMATCH);
@@ -160,7 +161,7 @@ public class AuthenticationService {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
         if (Boolean.TRUE.equals(accountRequest.getIsConditionLogin1())) {
-            throw new ApiException(AccountErrorCode.CHANGE_PWD_LOGIN);
+            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
         }
         if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
             throw new ApiException(AccountErrorCode.OLD_PASSWORD_INCORRECT);

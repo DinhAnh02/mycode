@@ -39,8 +39,12 @@ public enum AccountErrorCode implements BaseErrorCode {
     ACCOUNT_LOCK_NOT_FOUND(OK, "TK-23", "Tài khoản bạn chọn không tồn tại", new HashMap<>()),
     ACCOUNT_IS_LOCK(OK, "TK-24", "Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
     ACCOUNT_ACTIVE(OK, "TK-25", "Tài khoản đang hoạt", new HashMap<>()),
-    CHANGE_PWD_LOGIN(OK, "TK-26", "Chức năng này chỉ khả dụng khi bạn đăng nhập lần đầu", new HashMap<>()),
+    CHANGE_FIRST_LOGIN(OK, "TK-26", "Chức năng này chỉ khả dụng khi bạn đăng nhập lần đầu", new HashMap<>()),
     PATH_AVATAR_NOT_FOUND(OK, "TK-27", "Không tồn tại đường dẫn avatar ", new HashMap<>()),
+    CHANGE_PIN_LOGIN(OK, "TK-28", "Chức năng không khả dụng do tài khoản chưa được tạo mã PIN", new HashMap<>()),
+    OLD_PIN_INCORRECT(OK, "TK-29", "Mã PIN cũ không chính xác", new HashMap<>()),
+    NEW_PIN_SAME_AS_OLD(OK, "TK-30", "Mã PIN mới không được trùng với mã PIN cũ", new HashMap<>()),
+    CONFIRM_PIN_MISMATCH(OK, "TK-31", "Mã PIN nhập lại không được trùng với mã PIN mới", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

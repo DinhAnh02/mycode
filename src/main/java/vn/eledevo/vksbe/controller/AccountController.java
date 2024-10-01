@@ -1,36 +1,27 @@
 package vn.eledevo.vksbe.controller;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
-import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.request.PinChangeRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.*;
-import vn.eledevo.vksbe.dto.response.account.AccResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
-import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
@@ -38,6 +29,13 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructureService;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
+import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -121,7 +119,7 @@ public class AccountController {
 
     @PatchMapping("/{accountId}/swap-account-status/{swapAccountId}")
     @Operation(summary = "Swap trạng thái tài khoản")
-    public ApiResponse<ObjectSwapResponse> swapAccountSattus(
+    public ApiResponse<AccountSwapResponse> swapAccountSattus(
             @PathVariable Long accountId, @PathVariable Long swapAccountId) throws ApiException {
         return ApiResponse.ok(accountService.swapStatus(accountId, swapAccountId));
     }
@@ -157,7 +155,7 @@ public class AccountController {
 
     @PatchMapping("/{updatedAccId}/update-info")
     @Operation(summary = "Chỉnh sửa thông tin tài khoản")
-    public ApiResponse<AccResponse<Object>> updateAccountInfo(
+    public ApiResponse<AccountSwapResponse> updateAccountInfo(
             @PathVariable(value = "updatedAccId") Long updatedAccId, @Valid @RequestBody AccountUpdateRequest req)
             throws ApiException {
         organizationalStructureUtilsService.validateUpdate(req);
@@ -168,5 +166,12 @@ public class AccountController {
     @Operation(summary = "Thông tin cá nhân của tài khoản đăng nhập")
     public ApiResponse<UserInfo> userDetail() throws ApiException {
         return ApiResponse.ok(accountService.userInfo());
+    }
+
+    @PostMapping("/change-pin-code")
+    @Operation(summary = "Thay đổi mã PIN của tài khoản đang đăng nhập")
+    public ApiResponse<HashMap<String, String>> changePinCodeUserLogin(@Valid @RequestBody PinChangeRequest pinRequest)
+            throws ApiException {
+        return ApiResponse.ok(accountService.changePinUserLogin(pinRequest));
     }
 }

@@ -13,6 +13,4 @@ public class AccountSwapResponse {
     Long id;
     String username;
     String fullname;
-    String roleName;
-    String status;
 }
