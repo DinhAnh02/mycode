@@ -29,6 +29,9 @@ public class AccountUpdateRequest {
 
     String avatar;
 
+    @NotBlank(message = GENDER_NOT_BLANK)
+    String gender;
+
     Long roleId;
 
     String roleName;
@@ -46,7 +49,4 @@ public class AccountUpdateRequest {
     String phoneNumber;
 
     Long swappedAccId;
-
-    @NotBlank(message = GENDER_NOT_BLANK)
-    String gender;
 }
