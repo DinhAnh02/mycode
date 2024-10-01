@@ -72,14 +72,13 @@ public class UsbServiceImpl implements UsbService {
     @Override
     public String createUsbToken(String username) throws Exception {
         log.info("da vao tao usb chua");
-//        String zipFilePath = "src/AppUsb/app_usb.zip";
-        Path absolutePath = Paths.get("src/main/resources/AppUsb/app_usb.zip").toAbsolutePath();
-        String zipFilePath = absolutePath.toString();
-        log.info("day la a: {}",System.getProperty("user.dir") );
-        Path absolutePathFolder = Paths.get("src/main/resources/AppUsb/unzipped").toAbsolutePath();
-        String unzippedFolderPath = absolutePathFolder.toString();
-        log.info(unzippedFolderPath,"day la b");
-//        String unzippedFolderPath = "src/AppUsb/unzipped";
+        String userHome = System.getProperty("user.home");
+        Path absolutePath = Paths.get(userHome,"src/AppUsb/app_usb.zip");
+        String zipFilePath = absolutePath.toAbsolutePath().toString();
+        log.info("day la a: {}",userHome);
+        Path absolutePathFolder = Paths.get(userHome,"src/AppUsb/unzipped");
+        String unzippedFolderPath = absolutePathFolder.toAbsolutePath().toString();
+        log.info("day la b: {}",unzippedFolderPath);
         unzipFile(zipFilePath, unzippedFolderPath);
         Optional<AccountActive> account = accountRepository.findByUsernameActive(username);
         if (account.isPresent()) {
@@ -182,7 +181,7 @@ public class UsbServiceImpl implements UsbService {
 
     private File getFile() throws ApiException {
         log.info("da vao get file chua");
-        Path absolutePath = Paths.get("src/main/resources/AppUsb//unzipped/").toAbsolutePath();
+        Path absolutePath = Paths.get("src/AppUsb/unzipped/").toAbsolutePath();
         String resourcePath = absolutePath.toString();
         log.info(resourcePath,"day la getfile");
 //        String resourcePath = "src/AppUsb/unzipped/";
