@@ -51,7 +51,7 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
     boolean existsByUsername(String username);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.model.account.UserInfo(p.avatar, p.fullName, p.gender, p.phoneNumber, a.isConditionLogin1, a.isConditionLogin2, r.code, d.code) "
+            "SELECT new vn.eledevo.vksbe.dto.model.account.UserInfo(a.id,a.username,p.avatar, p.fullName, p.gender, p.phoneNumber,r.code, d.code,'1', a.isConditionLogin1, a.isConditionLogin2) "
                     + "FROM Accounts a "
                     + "JOIN a.roles r "
                     + "JOIN a.departments d "

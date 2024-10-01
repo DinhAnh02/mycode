@@ -11,12 +11,15 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserInfo {
+    Long id;
+    String userName;
     String avatar;
     String fullName;
     String gender;
     String phoneNumber;
-    Boolean isConditionLogin1;
-    Boolean isConditionLogin2;
     String roleCode;
     String departmentCode;
+    String organizationId;
+    Boolean isConditionLogin1;
+    Boolean isConditionLogin2;
 }
