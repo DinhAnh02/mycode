@@ -14,6 +14,8 @@ public class ResponseMessage {
 
     public static final String EXITS_PIN = "Mã pin không được để trống";
 
+    public static final String EXITS_PIN_OLD = "Mã PIN cũ không được để trống";
+
     public static final String RESET_PASSWORD_SUCCESS = "Reset mật khẩu thành công";
 
     public static final String CHANGE_PASSWORD_SUCCESS = "Thay đổi mật khẩu thành công";

@@ -1,12 +1,51 @@
 package vn.eledevo.vksbe.service.account;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+import vn.eledevo.vksbe.constant.DepartmentCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
+import vn.eledevo.vksbe.constant.Role;
+import vn.eledevo.vksbe.constant.Status;
+import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
+import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
+import vn.eledevo.vksbe.dto.model.account.UserInfo;
+import vn.eledevo.vksbe.dto.request.AccountActive;
+import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.request.PinChangeRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
+import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
+import vn.eledevo.vksbe.dto.response.AccountResponse;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.ResultList;
+import vn.eledevo.vksbe.dto.response.ResultUrl;
+import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
+import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
+import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
+import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
+import vn.eledevo.vksbe.entity.*;
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
+import vn.eledevo.vksbe.mapper.AccountMapper;
+import vn.eledevo.vksbe.repository.*;
+import vn.eledevo.vksbe.utils.Const;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,52 +60,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
-import vn.eledevo.vksbe.constant.DepartmentCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
-import vn.eledevo.vksbe.constant.ResponseMessage;
-import vn.eledevo.vksbe.constant.Role;
-import vn.eledevo.vksbe.constant.Status;
-import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
-import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
-import vn.eledevo.vksbe.dto.model.account.OldPositionAccInfo;
-import vn.eledevo.vksbe.dto.model.account.UserInfo;
-import vn.eledevo.vksbe.dto.request.AccountActive;
-import vn.eledevo.vksbe.dto.request.AccountRequest;
-import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
-import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
-import vn.eledevo.vksbe.dto.response.AccountResponse;
-import vn.eledevo.vksbe.dto.response.ResponseFilter;
-import vn.eledevo.vksbe.dto.response.ResultList;
-import vn.eledevo.vksbe.dto.response.ResultUrl;
-import vn.eledevo.vksbe.dto.response.account.*;
-import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
-import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
-import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
-import vn.eledevo.vksbe.entity.*;
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.exception.ValidationException;
-import vn.eledevo.vksbe.mapper.AccountMapper;
-import vn.eledevo.vksbe.mapper.ComputerMapper;
-import vn.eledevo.vksbe.mapper.UsbMapper;
-import vn.eledevo.vksbe.repository.*;
-import vn.eledevo.vksbe.utils.Const;
-import vn.eledevo.vksbe.utils.SecurityUtils;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -78,9 +78,7 @@ public class AccountServiceImpl implements AccountService {
     AccountMapper accountMapper;
     PasswordEncoder passwordEncoder;
     ComputerRepository computerRepository;
-    ComputerMapper computerMapper;
     UsbRepository usbRepository;
-    UsbMapper usbMapper;
     RoleRepository roleRepository;
     DepartmentRepository departmentRepository;
     OrganizationRepository organizationRepository;
@@ -455,7 +453,7 @@ public class AccountServiceImpl implements AccountService {
         boolean isSameDepartment = Objects.equals(
                 activedAcc.getDepartments().getId(), loginAcc.getDepartments().getId());
         if (activedAccRole.equals(Role.VIEN_TRUONG) || (activedAccRole.equals(Role.TRUONG_PHONG) && isSameDepartment)) {
-            OldPositionAccInfo old = accountRepository.getOldPositionAccInfo(
+            AccountSwapResponse old = accountRepository.getOldPositionAccInfo(
                     activedAcc.getDepartments().getId());
             if (old.getId() != null) {
                 return ActivedAccountResponse.builder().oldPositionAccInfo(old).build();
@@ -471,11 +469,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ObjectSwapResponse swapStatus(Long newAccountId, Long oldAccountId) throws ApiException {
+    public AccountSwapResponse swapStatus(Long newAccountId, Long oldAccountId) throws ApiException {
         return swap(newAccountId, oldAccountId);
     }
 
-    private ObjectSwapResponse swap(Long newAccountId, Long oldAccountId) throws ApiException {
+    private AccountSwapResponse swap(Long newAccountId, Long oldAccountId) throws ApiException {
         Accounts existingAccount =
                 accountRepository.findById(newAccountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
         if (!existingAccount.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
@@ -491,14 +489,9 @@ public class AccountServiceImpl implements AccountService {
         }
         Accounts accountLead = accountLeadOptional.get();
         if (!accountLead.getId().equals(oldAccountId)) {
-            AccountSwapResponse accountSwapResponse = AccountSwapResponse.builder()
+            return AccountSwapResponse.builder()
                     .id(accountLead.getId())
                     .fullname(accountLead.getProfile().getFullName())
-                    .roleName(accountLead.getRoles().getName())
-                    .status(accountLead.getStatus())
-                    .build();
-            return ObjectSwapResponse.builder()
-                    .accountSwapResponse(accountSwapResponse)
                     .build();
         }
 
@@ -506,7 +499,7 @@ public class AccountServiceImpl implements AccountService {
         existingAccount.setStatus("ACTIVE");
         accountRepository.save(existingAccount);
         accountRepository.save(accountLead);
-        return ObjectSwapResponse.builder().message(SWAP_ACCOUNT_SUCCESS).build();
+        return AccountSwapResponse.builder().build();
     }
 
     @Override
@@ -553,29 +546,65 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException {
+    public AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException {
         Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
         if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
                 && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
             accountToUpdate(req, updatedAccId, updateAccRole);
-            return AccResponse.builder().build();
+            return AccountSwapResponse.builder().build();
         }
-        OldPositionAccInfo oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
+        AccountSwapResponse oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
         if (oldPositionAccInfo.getId() == null) {
             accountToUpdate(req, updatedAccId, updateAccRole);
-            return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+            return AccountSwapResponse.builder().build();
         }
         if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
-            return AccResponse.builder().account(oldPositionAccInfo).build();
+            return oldPositionAccInfo;
         }
         Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
         accountLead.setStatus(Status.INACTIVE.name());
         Accounts account = accountToUpdate(req, updatedAccId, updateAccRole);
         account.setStatus(Status.ACTIVE.name());
-        return AccResponse.builder().message(UPDATE_ACCOUNT_SUCCESS).build();
+        return AccountSwapResponse.builder().build();
     }
 
-    private void clearPathImg(String path) {
+    @Override
+    public UserInfo userInfo() throws ApiException {
+        Long userId = SecurityUtils.getUserId();
+        Optional<UserInfo> userDetail = accountRepository.findAccountProfileById(userId);
+        if (userDetail.isEmpty()) {
+            throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_EXISTS);
+        }
+        return userDetail.get();
+    }
+
+    @Override
+    public HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException {
+        String userName = getUserName();
+        Accounts accountRequest = accountRepository
+                .findAccountInSystem(userName)
+                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
+            throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
+        }
+        if (Boolean.FALSE.equals(accountRequest.getIsConditionLogin1())) {
+            throw new ApiException(AccountErrorCode.CHANGE_PIN_LOGIN);
+        }
+        if (!passwordEncoder.matches(pinRequest.getOldPinCode(), accountRequest.getPin())) {
+            throw new ApiException(AccountErrorCode.OLD_PIN_INCORRECT);
+        }
+        if (pinRequest.getOldPinCode().equals(pinRequest.getNewPinCode())) {
+            throw new ApiException(AccountErrorCode.NEW_PIN_SAME_AS_OLD);
+        }
+        if (!pinRequest.getNewPinCode().equals(pinRequest.getConfirmPinCode())) {
+            throw new ApiException(AccountErrorCode.CONFIRM_PIN_MISMATCH);
+        }
+        accountRequest.setPin(passwordEncoder.encode(pinRequest.getConfirmPinCode()));
+        accountRepository.save(accountRequest);
+        return new HashMap<>();
+    }
+
+    private void clearPathImg(String path) throws ApiException {
         Path filePath = Paths.get(getPathImg(path));
         try {
             if (Files.exists(filePath)) {
@@ -583,7 +612,7 @@ public class AccountServiceImpl implements AccountService {
                 Files.delete(filePath);
             }
         } catch (IOException e) {
-            System.err.println("Lỗi khi xóa tệp: " + e.getMessage());
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
     }
 
@@ -826,15 +855,5 @@ public class AccountServiceImpl implements AccountService {
             case PHO_PHONG -> 7;
             default -> 0;
         };
-    }
-
-    @Override
-    public UserInfo userInfo() throws ApiException {
-        Long userId = SecurityUtils.getUserId();
-        Optional<UserInfo> userDetail = accountRepository.findAccountProfileById(userId);
-        if (userDetail.isEmpty()) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_EXISTS);
-        }
-        return userDetail.get();
     }
 }

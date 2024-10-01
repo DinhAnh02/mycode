@@ -1,29 +1,28 @@
 package vn.eledevo.vksbe.service.account;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
-
 import org.springframework.web.multipart.MultipartFile;
-
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.request.PinChangeRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.ResultUrl;
-import vn.eledevo.vksbe.dto.response.account.AccResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
+import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
-import vn.eledevo.vksbe.dto.response.account.ObjectSwapResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
 
 public interface AccountService {
     HashMap<String, String> resetPassword(Long id) throws ApiException;
@@ -47,7 +46,7 @@ public interface AccountService {
 
     ActivedAccountResponse activeAccount(Long id) throws ApiException;
 
-    ObjectSwapResponse swapStatus(Long accountId, Long swapAccountId) throws ApiException;
+    AccountSwapResponse swapStatus(Long accountId, Long swapAccountId) throws ApiException;
 
     AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException;
 
@@ -55,7 +54,9 @@ public interface AccountService {
 
     byte[] downloadAvatar(String fileName) throws ApiException, IOException;
 
-    AccResponse<Object> updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException;
+    AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException;
 
     UserInfo userInfo() throws ApiException;
+
+    HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException;
 }
