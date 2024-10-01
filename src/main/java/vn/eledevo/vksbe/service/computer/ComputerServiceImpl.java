@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.service.computer;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.*;
 
 import java.util.HashMap;
@@ -27,6 +28,8 @@ import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.ComputerRepository;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -86,6 +89,15 @@ public class ComputerServiceImpl implements ComputerService {
 
         Computers computersCreate = computerRepository.save(computerMapper.toResource(request));
         computerMapper.toResponse(computersCreate);
+        return new HashMap<>();
+    }
+
+    @Override
+    public HashMap<String, String> checkExistComputer(String computerCode) throws ApiException {
+        Optional<Computers> result = computerRepository.findComputersByCode(computerCode);
+        if(result.isPresent()) {
+            throw new ApiException(PC_CODE_ALREADY_EXISTS);
+        }
         return new HashMap<>();
     }
 }
