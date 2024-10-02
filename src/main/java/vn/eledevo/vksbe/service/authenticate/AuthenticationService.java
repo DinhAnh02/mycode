@@ -138,9 +138,9 @@ public class AuthenticationService {
         if (!account.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
         }
-        if (Boolean.TRUE.equals(account.getIsConditionLogin2())) {
-            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
-        }
+//        if (Boolean.TRUE.equals(account.getIsConditionLogin2())) {
+//            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
+//        }
         if (!pinRequest.getPin().equals(pinRequest.getPin2())) {
             throw new ApiException(AccountErrorCode.PIN_CODE_MISMATCH);
         }
@@ -160,9 +160,9 @@ public class AuthenticationService {
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
-        if (Boolean.TRUE.equals(accountRequest.getIsConditionLogin1())) {
-            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
-        }
+//        if (Boolean.TRUE.equals(accountRequest.getIsConditionLogin1())) {
+//            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
+//        }
         if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
             throw new ApiException(AccountErrorCode.OLD_PASSWORD_INCORRECT);
         }
