@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatusCode;
 
@@ -20,9 +21,9 @@ public enum SystemErrorCode implements BaseErrorCode {
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
     private final String message;
-    private final Map<String, String> result; // Đảm bảo `result` là Map<String, String>
+    private final Map<String, Optional<?>> result; // Đảm bảo `result` là Map<String, String>
 
-    SystemErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, String> result) {
+    SystemErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, Optional<?>> result) {
         this.statusCode = statusCode;
         this.code = code;
         this.message = message;
@@ -45,7 +46,11 @@ public enum SystemErrorCode implements BaseErrorCode {
     }
 
     @Override
-    public Map<String, String> getResult() { // Đảm bảo `result` là Map<String, String>
+    public void setResult(Optional<?> value) {
+    }
+
+    @Override
+    public Map<String, Optional<?>> getResult() { // Đảm bảo `result` là Map<String, String>
         return result;
     }
 }

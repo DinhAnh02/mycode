@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatusCode;
 
@@ -69,9 +70,9 @@ public enum ErrorCode implements BaseErrorCode {
     private final HttpStatusCode statusCode; // Đảm bảo rằng bạn đã khai báo biến này
     private final String code;
     private final String message;
-    private final Map<String, String> result;
+    private final Map<String, Optional<?>> result;
 
-    ErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, String> result) {
+    ErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, Optional<?>> result) {
         this.statusCode = statusCode; // Gán giá trị cho `statusCode`
         this.code = code;
         this.message = message;
@@ -94,7 +95,12 @@ public enum ErrorCode implements BaseErrorCode {
     }
 
     @Override
-    public Map<String, String> getResult() {
+    public void setResult(Optional<?> value) {
+
+    }
+
+    @Override
+    public Map<String, Optional<?>> getResult() {
         return result;
     }
 }

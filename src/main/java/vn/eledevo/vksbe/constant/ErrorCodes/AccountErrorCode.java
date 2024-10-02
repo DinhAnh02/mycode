@@ -2,8 +2,10 @@ package vn.eledevo.vksbe.constant.ErrorCodes;
 
 import static org.springframework.http.HttpStatus.OK;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatusCode;
 
@@ -46,15 +48,16 @@ public enum AccountErrorCode implements BaseErrorCode {
     NEW_PIN_SAME_AS_OLD(OK, "TK-30", "Mã PIN mới không được trùng với mã PIN cũ", new HashMap<>()),
     CONFIRM_PIN_MISMATCH(OK, "TK-31", "Mã PIN nhập lại không được trùng với mã PIN mới", new HashMap<>()),
     URL_NOT_FOUND(OK, "TK-32", "Đường dẫn ảnh không hợp lệ", new HashMap<>()),
-    ACCOUNT_LINKED_USB(OK,"TK-33","Tài khoản đã được liên kết usb . Vui lòng gỡ usb cũ và thử lại",new HashMap<>())
+    ACCOUNT_LINKED_USB(OK,"TK-33","Tài khoản đã được liên kết usb . Vui lòng gỡ usb cũ và thử lại",new HashMap<>()),
+    ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>())
     ;
 
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
     private final String message;
-    private final Map<String, String> result;
+    private final Map<String, Optional<?>> result;
 
-    AccountErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, String> result) {
+    AccountErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, Optional<?>> result) {
         this.code = code;
         this.message = message;
         this.statusCode = statusCode;
@@ -77,7 +80,31 @@ public enum AccountErrorCode implements BaseErrorCode {
     }
 
     @Override
-    public Map<String, String> getResult() {
+    public Map<String, Optional<?>> getResult() {
         return result;
+    }
+
+    @Override
+    public void setResult(Optional<?> value) {
+        // Kiểm tra nếu Optional chứa giá trị
+        if (value.isPresent()) {
+            Object object = value.get();
+            // Sử dụng reflection để lấy tất cả các trường (fields) của object
+            Field[] fields = object.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                field.setAccessible(true); // Cho phép truy cập vào các trường private
+
+                try {
+                    // Lấy tên trường (field name) làm key
+                    String key = field.getName();
+                    // Lấy giá trị của trường (field value) làm value và gán vào result
+                    Object fieldValue = field.get(object);
+                    this.result.put(key, Optional.ofNullable(fieldValue)); // Sử dụng Optional để bọc giá trị
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace(); // Xử lý ngoại lệ nếu không thể truy cập vào trường
+                }
+            }
+        }
     }
 }
