@@ -75,7 +75,7 @@ public class ComputerController {
 
     @PostMapping("/check-exist-computer")
     @Operation(summary = "Check thiết bị máy tính tồn tại trong hệ thống")
-    public ApiResponse<Map<String, String>> getComputerList(@RequestBody ComputerToCheckExist computer)
+    public ApiResponse<HashMap<String, String>> getComputerList(@RequestBody ComputerToCheckExist computer)
             throws ApiException {
         return ApiResponse.ok(computerService.checkExistComputer(computer));
     }

@@ -1,13 +1,19 @@
 package vn.eledevo.vksbe.service.authenticate;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
@@ -34,11 +40,6 @@ import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.service.ChangeData;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -138,9 +139,9 @@ public class AuthenticationService {
         if (!account.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
         }
-//        if (Boolean.TRUE.equals(account.getIsConditionLogin2())) {
-//            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
-//        }
+        if (Boolean.TRUE.equals(account.getIsConditionLogin2())) {
+            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
+        }
         if (!pinRequest.getPin().equals(pinRequest.getPin2())) {
             throw new ApiException(AccountErrorCode.PIN_CODE_MISMATCH);
         }
@@ -160,9 +161,9 @@ public class AuthenticationService {
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
-//        if (Boolean.TRUE.equals(accountRequest.getIsConditionLogin1())) {
-//            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
-//        }
+        //        if (Boolean.TRUE.equals(accountRequest.getIsConditionLogin1())) {
+        //            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
+        //        }
         if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
             throw new ApiException(AccountErrorCode.OLD_PASSWORD_INCORRECT);
         }
@@ -223,7 +224,11 @@ public class AuthenticationService {
         // Lưu token truy cập mới vào cơ sở dữ liệu
         saveUserToken(accounts.get(), jwtToken, TokenType.ACCESS.toString());
         // Trả về đối tượng AuthenticationResponse chứa các token
-        return AuthenticationResponse.builder().accessToken(jwtToken).build();
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .isConditionLogin1(accounts.get().getIsConditionLogin1())
+                .isConditionLogin2(accounts.get().getIsConditionLogin2())
+                .build();
     }
 
     private Boolean checkRoleItAdmin(String role) {

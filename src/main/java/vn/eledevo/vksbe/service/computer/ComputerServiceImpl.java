@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
@@ -96,7 +97,7 @@ public class ComputerServiceImpl implements ComputerService {
     public HashMap<String, String> checkExistComputer(ComputerToCheckExist computer) throws ApiException {
         Optional<Computers> result = computerRepository.findComputersByCode(computer.getComputerCode());
         if(result.isPresent()) {
-            throw new ApiException(PC_CODE_ALREADY_EXISTS);
+            throw new ApiException(ComputerErrorCode.PC_CODE_ALREADY_EXISTS);
         }
         return new HashMap<>();
     }
