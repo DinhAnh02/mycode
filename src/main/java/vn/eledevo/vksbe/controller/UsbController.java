@@ -45,7 +45,7 @@ public class UsbController {
         return ApiResponse.ok(usbService.getUsbByFilter(usbRequest, page, pageSize));
     }
 
-    @GetMapping("/download/{idAccount}")
+    @PostMapping("/download/{idAccount}")
     public ResponseEntity<InputStreamResource> createUsbToken(@PathVariable Long idAccount, @RequestBody UsbToken usbToken) throws Exception {
         String zipFilePath = usbService.createUsbToken(idAccount,usbToken);
 
