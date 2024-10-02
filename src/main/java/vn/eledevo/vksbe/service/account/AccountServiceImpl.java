@@ -1,10 +1,26 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -15,6 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.DepartmentCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
@@ -46,28 +68,6 @@ import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.URL_NOT_FOUND;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -490,10 +490,13 @@ public class AccountServiceImpl implements AccountService {
         }
         Accounts accountLead = accountLeadOptional.get();
         if (!accountLead.getId().equals(oldAccountId)) {
-            return AccountSwapResponse.builder()
+            AccountSwapResponse accountLeadResponse = AccountSwapResponse.builder()
                     .id(accountLead.getId())
+                    .username(accountLead.getUsername())
                     .fullname(accountLead.getProfile().getFullName())
                     .build();
+            AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(accountLeadResponse));
+            throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
 
         accountLead.setStatus("INACTIVE");
@@ -551,16 +554,19 @@ public class AccountServiceImpl implements AccountService {
         Accounts accountLogin = SecurityUtils.getUser();
         Accounts accountUpdate = validAccount(updatedAccId);
 
-        int priorityRoleUpdate = priorityRoles(Role.valueOf(accountUpdate.getRoles().getCode()));
-        int priorityRoleLogin = priorityRoles(Role.valueOf(accountLogin.getRoles().getCode()));
+        int priorityRoleUpdate =
+                priorityRoles(Role.valueOf(accountUpdate.getRoles().getCode()));
+        int priorityRoleLogin =
+                priorityRoles(Role.valueOf(accountLogin.getRoles().getCode()));
 
-        if (priorityRoleLogin <= priorityRoleUpdate){
+        if (priorityRoleLogin <= priorityRoleUpdate) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
         Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
         if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
+                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())
+                || accountUpdate.getStatus().equals(Status.INACTIVE.name())) {
             accountToUpdate(req, updatedAccId, updateAccRole);
             return AccountSwapResponse.builder().build();
         }
@@ -569,9 +575,10 @@ public class AccountServiceImpl implements AccountService {
             accountToUpdate(req, updatedAccId, updateAccRole);
             return AccountSwapResponse.builder().build();
         }
-        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+        Accounts accountBeSwap = accountRepository.findById(req.getSwappedAccId()).orElseThrow(()-> new ApiException(AccountErrorCode.ACCOUNT_SWAP_EXITS));
+        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId()) && accountBeSwap.getStatus().equals(Status.ACTIVE.name())) {
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
-            throw  new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
+            throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
         Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
         accountLead.setStatus(Status.INACTIVE.name());
@@ -645,7 +652,6 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.URL_NOT_FOUND);
         }
     }
-
 
     private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
         Accounts accounts = accountRepository
@@ -838,7 +844,7 @@ public class AccountServiceImpl implements AccountService {
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
-        if (Objects.nonNull(req.getAvatar()) && !req.getAvatar().equals(profile.getAvatar())) {
+        if (Objects.nonNull(req.getAvatar()) && !req.getAvatar().isEmpty() && !req.getAvatar().equals(profile.getAvatar())) {
             clearPathImg(profile.getAvatar());
             String pathFile = getPathImg(req.getAvatar());
             if (!Files.exists(Paths.get(pathFile))) {

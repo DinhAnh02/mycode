@@ -80,7 +80,8 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/remove-usb/{accountId}/usb/{usbId}",
                                 "/api/v1/private/accounts/create",
                                 "/api/v1/private/accounts/{updatedAccId}/update-info",
-                                "/api/v1/private/accounts/connect-computer/{id}/computers")
+                                "/api/v1/private/accounts/connect-computer/{id}/computers",
+                                "/api/v1/private/computers/check-exist-computer")
                         .hasAuthority(Role.IT_ADMIN.name())
                         .anyRequest()
                         .authenticated())

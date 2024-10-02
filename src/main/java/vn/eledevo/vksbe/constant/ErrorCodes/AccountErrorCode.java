@@ -49,7 +49,8 @@ public enum AccountErrorCode implements BaseErrorCode {
     CONFIRM_PIN_MISMATCH(OK, "TK-31", "Mã PIN nhập lại không được trùng với mã PIN mới", new HashMap<>()),
     URL_NOT_FOUND(OK, "TK-32", "Đường dẫn ảnh không hợp lệ", new HashMap<>()),
     ACCOUNT_LINKED_USB(OK,"TK-33","Tài khoản đã được liên kết usb . Vui lòng gỡ usb cũ và thử lại",new HashMap<>()),
-    ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>())
+    ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>()),
+    ACCOUNT_SWAP_EXITS(OK, "TK-34", "Tài khoản bị hoán đổi không tồn tại", new HashMap<>())
     ;
 
     private final HttpStatusCode statusCode;
