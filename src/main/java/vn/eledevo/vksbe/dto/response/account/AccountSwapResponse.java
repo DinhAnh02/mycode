@@ -12,5 +12,5 @@ import lombok.experimental.FieldDefaults;
 public class AccountSwapResponse {
     Long id;
     String username;
-    String fullname;
+    String fullName;
 }
