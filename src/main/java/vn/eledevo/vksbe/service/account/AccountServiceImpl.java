@@ -493,7 +493,7 @@ public class AccountServiceImpl implements AccountService {
             AccountSwapResponse accountLeadResponse = AccountSwapResponse.builder()
                     .id(accountLead.getId())
                     .username(accountLead.getUsername())
-                    .fullname(accountLead.getProfile().getFullName())
+                    .fullName(accountLead.getProfile().getFullName())
                     .build();
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(accountLeadResponse));
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
