@@ -5,6 +5,7 @@ import java.util.HashMap;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
+import vn.eledevo.vksbe.dto.request.computer.ComputerToCheckExist;
 import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
@@ -23,5 +24,5 @@ public interface ComputerService {
 
     HashMap<String, String> createComputer(ComputerRequestForCreate request) throws ApiException, ValidationException;
 
-    HashMap<String, String> checkExistComputer(String computerCode) throws ApiException;
+    HashMap<String, String> checkExistComputer(ComputerToCheckExist computerCode) throws ApiException;
 }

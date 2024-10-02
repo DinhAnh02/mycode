@@ -558,28 +558,28 @@ public class AccountServiceImpl implements AccountService {
                 priorityRoles(Role.valueOf(accountUpdate.getRoles().getCode()));
         int priorityRoleLogin =
                 priorityRoles(Role.valueOf(accountLogin.getRoles().getCode()));
-
         if (priorityRoleLogin <= priorityRoleUpdate) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
         Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
         if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())
-                || accountUpdate.getStatus().equals(Status.INACTIVE.name())) {
+                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
             accountToUpdate(req, updatedAccId, updateAccRole);
             return AccountSwapResponse.builder().build();
         }
+
         AccountSwapResponse oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
         if (Objects.equals(oldPositionAccInfo, null)) {
             accountToUpdate(req, updatedAccId, updateAccRole);
             return AccountSwapResponse.builder().build();
         }
-        Accounts accountBeSwap = accountRepository.findById(req.getSwappedAccId()).orElseThrow(()-> new ApiException(AccountErrorCode.ACCOUNT_SWAP_EXITS));
-        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId()) && accountBeSwap.getStatus().equals(Status.ACTIVE.name())) {
+
+        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
+
         Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
         accountLead.setStatus(Status.INACTIVE.name());
         Accounts account = accountToUpdate(req, updatedAccId, updateAccRole);
