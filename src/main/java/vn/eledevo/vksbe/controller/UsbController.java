@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
+import vn.eledevo.vksbe.dto.request.usb.UsbToken;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
@@ -44,9 +45,9 @@ public class UsbController {
         return ApiResponse.ok(usbService.getUsbByFilter(usbRequest, page, pageSize));
     }
 
-    @GetMapping("/download/{username}")
-    public ResponseEntity<InputStreamResource> createUsbToken(@PathVariable String username) throws Exception {
-        String zipFilePath = usbService.createUsbToken(username);
+    @GetMapping("/download/{idAccount}")
+    public ResponseEntity<InputStreamResource> createUsbToken(@PathVariable Long idAccount, @RequestBody UsbToken usbToken) throws Exception {
+        String zipFilePath = usbService.createUsbToken(idAccount,usbToken);
 
         // Trả về file ZIP cho frontend
         File zipFile = new File(zipFilePath);
