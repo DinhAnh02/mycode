@@ -570,7 +570,8 @@ public class AccountServiceImpl implements AccountService {
             return AccountSwapResponse.builder().build();
         }
         if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
-            return oldPositionAccInfo;
+            AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
+            throw  new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
         Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
         accountLead.setStatus(Status.INACTIVE.name());
@@ -628,14 +629,23 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private String getPathImg(String url) throws ApiException {
+        // Kiểm tra nếu url là null hoặc rỗng
+        if (url == null || url.isEmpty()) {
+            // Ném ra một ngoại lệ ApiException với mã lỗi URL_NOT_FOUND
+            throw new ApiException(AccountErrorCode.URL_NOT_FOUND);
+        }
+        // Tạo prefix từ appHost và AVATAR_URI
         String prefix = appHost + AVATAR_URI;
+        // Kiểm tra nếu url bắt đầu với prefix
         if (url.startsWith(prefix)) {
+            // Tính toán đường dẫn dựa trên url và trả về kết quả
             return uploadDir + "/" + url.substring(prefix.length());
         } else {
-            // Xử lý trường hợp url không đúng format mong đợi
+            // Nếu url không bắt đầu với prefix, ném ra ngoại lệ
             throw new ApiException(AccountErrorCode.URL_NOT_FOUND);
         }
     }
+
 
     private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
         Accounts accounts = accountRepository

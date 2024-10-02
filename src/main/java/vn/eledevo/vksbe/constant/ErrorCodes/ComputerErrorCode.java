@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatusCode;
 
@@ -16,9 +17,9 @@ public enum ComputerErrorCode implements BaseErrorCode {
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
     private final String message;
-    private final Map<String, String> result;
+    private final Map<String, Optional<?>> result;
 
-    ComputerErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, String> result) {
+    ComputerErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, Optional<?>> result) {
         this.code = code;
         this.message = message;
         this.statusCode = statusCode;
@@ -36,12 +37,17 @@ public enum ComputerErrorCode implements BaseErrorCode {
     }
 
     @Override
+    public void setResult(Optional<?> value) {
+
+    }
+
+    @Override
     public HttpStatusCode getStatusCode() {
         return statusCode;
     }
 
     @Override
-    public Map<String, String> getResult() {
+    public Map<String, Optional<?>> getResult() {
         return result;
     }
 }

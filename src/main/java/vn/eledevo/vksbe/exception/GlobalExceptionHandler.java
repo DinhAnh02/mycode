@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -34,8 +35,8 @@ public class GlobalExceptionHandler {
         String displayMessage = (ex instanceof ApiException) ? ex.getMessage() : errorCode.getMessage();
 
         // Lấy kết quả với kiểu dữ liệu `Map<String, String>`
-        Map<String, String> result =
-                errorCode.getResult() instanceof Map ? (Map<String, String>) errorCode.getResult() : new HashMap<>();
+        Map<String, Optional<?>> result =
+                errorCode.getResult() instanceof Map ? (Map<String, Optional<?>>) errorCode.getResult() : new HashMap<>();
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(new HashMap<String, Object>() {
             {
