@@ -36,4 +36,7 @@ public interface UsbRepository extends BaseRepository<Usbs, Long> {
     @Query(
             "select u from Usbs u inner join Accounts a on u.accounts.id = a.id where a.id =:accountId and u.status = 'CONNECTED'")
     Optional<Usbs> usbByAccountAndConnect(Long accountId);
+
+    @Query("select u from Usbs u where u.usbCode =:usbCode and u.usbVendorCode =:usbVendorCode")
+    Optional<Usbs> usbTokenNew(String usbCode , String usbVendorCode);
 }

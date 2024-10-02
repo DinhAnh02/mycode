@@ -15,6 +15,8 @@ public enum UsbErrorCode implements BaseErrorCode {
             new HashMap<>()),
     USB_NOT_BELONG_TO_ACCOUNT(OK, "USB-02", "USB không phải của tài khoản này. Vui lòng kiểm tra lại", new HashMap<>()),
     FOLDER_NOT_FOUND(OK, "USB-03", "Không tìm thấy thư mục.", new HashMap<>()),
+    USB_NOT_FOUND(OK,"USB-04","USB không tồn tại",new HashMap<>()),
+    USB_IS_CONNECTED(OK,"USB-05","USB đã được kết nối với tài khoản khác",new HashMap<>())
     ;
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
