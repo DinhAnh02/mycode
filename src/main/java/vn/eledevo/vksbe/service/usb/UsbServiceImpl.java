@@ -27,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import vn.eledevo.vksbe.constant.ErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
@@ -105,15 +106,18 @@ public class UsbServiceImpl implements UsbService {
         if(usbInfo.isEmpty()){
             throw new ApiException(UsbErrorCode.USB_NOT_FOUND);
         }
-        if(!usbInfo.get().getKeyUsb().isBlank()){
+        if(usbInfo.get().getKeyUsb() != null && !usbInfo.get().getKeyUsb().isEmpty()){
             throw new ApiException(UsbErrorCode.USB_IS_CONNECTED);
         }
         UUID keyUsb = UUID.randomUUID();
+        account.get().setIsConnectUsb(Boolean.TRUE);
+        Accounts accountUpdate = accountRepository.save(account.get());
         usbInfo.get().setKeyUsb(keyUsb.toString());
         usbInfo.get().setStatus(Status.CONNECTED.name());
-        Usbs usbUpdate = usbRepository.save(usbInfo.get());
-        account.get().setUsb(usbUpdate);
-        Accounts accountUpdate = accountRepository.save(account.get());
+        usbInfo.get().setAccounts(accountUpdate);
+        usbRepository.save(usbInfo.get());
+        accountUpdate.setUsb(usbInfo.get());
+        accountRepository.save(accountUpdate);
         List<Computers> computers = accountUpdate.getComputers();
         String[] computerCode =
                         computers.stream().map(Computers::getCode).toArray(String[]::new);
