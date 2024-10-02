@@ -15,5 +15,6 @@ public class AuthenticationResponse {
     String refreshToken;
     String usbCode;
     String usbVendorCode;
-    UserInfo userInfo;
+    Boolean isConditionLogin1;
+    Boolean isConditionLogin2;
 }

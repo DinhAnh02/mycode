@@ -12,14 +12,14 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserInfo {
     Long id;
-    String userName;
+    String username;
     String avatar;
     String fullName;
     String gender;
     String phoneNumber;
     String roleCode;
     String departmentCode;
-    String organizationId;
+    Long organizationId;
     Boolean isConditionLogin1;
     Boolean isConditionLogin2;
 }
