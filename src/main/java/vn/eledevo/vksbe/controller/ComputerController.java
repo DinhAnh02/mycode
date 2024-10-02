@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
+import vn.eledevo.vksbe.dto.request.computer.ComputerToCheckExist;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
@@ -74,8 +75,8 @@ public class ComputerController {
 
     @PostMapping("/check-exist-computer")
     @Operation(summary = "Check thiết bị máy tính tồn tại trong hệ thống")
-    public ApiResponse<Map<String, String>> getComputerList(@RequestBody String computerCode)
+    public ApiResponse<Map<String, String>> getComputerList(@RequestBody ComputerToCheckExist computer)
             throws ApiException {
-        return ApiResponse.ok(computerService.checkExistComputer(computerCode));
+        return ApiResponse.ok(computerService.checkExistComputer(computer));
     }
 }
