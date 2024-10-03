@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.service.account;
 
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
@@ -52,7 +53,7 @@ public interface AccountService {
 
     ResultUrl uploadAvatar(MultipartFile file) throws ApiException, IOException;
 
-    byte[] downloadAvatar(String fileName) throws ApiException, IOException;
+    Resource downloadAvatar(String fileName) throws ApiException, IOException;
 
     AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException;
 

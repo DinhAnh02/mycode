@@ -7,6 +7,8 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -544,12 +546,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public byte[] downloadAvatar(String fileName) throws ApiException, IOException {
+    public Resource downloadAvatar(String fileName) throws ApiException, IOException {
         if (fileName == null || fileName.isEmpty()) {
             throw new ApiException(AVATAR_NOT_FOUND);
         }
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-        return Files.readAllBytes(filePath);
+        return new UrlResource(filePath.toUri());
     }
 
     @Override
