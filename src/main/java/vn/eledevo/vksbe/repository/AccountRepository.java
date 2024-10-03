@@ -66,4 +66,11 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
             + "AND a.status = 'ACTIVE' "
             + "AND a.roles.id IN(1, 4)")
     AccountSwapResponse getOldPositionAccInfo(@Param("departmentId") Long departmentId);
+
+    @Query("SELECT new vn.eledevo.vksbe.dto.response.account.AccountSwapResponse(a.id, a.username, p.fullName) "
+            + "FROM Accounts a "
+            + "JOIN a.profile p "
+            + "WHERE a.status = 'ACTIVE' "
+            + "AND a.roles.id =:id ")
+    Optional<AccountSwapResponse> getOldLeader(Long id);
 }
