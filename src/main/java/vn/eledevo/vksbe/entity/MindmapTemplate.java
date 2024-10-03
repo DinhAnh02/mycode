@@ -36,12 +36,16 @@ public class MindmapTemplate {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
         this.createdBy = SecurityUtils.getUserName();
+        this.updatedBy = SecurityUtils.getUserName();
     }
 
     @PreUpdate
     public void preUpdate() {
+        this.createdAt = LocalDate.now();
         this.updatedAt = LocalDate.now();
+        this.createdBy = SecurityUtils.getUserName();
         this.updatedBy = SecurityUtils.getUserName();
     }
 }
