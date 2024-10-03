@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,8 @@ public class ComputerServiceImpl implements ComputerService {
     @Override
     public ResponseFilter<ComputerResponseFilter> getComputerList(
             ComputerRequest computerRequest, Integer currentPage, Integer limit) {
-        Pageable pageable = PageRequest.of(currentPage - 1, limit);
+        Pageable pageable =
+                PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
         Page<ComputerResponseFilter> page = computerRepository.getComputerList(computerRequest, pageable);
         return new ResponseFilter<>(
                 page.getContent(),
@@ -96,7 +98,7 @@ public class ComputerServiceImpl implements ComputerService {
     @Override
     public HashMap<String, String> checkExistComputer(ComputerToCheckExist computer) throws ApiException {
         Optional<Computers> result = computerRepository.findComputersByCode(computer.getComputerCode());
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             throw new ApiException(ComputerErrorCode.PC_CODE_ALREADY_EXISTS);
         }
         return new HashMap<>();
