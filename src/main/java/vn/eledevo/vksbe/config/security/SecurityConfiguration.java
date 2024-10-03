@@ -38,7 +38,6 @@ public class SecurityConfiguration {
         "/swagger-ui/**",
         "/webjars/**",
         "/swagger-ui.html",
-        "/api/v1/auth/download",
         "/api/v1/private/accounts/download-image/{fileName:.+}",
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -50,7 +49,10 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL)
                         .permitAll()
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/private/accounts/get-user-info")
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/api/v1/private/accounts/get-user-info",
+                                "/api/v1/private/accounts/change-pin-code")
                         .hasAnyAuthority(
                                 Role.IT_ADMIN.name(),
                                 Role.KIEM_SAT_VIEN.name(),
