@@ -39,7 +39,7 @@ import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
 import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
 @RestController
-@RequestMapping("/api/v1/private/accounts`")
+@RequestMapping("/api/v1/private/accounts")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Quản lý tài khoản")
