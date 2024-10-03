@@ -21,6 +21,7 @@ import java.util.zip.ZipOutputStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import lombok.AccessLevel;
@@ -67,7 +68,8 @@ public class UsbServiceImpl implements UsbService {
         if (usbRequest.getFromDate().isAfter(usbRequest.getToDate())) {
             throw new ApiException(ErrorCode.CHECK_FROM_DATE);
         }
-        Pageable pageable = PageRequest.of(currentPage - 1, limit);
+        Pageable pageable =
+                PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
         Page<UsbResponseFilter> page = usbRepository.getUsbDeviceList(usbRequest, pageable);
 
         return new ResponseFilter<>(

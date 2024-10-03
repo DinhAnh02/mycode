@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,7 +159,8 @@ public class AccountServiceImpl implements AccountService {
         if (Boolean.FALSE.equals(isBoss(accSecurity))) {
             accountRequest.setDepartmentId(accSecurity.getDepartments().getId());
         }
-        Pageable pageable = PageRequest.of(currentPage - 1, limit);
+        Pageable pageable =
+                PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
         Page<AccountQueryToFilter> page =
                 accountRepository.getAccountList(accountRequest, isBoss(accSecurity), pageable);
         Page<AccountResponseByFilter> filters = page.map(account -> {
