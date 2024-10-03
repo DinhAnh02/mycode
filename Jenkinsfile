@@ -66,7 +66,7 @@ pipeline {
             docker rm -f ${NAME_BACKEND} || true  # Xóa container nếu nó tồn tại
             cd /home/docker-image
             docker load -i ${NAME_BACKEND}.tar.gz
-            docker run --name ${NAME_BACKEND} -dp 8080:8081 ${NAME_BACKEND}:$DOCKER_TAG
+            docker run --name ${NAME_BACKEND} -dp 8080:8081 -v /home/dev/storage:/src/main/resources/storage ${NAME_BACKEND}:$DOCKER_TAG
           '''
           sshagent(credentials: ['jenkins-ssh-key']) {
             sh """
@@ -91,7 +91,7 @@ pipeline {
              docker rm -f ${NAME_BACKEND} || true  # Xóa container nếu nó tồn tại
              cd /home/docker-image
              docker load -i ${NAME_BACKEND}.tar.gz
-             docker run --name ${NAME_BACKEND} -dp 8082:8082 -e "SPRING_PROFILES_ACTIVE=test" ${NAME_BACKEND}:$DOCKER_TAG
+             docker run --name ${NAME_BACKEND} -dp 8082:8082 -e "SPRING_PROFILES_ACTIVE=test" -v /home/dev/storage:/src/main/resources/storage ${NAME_BACKEND}:$DOCKER_TAG
            '''
            sshagent(credentials: ['jenkins-ssh-key']) {
              sh """
