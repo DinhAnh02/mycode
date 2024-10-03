@@ -50,7 +50,9 @@ public enum AccountErrorCode implements BaseErrorCode {
     URL_NOT_FOUND(OK, "TK-32", "Đường dẫn ảnh không hợp lệ", new HashMap<>()),
     ACCOUNT_LINKED_USB(OK,"TK-33","Tài khoản đã được liên kết usb . Vui lòng gỡ usb cũ và thử lại",new HashMap<>()),
     ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>()),
-    ACCOUNT_SWAP_EXITS(OK, "TK-34", "Tài khoản bị hoán đổi không tồn tại", new HashMap<>())
+    ACCOUNT_SWAP_EXITS(OK, "TK-34", "Tài khoản bị hoán đổi không tồn tại", new HashMap<>()),
+    ACCOUNT_INVALID(OK, "TK-35", "Tài khoản không hợp lệ. Vui lòng liên hệ IT Admin để được hỗ trợ", new HashMap<>()),
+    NOT_PERMISSION_CREATE_ACCOUNT(OK, "TK-36", "Bạn không có quyền tạo tài khoản IT Admin", new HashMap<>())
     ;
 
     private final HttpStatusCode statusCode;
