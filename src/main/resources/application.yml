@@ -33,5 +33,3 @@ application:
 
 file:
   upload-dir: src/main/resources/storage
-app:
-  host: http://100.67.168.11:${server.port}
