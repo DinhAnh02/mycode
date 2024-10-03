@@ -1,10 +1,25 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -18,6 +33,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.DepartmentCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
@@ -49,26 +70,6 @@ import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -139,8 +140,27 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public ResponseFilter<AccountResponseByFilter> getListAccountByFilter(
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
-        String loginAccountName = getUserName();
-        Accounts accSecurity = accountRepository.findAccountsByUsername(loginAccountName);
+        Accounts loginAccount = SecurityUtils.getUser();
+        if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
+                || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name())
+                && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))
+        ) {
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_READ_DATA_DEPARTMENT);
+        }
+
+        Page<AccountResponseByFilter> filters = getListAccount(loginAccount, accountRequest, currentPage, limit);
+
+        return new ResponseFilter<>(
+                filters.getContent(),
+                (int) filters.getTotalElements(),
+                filters.getSize(),
+                filters.getNumber(),
+                filters.getTotalPages());
+    }
+
+    private Page<AccountResponseByFilter> getListAccount(
+            Accounts loginAccount, AccountRequest accountRequest, Integer currentPage, Integer limit)
+            throws ApiException {
         if (currentPage < 1) {
             currentPage = 1;
         }
@@ -154,17 +174,17 @@ public class AccountServiceImpl implements AccountService {
             accountRequest.setToDate(LocalDate.now());
         }
         if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
-            throw new ApiException(CHECK_FROM_DATE);
+            throw new ApiException(AccountErrorCode.CHECK_FROM_DATE);
         }
-        if (Boolean.FALSE.equals(isBoss(accSecurity))) {
-            accountRequest.setDepartmentId(accSecurity.getDepartments().getId());
+        if (Boolean.FALSE.equals(isBoss(loginAccount))) {
+            accountRequest.setDepartmentId(loginAccount.getDepartments().getId());
         }
         Pageable pageable =
                 PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
         Page<AccountQueryToFilter> page =
-                accountRepository.getAccountList(accountRequest, isBoss(accSecurity), pageable);
-        Page<AccountResponseByFilter> filters = page.map(account -> {
-            checkRoleToShowLockOrUnlockButton(account, accSecurity);
+                accountRepository.getAccountList(accountRequest, isBoss(loginAccount), pageable);
+        return page.map(account -> {
+            checkRoleToShowLockOrUnlockButton(account, loginAccount);
             return AccountResponseByFilter.builder()
                     .id(account.getId())
                     .username(account.getUsername())
@@ -181,12 +201,6 @@ public class AccountServiceImpl implements AccountService {
                     .isEnabledLockButton(account.getIsEnabledLockButton())
                     .build();
         });
-        return new ResponseFilter<>(
-                filters.getContent(),
-                (int) filters.getTotalElements(),
-                filters.getSize(),
-                filters.getNumber(),
-                filters.getTotalPages());
     }
 
     private void checkRoleToShowLockOrUnlockButton(AccountQueryToFilter account, Accounts accSecurity) {
@@ -444,14 +458,15 @@ public class AccountServiceImpl implements AccountService {
         if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
-        if(activedAccRole.equals(Role.VIEN_TRUONG) ||activedAccRole.equals(Role.TRUONG_PHONG) ){
+        if (activedAccRole.equals(Role.VIEN_TRUONG) || activedAccRole.equals(Role.TRUONG_PHONG)) {
             Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(1L);
-            if (accountsLeader.isPresent()){
+            if (accountsLeader.isPresent()) {
                 AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(accountsLeader));
                 throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
             }
         }
-        if(loginAccRole.equals(Role.TRUONG_PHONG) && !isSameDepartment || loginAccRole.equals(Role.PHO_PHONG) && !isSameDepartment ){
+        if (loginAccRole.equals(Role.TRUONG_PHONG) && !isSameDepartment
+                || loginAccRole.equals(Role.PHO_PHONG) && !isSameDepartment) {
             throw new ApiException(AccountErrorCode.DEPARTMENT_CONFLICT);
         }
         if (Boolean.FALSE.equals(activedAcc.getIsConnectComputer())) {
@@ -465,9 +480,9 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_ACTIVATED);
         }
         activedAcc.setStatus(Const.ACTIVE);
-                activedAcc.setUpdatedAt(LocalDate.now());
-                activedAcc.setUpdatedBy(SecurityUtils.getUserName());
-                accountRepository.save(activedAcc);
+        activedAcc.setUpdatedAt(LocalDate.now());
+        activedAcc.setUpdatedBy(SecurityUtils.getUserName());
+        accountRepository.save(activedAcc);
         return new ActivedAccountResponse();
     }
 
@@ -516,8 +531,9 @@ public class AccountServiceImpl implements AccountService {
         if (!isAllowedToCreateAccount(curLoginAcc)) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
-        Roles newAccountRole = roleRepository.findById(request.getRoleId()).orElseThrow(() -> new ApiException(ROLE_NOT_FOUND));
-        if(newAccountRole.getCode().equals(Role.IT_ADMIN.name())){
+        Roles newAccountRole =
+                roleRepository.findById(request.getRoleId()).orElseThrow(() -> new ApiException(ROLE_NOT_FOUND));
+        if (newAccountRole.getCode().equals(Role.IT_ADMIN.name())) {
             throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT);
         }
 
@@ -594,7 +610,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public UserInfo  userInfo() throws ApiException {
+    public UserInfo userInfo() throws ApiException {
         Long userId = SecurityUtils.getUserId();
         Optional<UserInfo> userDetail = accountRepository.findAccountProfileById(userId);
         if (userDetail.isEmpty()) {
@@ -850,7 +866,9 @@ public class AccountServiceImpl implements AccountService {
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
-        if (Objects.nonNull(req.getAvatar()) && !req.getAvatar().isEmpty() && !req.getAvatar().equals(profile.getAvatar())) {
+        if (Objects.nonNull(req.getAvatar())
+                && !req.getAvatar().isEmpty()
+                && !req.getAvatar().equals(profile.getAvatar())) {
             clearPathImg(profile.getAvatar());
             String pathFile = getPathImg(req.getAvatar());
             if (!Files.exists(Paths.get(pathFile))) {

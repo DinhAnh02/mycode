@@ -1,15 +1,14 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import static org.springframework.http.HttpStatus.OK;
+import lombok.Getter;
+import org.springframework.http.HttpStatusCode;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatusCode;
-
-import lombok.Getter;
+import static org.springframework.http.HttpStatus.OK;
 
 @Getter
 public enum AccountErrorCode implements BaseErrorCode {
@@ -52,7 +51,9 @@ public enum AccountErrorCode implements BaseErrorCode {
     ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>()),
     ACCOUNT_SWAP_EXITS(OK, "TK-34", "Tài khoản bị hoán đổi không tồn tại", new HashMap<>()),
     ACCOUNT_INVALID(OK, "TK-35", "Tài khoản không hợp lệ. Vui lòng liên hệ IT Admin để được hỗ trợ", new HashMap<>()),
-    NOT_PERMISSION_CREATE_ACCOUNT(OK, "TK-36", "Bạn không có quyền tạo tài khoản IT Admin", new HashMap<>())
+    NOT_PERMISSION_CREATE_ACCOUNT(OK, "TK-36", "Bạn không có quyền tạo tài khoản IT Admin", new HashMap<>()),
+    ACCOUNT_NOT_READ_DATA_DEPARTMENT(OK, "TK-37", "Bạn không có quyền xem dữ liệu của phòng ban khác", new HashMap<>()),
+    CHECK_FROM_DATE(OK, "TK-38", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc.", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

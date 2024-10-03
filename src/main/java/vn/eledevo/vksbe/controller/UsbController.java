@@ -46,6 +46,7 @@ public class UsbController {
     }
 
     @PostMapping("/download/{idAccount}")
+    @Operation(summary = "Tạo USB token liên kết với tài khoản")
     public ResponseEntity<InputStreamResource> createUsbToken(@PathVariable Long idAccount, @RequestBody UsbToken usbToken) throws Exception {
         String zipFilePath = usbService.createUsbToken(idAccount,usbToken);
 
