@@ -1,26 +1,10 @@
 package vn.eledevo.vksbe.service.account;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -32,12 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.DepartmentCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
@@ -69,6 +47,26 @@ import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -121,7 +119,7 @@ public class AccountServiceImpl implements AccountService {
         accounts.setIsConditionLogin1(false);
         accounts.setIsConditionLogin2(false);
         accounts.setUpdatedBy(getUserName());
-        accounts.setUpdatedAt(LocalDateTime.now());
+        accounts.setUpdatedAt(LocalDate.now());
         accounts.setStatus(String.valueOf(Status.INACTIVE));
         accountRepository.save(accounts);
         tokenRepository.deleteByAccounts_Id(id);
@@ -398,7 +396,7 @@ public class AccountServiceImpl implements AccountService {
                                 .build());
                         computer.setAccounts(accounts);
                         computer.setStatus(Const.CONNECTED);
-                        computer.setUpdatedAt(LocalDateTime.now());
+                        computer.setUpdatedAt(LocalDate.now());
                         computer.setUpdatedBy(nameUpdate);
                         connectedComputers.add(computer);
                         Optional<Usbs> usb = usbRepository.findByAccounts_Id(id);
@@ -462,7 +460,7 @@ public class AccountServiceImpl implements AccountService {
                 return ActivedAccountResponse.builder().oldPositionAccInfo(old).build();
             } else {
                 activedAcc.setStatus(Const.ACTIVE);
-                activedAcc.setUpdatedAt(LocalDateTime.now());
+                activedAcc.setUpdatedAt(LocalDate.now());
                 activedAcc.setUpdatedBy(SecurityUtils.getUserName());
                 accountRepository.save(activedAcc);
                 return new ActivedAccountResponse();

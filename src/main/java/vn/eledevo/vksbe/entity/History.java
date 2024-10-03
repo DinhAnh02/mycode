@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 
@@ -23,12 +23,12 @@ public class History {
 
     String action;
     String impact;
-    LocalDateTime createdAt;
+    LocalDate createdAt;
     String createdBy;
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDate.now();
         this.createdBy = SecurityUtils.getUserName();
     }
 }

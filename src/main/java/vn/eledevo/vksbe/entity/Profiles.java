@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -29,8 +29,8 @@ public class Profiles {
     String avatar;
 
     String gender;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDate createdAt;
+    LocalDate updatedAt;
     String createdBy;
     String updatedBy;
 
@@ -40,13 +40,13 @@ public class Profiles {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDate.now();
         this.createdBy = SecurityUtils.getUserName();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDate.now();
         this.updatedBy = SecurityUtils.getUserName();
     }
 }

@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.dto.response.account;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,8 +19,8 @@ public class AccountResponseByFilter {
     String departmentName;
     String organizationName;
     String status;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDate createdAt;
+    LocalDate updatedAt;
     Boolean isShowLockButton;
     Boolean isShowUnlockButton;
     Boolean isEnabledLockButton;
