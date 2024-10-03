@@ -4,7 +4,6 @@ public class ResponseMessage {
 
     private ResponseMessage() {}
 
-    public static final String USER_EXIST = "Người dùng đã tồn tại";
 
     public static final String USER_BLANK = "Tên đăng nhập không được để trống";
 
@@ -15,10 +14,6 @@ public class ResponseMessage {
     public static final String EXITS_PIN = "Mã pin không được để trống";
 
     public static final String EXITS_PIN_OLD = "Mã PIN cũ không được để trống";
-
-    public static final String RESET_PASSWORD_SUCCESS = "Reset mật khẩu thành công";
-
-    public static final String CHANGE_PASSWORD_SUCCESS = "Thay đổi mật khẩu thành công";
 
     public static final String OLD_PASSWD_BLANK = "Mật khẩu cũ không được để trống";
 
@@ -32,25 +27,9 @@ public class ResponseMessage {
 
     public static final String FULL_NAME_SIZE = "Họ và tên chỉ bao gồm chữ, dấu cách và tối đa 255 ký tự";
 
-    public static final String ROLE_ID_REQUIRE = "Chức vụ không được để trống";
-
-    public static final String ROLE_NAME_REQUIRE = "Tên chức vụ không được để trống";
-
-    public static final String ROLE_CODE_SIZE = "Mã chức vụ phải có độ dài từ {min} đến {max} ký tự";
-
-    public static final String DEPARTMENT_REQUIRE = "Phòng ban không được để trống";
-
-    public static final String DEPARTMENT_NAME_REQUIRE = "Tên phòng ban không được để trống";
-
-    public static final String ORGANIZATION_REQUIRE = "Đơn vị không được để trống";
-
-    public static final String ORGANIZATION_NAME_REQUIRE = "Tên đơn vị không được để trống";
-
     public static final String PASSWD_SIZE = "Mật khẩu phải có từ 8 kí tự trở lên";
 
     public static final String PIN_SIZE = "Mã PIN phải có 6 kí tự";
-
-    public static final String CREATE_PIN_SUCCESS = "Tạo mã PIN thành công";
 
     public static final String PHONE_NUMBER_REQUIRE = "Số điện thoại không được để trống";
 
@@ -67,41 +46,13 @@ public class ResponseMessage {
 
     public static final String ORGANIZATION_NOT_EXIST = "Đơn vị không tồn tại";
 
-    public static final String AVATAR_MAX_SIZE = "Ảnh đại diện không được vượt quá {0} MB.";
-
-    public static final String AVATAR_EXTENSION_INVALID = "Ảnh đại diện chỉ chấp nhận định dạng {0}.";
-
-    public static final String SWAP_ACCOUNT_SUCCESS = "Hoán đổi trạng thái tài khoản thành công";
-
     public static final String AVATAR_URL_INVALID = "Đường dẫn ảnh đại diện không hợp lệ";
-
-    public static final String UPDATE_COMPUTER_INFOR_SUCCESS = "Chỉnh sửa thông tin thiết bị máy tính thành công";
-
-    public static final String ACTIVE_ACCOUNT_SUCCESS = "Kích hoạt tài khoản thành công";
-
-    public static final String LOCK_ACCOUNT_SUCCESS = "Khóa tài khoản thành công";
-
-    public static final String UPDATE_ACCOUNT_SUCCESS = "Chỉnh sửa thông tin tài khoản thành công";
-
-    public static final String REMOVE_CONNECT_COMPUTER_SUCCESS = "Gỡ liên kết máy tính với tài khoản thành công";
-
-    public static final String CREATE_NEW_DEVICE_SUCCESS = "Tạo mới thông tin máy tính thành công";
-
-    public static final String REMOVE_CONNECT_USB_SUCCESS = "Gỡ liên kết USB thành công";
 
     public static final String COMPUTER_CONNECTED_WITH_ANOTHER_ACCOUNT = "Thiết bị đã được kết nối với tài khoản khác";
 
     public static final String COMPUTER_CONNECTED_SUCCESS = "Kết nối thiết bị thành công";
 
     public static final String COMPUTER_NOT_FOUND_SYSTEM = "Máy tính không tồn tại trong hệ thống";
-
-    public static final String COMPUTER_NAME_NOT_SAME = "Tên máy tính đã tồn tại trong hệ thống";
-
-    public static final String COMPUTER_CODE_NOT_SAME = "Mã máy tính đã tồn tại trong hệ thống";
-
-    public static final String COMPUTER_BRAND_NOT_FOUND = "Tên hãng máy tính không được để trống";
-
-    public static final String COMPUTER_TYPE_NOT_FOUND = "Loại máy tính không được để trống";
 
     public static final String ROLE_ID_NOT_NULL = "Tên chức vụ không được để trống";
 

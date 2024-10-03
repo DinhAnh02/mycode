@@ -1,27 +1,10 @@
 package vn.eledevo.vksbe.service.account;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.constant.RoleCodes.PHO_PHONG;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -33,12 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.DepartmentCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
@@ -70,6 +47,26 @@ import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
+import static vn.eledevo.vksbe.constant.FileConst.*;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -517,6 +514,10 @@ public class AccountServiceImpl implements AccountService {
         if (!isAllowedToCreateAccount(curLoginAcc)) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
+        Roles newAccountRole = roleRepository.findById(request.getRoleId()).orElseThrow(() -> new ApiException(ROLE_NOT_FOUND));
+        if(newAccountRole.getCode().equals(Role.IT_ADMIN.name())){
+            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT);
+        }
 
         Map<String, String> errors = validateAccountCreateRequest(request);
         if (!errors.isEmpty()) {
@@ -591,11 +592,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public UserInfo userInfo() throws ApiException {
+    public UserInfo  userInfo() throws ApiException {
         Long userId = SecurityUtils.getUserId();
         Optional<UserInfo> userDetail = accountRepository.findAccountProfileById(userId);
         if (userDetail.isEmpty()) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_EXISTS);
+            throw new ApiException(AccountErrorCode.ACCOUNT_INVALID);
         }
         return userDetail.get();
     }
