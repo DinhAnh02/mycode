@@ -39,6 +39,7 @@ public class SecurityConfiguration {
         "/webjars/**",
         "/swagger-ui.html",
         "/api/v1/auth/download",
+        "/api/v1/private/accounts/download-image/{fileName:.+}",
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -51,12 +52,12 @@ public class SecurityConfiguration {
                         .permitAll()
                         .requestMatchers("/api/v1/auth/**", "/api/v1/private/accounts/get-user-info")
                         .hasAnyAuthority(
-                                Role.IT_ADMIN.toString(),
-                                Role.KIEM_SAT_VIEN.toString(),
-                                Role.VIEN_PHO.toString(),
-                                Role.VIEN_TRUONG.toString(),
-                                Role.TRUONG_PHONG.toString(),
-                                Role.PHO_PHONG.toString())
+                                Role.IT_ADMIN.name(),
+                                Role.KIEM_SAT_VIEN.name(),
+                                Role.VIEN_PHO.name(),
+                                Role.VIEN_TRUONG.name(),
+                                Role.TRUONG_PHONG.name(),
+                                Role.PHO_PHONG.name())
                         .requestMatchers(
                                 "/api/v1/private/accounts",
                                 "/api/v1/private/accounts/{id}/detail",
@@ -81,7 +82,8 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/create",
                                 "/api/v1/private/accounts/{updatedAccId}/update-info",
                                 "/api/v1/private/accounts/connect-computer/{id}/computers",
-                                "/api/v1/private/computers/check-exist-computer")
+                                "/api/v1/private/computers/check-exist-computer",
+                                "/api/v1/private/accounts/upload-image")
                         .hasAuthority(Role.IT_ADMIN.name())
                         .anyRequest()
                         .authenticated())

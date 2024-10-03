@@ -39,7 +39,7 @@ import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
 import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
 @RestController
-@RequestMapping("/api/v1/private/accounts")
+@RequestMapping("/api/v1/private/accounts`")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Quản lý tài khoản")
@@ -71,8 +71,8 @@ public class AccountController {
     @Operation(summary = "Xem danh sách tài khoản")
     public ApiResponse<ResponseFilter<AccountResponseByFilter>> getAccountList(
             @RequestBody AccountRequest req,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer pageSize)
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize)
             throws ApiException {
         organizationalStructureUtilsService.validate(req);
         return ApiResponse.ok(accountService.getListAccountByFilter(req, page, pageSize));
