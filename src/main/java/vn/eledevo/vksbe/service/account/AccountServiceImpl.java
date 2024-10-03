@@ -683,7 +683,13 @@ public class AccountServiceImpl implements AccountService {
         if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
             throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
         }
-        accounts.setUsb(null);
+//        accounts.setUsb(null);
+        Optional<Usbs> usbToken = usbRepository.findById(usbID);
+        if(usbToken.isEmpty()){
+            throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
+        }
+        usbToken.get().setAccounts(null);
+        usbRepository.save(usbToken.get());
         accounts.setIsConnectUsb(false);
         Accounts accRemove = accountRepository.save(accounts);
         return accountMapper.toResponse(accRemove);
