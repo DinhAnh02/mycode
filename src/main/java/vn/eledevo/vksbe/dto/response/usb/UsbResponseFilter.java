@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.dto.response.usb;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,8 +17,8 @@ public class UsbResponseFilter {
     String usbVendorCode;
     String keyUsb;
     String status;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDate createdAt;
+    LocalDate updatedAt;
     String createdBy;
     String updatedBy;
     String accountFullName;

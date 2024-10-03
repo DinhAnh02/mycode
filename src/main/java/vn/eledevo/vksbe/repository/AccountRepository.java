@@ -34,8 +34,8 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
             + "AND (:#{#filter.departmentId} = 0 OR a.departments.id = :#{#filter.departmentId}) "
             + "AND (:#{#filter.organizationId} = 0 OR o.id = :#{#filter.organizationId}) "
             + "AND (:#{#filter.status} IS NULL OR :#{#filter.status} = '' OR a.status = :#{#filter.status}) "
-            + "AND (:#{#filter.fromDate} IS NULL OR a.createdAt >= :#{#filter.fromDate.atStartOfDay()}) "
-            + "AND (:#{#filter.toDate} IS NULL OR a.createdAt <= :#{#filter.toDate.atTime(23, 59, 59)})")
+            + "AND (:#{#filter.fromDate} IS NULL OR a.createdAt >= :#{#filter.fromDate}) "
+            + "AND (:#{#filter.toDate} IS NULL OR a.createdAt <= :#{#filter.toDate})")
     Page<AccountQueryToFilter> getAccountList(AccountRequest filter, Boolean isBoss, Pageable pageable);
 
     Accounts findAccountsByUsername(String username);

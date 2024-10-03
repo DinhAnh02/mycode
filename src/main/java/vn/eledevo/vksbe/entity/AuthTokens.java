@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 
@@ -23,7 +23,7 @@ public class AuthTokens {
     String token;
     String tokenType;
     Boolean isExpiredTime;
-    LocalDateTime createdTime;
+    LocalDate createdTime;
 
     @ManyToOne
     @JoinColumn(name = "accountId", nullable = false)
@@ -31,6 +31,6 @@ public class AuthTokens {
 
     @PrePersist
     public void prePersist() {
-        this.createdTime = LocalDateTime.now();
+        this.createdTime = LocalDate.now();
     }
 }

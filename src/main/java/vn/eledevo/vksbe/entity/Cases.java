@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -26,8 +26,8 @@ public class Cases {
     String name;
     String description;
     String caseType;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDate createdAt;
+    LocalDate updatedAt;
     String createdBy;
     String updatedBy;
 
@@ -53,13 +53,13 @@ public class Cases {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDate.now();
         this.createdBy = SecurityUtils.getUserName();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDate.now();
         this.updatedBy = SecurityUtils.getUserName();
     }
 }

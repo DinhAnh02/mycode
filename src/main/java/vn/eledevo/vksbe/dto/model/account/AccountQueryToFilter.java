@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.dto.model.account;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -25,8 +25,8 @@ public class AccountQueryToFilter {
     String status;
     Boolean isConnectComputer;
     Boolean isConnectUsb;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDate createdAt;
+    LocalDate updatedAt;
     Boolean isShowLockButton;
     Boolean isShowUnlockButton;
     Boolean isEnabledLockButton;

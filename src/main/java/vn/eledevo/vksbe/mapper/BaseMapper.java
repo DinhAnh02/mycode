@@ -1,7 +1,7 @@
 package vn.eledevo.vksbe.mapper;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -24,13 +24,13 @@ public abstract class BaseMapper<I, O, E> {
         return new PageResponse<>(total, rpList);
     }
 
-    Long mapLocalDateTimeToEpochTimestamp(LocalDateTime dateTime) {
-        return dateTime != null ? dateTime.toEpochSecond(ZoneOffset.UTC) : null;
+    Long mapLocalDateToEpochTimestamp(LocalDate dateTime) {
+        return dateTime != null ? dateTime.atStartOfDay().toEpochSecond(ZoneOffset.UTC) : null;
     }
 
-    LocalDateTime mapEpochTimestampToLocalDateTime(Long epochTimestamp) {
+    LocalDate mapEpochTimestampToLocalDate(Long epochTimestamp) {
         return epochTimestamp != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochSecond(epochTimestamp), ZoneOffset.UTC)
+                ? LocalDate.ofInstant(Instant.ofEpochSecond(epochTimestamp), ZoneOffset.UTC)
                 : null;
     }
 }

@@ -1,6 +1,6 @@
 package vn.eledevo.vksbe.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,8 +19,8 @@ public class AccountResponse {
     Boolean isConditionLogin2;
     Boolean isConnectComputer;
     Boolean isConnectUsb;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDate createdAt;
+    LocalDate updatedAt;
     String createdBy;
     String updatedBy;
 }
