@@ -1,4 +1,4 @@
-package vn.eledevo.vksbe.dto.response;
+package vn.eledevo.vksbe.dto.response.account;
 
 import java.time.LocalDate;
 

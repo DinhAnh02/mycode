@@ -6,7 +6,7 @@ import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.request.computer.ComputerToCheckExist;
-import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
+import vn.eledevo.vksbe.dto.response.computer.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;

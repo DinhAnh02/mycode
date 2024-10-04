@@ -8,7 +8,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import vn.eledevo.vksbe.dto.response.AccountResponse;
+import vn.eledevo.vksbe.dto.response.account.AccountResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 
 @Component

@@ -29,10 +29,10 @@ public enum AccountErrorCode implements BaseErrorCode {
     AVATAR_SIZE_EXCEEDS_LIMIT(OK, "TK-13", "Ảnh đại diện không được vượt quá {0}", new HashMap<>()),
     AVATAR_INVALID_FORMAT(OK, "TK-14", "Ảnh đại diện chỉ chấp nhận định dạng {0}", new HashMap<>()),
     AVATAR_NOT_FOUND(OK, "TK-15", "Không tìm thấy ảnh đại diện", new HashMap<>()),
-    POSITION_NOT_FOUND(OK, "TK-16", "Chức vụ không tồn tại", new HashMap<>()),
+    NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH(OK, "TK-16", "Bạn không có quyền thao tác với tài khoản trong phòng ban Kỹ thuật", new HashMap<>()),
     DIRECTORY_NOT_FOUND(OK, "TK-17", "Không tìm thấy thư mục", new HashMap<>()),
     ACCOUNT_NOT_ACTIVATED(OK, "TK-18", "Tài khoản chưa được kích hoạt", new HashMap<>()),
-    CURRENT_POSITION_NOT_CHANGEABLE(OK, "TK-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
+    DEPARTMENT_AND_ROLE_INVALID(OK, "TK-19", "Chức vụ không phù hợp với phòng ban", new HashMap<>()),
     DEPARTMENT_HEAD_INFO_NOT_FOUND(OK, "TK-20", "Không tìm thấy thông tin trưởng phòng", new HashMap<>()),
     START_TIME_GREATER_THAN_END_TIME(
             OK, "TK-21", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc", new HashMap<>()),

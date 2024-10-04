@@ -10,14 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
-import vn.eledevo.vksbe.dto.response.ComputerResponseFilter;
+import vn.eledevo.vksbe.dto.response.computer.ComputerResponseFilter;
 import vn.eledevo.vksbe.entity.Computers;
 
 public interface ComputerRepository extends BaseRepository<Computers, Long> {
     List<Computers> findByAccounts_Id(Long accountId);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.ComputerResponseFilter(c.id, c.name, p.fullName, c.code, c.status, c.brand, c.type, c.note, c.createdAt, c.updatedAt, c.createdBy, c.updatedBy) "
+            "SELECT new vn.eledevo.vksbe.dto.response.computer.ComputerResponseFilter(c.id, c.name, p.fullName, c.code, c.status, c.brand, c.type, c.note, c.createdAt, c.updatedAt, c.createdBy, c.updatedBy) "
                     + "FROM Computers c "
                     + "LEFT JOIN Accounts a ON c.accounts.id = a.id "
                     + "LEFT JOIN Profiles p ON p.accounts.id = a.id "

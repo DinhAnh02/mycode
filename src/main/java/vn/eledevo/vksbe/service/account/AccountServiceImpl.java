@@ -39,8 +39,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import vn.eledevo.vksbe.constant.DepartmentCode;
+import vn.eledevo.vksbe.constant.Department;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.RoleErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
@@ -53,10 +55,10 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.PinChangeRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
-import vn.eledevo.vksbe.dto.response.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.ResultUrl;
+import vn.eledevo.vksbe.dto.response.account.AccountResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
@@ -143,8 +145,7 @@ public class AccountServiceImpl implements AccountService {
         Accounts loginAccount = SecurityUtils.getUser();
         if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
                 || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name())
-                && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))
-        ) {
+                        && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_READ_DATA_DEPARTMENT);
         }
 
@@ -324,7 +325,7 @@ public class AccountServiceImpl implements AccountService {
             case VIEN_TRUONG, VIEN_PHO, IT_ADMIN -> handleLeader(Role.valueOf(roleCode), Role.valueOf(lockAccountRole));
             case TRUONG_PHONG, PHO_PHONG -> handleMember(
                     Role.valueOf(roleCode), Role.valueOf(lockAccountRole), sameDepartment);
-            default -> throw new ApiException(AccountErrorCode.POSITION_NOT_FOUND);
+            default -> throw new ApiException(RoleErrorCode.ROLE_NOT_FOUND);
         }
         lockAccount.setStatus(Status.INACTIVE.name());
         accountRepository.save(lockAccount);
@@ -339,9 +340,9 @@ public class AccountServiceImpl implements AccountService {
         return null;
     }
 
-    private Void handleMember(Role roleLogin, Role lockAccountRole, boolean sameDepartment) throws ApiException {
+    private void handleMember(Role roleLogin, Role lockAccountRole, boolean sameDepartment) throws ApiException {
         if ((priorityRoles(roleLogin) > priorityRoles(lockAccountRole)) && sameDepartment) {
-            return null;
+            return;
         }
         throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
     }
@@ -501,9 +502,10 @@ public class AccountServiceImpl implements AccountService {
 
         Long departmentId = existingAccount.getDepartments().getId();
         String roleCode = existingAccount.getRoles().getCode();
-        Optional<Accounts> accountLeadOptional = accountRepository.findByDepartment(departmentId, roleCode, "ACTIVE");
+        Optional<Accounts> accountLeadOptional =
+                accountRepository.findByDepartment(departmentId, roleCode, Status.ACTIVE.name());
         if (accountLeadOptional.isEmpty()) {
-            throw new ApiException(LEADER_NOT_FOUND);
+            throw new ApiException(AccountErrorCode.DEPARTMENT_HEAD_INFO_NOT_FOUND);
         }
         Accounts accountLead = accountLeadOptional.get();
         if (!accountLead.getId().equals(oldAccountId)) {
@@ -516,8 +518,8 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
 
-        accountLead.setStatus("INACTIVE");
-        existingAccount.setStatus("ACTIVE");
+        accountLead.setStatus(Status.INACTIVE.name());
+        existingAccount.setStatus(Status.ACTIVE.name());
         accountRepository.save(existingAccount);
         accountRepository.save(accountLead);
         return AccountSwapResponse.builder().build();
@@ -526,16 +528,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException {
-        Accounts curLoginAcc = SecurityUtils.getUser();
+        Roles newAccountRole = roleRepository
+                .findById(request.getRoleId())
+                .orElseThrow(() -> new ApiException(RoleErrorCode.ROLE_NOT_FOUND));
+        Departments newAccountDepartment = departmentRepository
+                .findById(request.getDepartmentId())
+                .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
 
-        if (!isAllowedToCreateAccount(curLoginAcc)) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
-        }
-        Roles newAccountRole =
-                roleRepository.findById(request.getRoleId()).orElseThrow(() -> new ApiException(ROLE_NOT_FOUND));
-        if (newAccountRole.getCode().equals(Role.IT_ADMIN.name())) {
-            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT);
-        }
+        validateRoleAndDepartment(newAccountRole, newAccountDepartment);
 
         Map<String, String> errors = validateAccountCreateRequest(request);
         if (!errors.isEmpty()) {
@@ -548,6 +548,21 @@ public class AccountServiceImpl implements AccountService {
         profileRepository.save(profile);
         Accounts savedAccount = accountRepository.save(account);
         return AccountResponse.builder().id(savedAccount.getId()).build();
+    }
+
+    private void validateRoleAndDepartment(Roles newAccountRole, Departments newAccountDepartment) throws ApiException{
+        Accounts curLoginAcc = SecurityUtils.getUser();
+
+        if (!curLoginAcc.getRoles().getCode().equals(Role.IT_ADMIN.name())
+                || newAccountRole.getCode().equals(Role.IT_ADMIN.name())) {
+            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+        }
+        if (newAccountDepartment.getCode().equals(Department.PB_KY_THUAT.name())) {
+            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH);
+        }
+        if (Boolean.FALSE.equals(isAllowedToCreateAccount(newAccountRole, newAccountDepartment))) {
+            throw new ApiException(AccountErrorCode.DEPARTMENT_AND_ROLE_INVALID);
+        }
     }
 
     @Override
@@ -583,6 +598,8 @@ public class AccountServiceImpl implements AccountService {
         if (priorityRoleLogin <= priorityRoleUpdate) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
+
+//        validateRoleAndDepartment(accountUpdate.getRoles(), accountUpdate.getDepartments());
 
         Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
         if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
@@ -675,7 +692,7 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private AccountResponse removeUSB(Long accountID, Long usbID) throws ApiException {
+    private void removeUSB(Long accountID, Long usbID) throws ApiException {
         Accounts accounts = accountRepository
                 .findById(accountID)
                 .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
@@ -683,16 +700,15 @@ public class AccountServiceImpl implements AccountService {
         if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
             throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
         }
-//        accounts.setUsb(null);
+
         Optional<Usbs> usbToken = usbRepository.findById(usbID);
-        if(usbToken.isEmpty()){
+        if (usbToken.isEmpty()) {
             throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
         }
         usbToken.get().setAccounts(null);
         usbRepository.save(usbToken.get());
         accounts.setIsConnectUsb(false);
-        Accounts accRemove = accountRepository.save(accounts);
-        return accountMapper.toResponse(accRemove);
+        accountRepository.save(accounts);
     }
 
     private void validateRoleForViewButton(
@@ -736,14 +752,14 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private boolean isAllowedToCreateAccount(Accounts curLoginAcc) {
-        List<String> roleAccepts = List.of(VIEN_TRUONG, VIEN_PHO);
-        if (roleAccepts.contains(curLoginAcc.getRoles().getCode())) {
-            return false;
-        }
+    private Boolean isAllowedToCreateAccount(Roles newAccountRole, Departments newAccountDepartment) {
+        List<String> roleLead = List.of(Role.VIEN_TRUONG.name(), Role.VIEN_PHO.name());
 
-        Departments curLoginDepartment = departmentRepository.findByAccounts_Id(curLoginAcc.getId());
-        return Objects.equals(curLoginDepartment.getCode(), DepartmentCode.PB_KY_THUAT.name());
+        if (newAccountDepartment.getCode().equals(Department.PB_LANH_DAO.name()))
+            return roleLead.contains(newAccountRole.getCode());
+
+        return !newAccountRole.getCode().equals(Role.VIEN_TRUONG.name())
+                && !newAccountRole.getCode().equals(Role.VIEN_PHO.name());
     }
 
     private Map<String, String> validateAccountCreateRequest(AccountCreateRequest request) {
