@@ -8,5 +8,5 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://100.67.168.11:3307/test-db
   app:
-    host: http://100.109.99.124:${server.port}
+    host: https://100.109.99.124:${server.port}
 
