@@ -33,7 +33,7 @@ import vn.eledevo.vksbe.dto.request.PinRequest;
 import vn.eledevo.vksbe.dto.request.TwoFactorAuthenticationRequest;
 import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
-import vn.eledevo.vksbe.dto.response.Token2FAResponse;
+import vn.eledevo.vksbe.dto.response.account.Token2FAResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.AuthTokens;
 import vn.eledevo.vksbe.entity.Computers;
