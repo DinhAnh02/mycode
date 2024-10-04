@@ -1,7 +1,10 @@
 package vn.eledevo.vksbe.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +39,10 @@ public class AuthenticationController {
         return ApiResponse.ok(service.authenticate(request));
     }
 
-    //    @PostMapping("/refresh-token")
-    //    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    //        service.refreshToken(request, response);
-    //    }
+    @PostMapping("/refresh-token")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        service.refreshToken(request, response);
+    }
 
     @PostMapping("/2FA")
     @Operation(summary = "Đăng nhập xác thực bước 2")
