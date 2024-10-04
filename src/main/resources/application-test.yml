@@ -7,6 +7,6 @@ spring:
     password: eledevo@123
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://100.67.168.11:3307/test-db
-  app:
-    host: https://100.109.99.124:${server.port}
+app:
+  host: https://100.109.99.124:${server.port}
 
