@@ -1,10 +1,15 @@
 package vn.eledevo.vksbe.service.authenticate;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -219,6 +224,9 @@ public class AuthenticationService {
                 accounts.get(),
                 UUID.fromString(usbToken.get().getKeyUsb()),
                 accounts.get().getRoles().getCode());
+        var refreshToken = jwtService.generateRefreshToken(accounts.get(),
+                UUID.fromString(usbToken.get().getKeyUsb()),
+                accounts.get().getRoles().getCode());
         // Hủy tất cả các token hiện có của người dùng
         revokeAllUserTokens(accounts.get());
         // Lưu token truy cập mới vào cơ sở dữ liệu
@@ -226,6 +234,7 @@ public class AuthenticationService {
         // Trả về đối tượng AuthenticationResponse chứa các token
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .isConditionLogin1(accounts.get().getIsConditionLogin1())
                 .isConditionLogin2(accounts.get().getIsConditionLogin2())
                 .build();
@@ -252,5 +261,48 @@ public class AuthenticationService {
         createAccountTest.setPassword(passwordEncoder.encode(createAccountTest.getPassword()));
         createAccountTest.setPinCode(passwordEncoder.encode(createAccountTest.getPinCode()));
         return createAccountTest;
+    }
+    /**
+     * Làm mới token truy cập cho người dùng.
+     *
+     * @param request  Đối tượng HttpServletRequest
+     * @param response Đối tượng HttpServletResponse
+     * @throws IOException Ngoại lệ xảy ra khi ghi dữ liệu vào luồng đầu ra
+     */
+    public void refreshToken(
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response
+    ) throws IOException {
+
+        // Lấy token làm mới từ header yêu cầu
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String refreshToken;
+        final String username;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return;
+        }
+        refreshToken = authHeader.substring(7);
+
+        // Trích xuất email người dùng từ token làm mới
+        username = jwtService.extractUsername(refreshToken);
+        if (username != null) {
+            var user = this.accountRepository.findByUsername(username).orElseThrow();
+            // Kiểm tra tính hợp lệ của token làm mới
+            if (jwtService.isTokenValid(refreshToken, user)) {
+                // Nếu token làm mới hợp lệ:
+                //   - Tạo token truy cập mới cho người dùng
+                //   - Hủy tất cả các token hiện có của người dùng
+                //   - Lưu token truy cập mới vào cơ sở dữ liệu
+                //   - Trả về đối tượng AuthenticationResponse chứa các token mới
+                var accessToken = jwtService.generateToken(user, UUID.fromString(user.getUsb().getKeyUsb()),user.getRoles().getCode());
+                revokeAllUserTokens(user);
+                saveUserToken(user, accessToken,TokenType.ACCESS.name());
+                var authResponse = AuthenticationResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            }
+        }
     }
 }

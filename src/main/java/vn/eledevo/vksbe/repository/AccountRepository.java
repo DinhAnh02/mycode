@@ -40,6 +40,8 @@ public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSp
 
     Accounts findAccountsByUsername(String username);
 
+    Optional<Accounts> findByUsername(String username);
+
     @Query("SELECT new vn.eledevo.vksbe.dto.request.AccountActive(a.id, a.roles.code,"
             + "a.status,a.departments.id) from Accounts a where a.username =:username")
     Optional<AccountActive> findByUsernameActive(String username);
