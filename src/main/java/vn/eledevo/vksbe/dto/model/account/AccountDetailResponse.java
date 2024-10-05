@@ -26,21 +26,17 @@ public class AccountDetailResponse {
 
     /** Trạng thái của nút KHÓA TÀI KHOẢN */
     Boolean isEnabledLockButton;
-
     Boolean isShowLockButton;
 
     /** Trạng thái nút SỬA */
     Boolean isEnabledEditButton;
-
     Boolean isShowEditButton;
 
     /** Trạng thái nút RESET MẬT KHẨU */
     Boolean isEnabledResetPasswordButton;
-
     Boolean isShowResetPasswordButton;
 
     /** Trạng thái nút KÍCH HOẠT TÀI KHOẢN */
     Boolean isEnabledActivateButton;
-
     Boolean isShowActivateButton;
 }

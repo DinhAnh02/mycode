@@ -20,7 +20,10 @@ import vn.eledevo.vksbe.dto.request.PinChangeRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
 import vn.eledevo.vksbe.dto.request.account.AvatarRequest;
-import vn.eledevo.vksbe.dto.response.*;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.ResultList;
+import vn.eledevo.vksbe.dto.response.ResultUrl;
 import vn.eledevo.vksbe.dto.response.account.AccountResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
@@ -37,7 +40,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.FIELD_INVALID;
 import static vn.eledevo.vksbe.utils.FileUtils.getContentType;
 
 @RestController
@@ -83,9 +85,6 @@ public class AccountController {
     @PatchMapping("/{accountId}/inactivate")
     @Operation(summary = "Khóa tài khoản")
     public ApiResponse<HashMap<String, String>> lockAccount(@PathVariable Long accountId) throws ApiException {
-        if (accountId == null) {
-            throw new ApiException(FIELD_INVALID);
-        }
         return ApiResponse.ok(accountService.inactivateAccount(accountId));
     }
 

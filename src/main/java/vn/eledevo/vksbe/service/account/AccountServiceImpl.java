@@ -18,14 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-import vn.eledevo.vksbe.constant.Department;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.RoleErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
-import vn.eledevo.vksbe.constant.ResponseMessage;
-import vn.eledevo.vksbe.constant.Role;
-import vn.eledevo.vksbe.constant.Status;
+import vn.eledevo.vksbe.constant.*;
+import vn.eledevo.vksbe.constant.ErrorCodes.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
@@ -65,10 +59,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
-import static vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB;
-import static vn.eledevo.vksbe.constant.FileConst.*;
-import static vn.eledevo.vksbe.constant.ResponseMessage.*;
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_URI;
 import static vn.eledevo.vksbe.constant.RoleCodes.*;
 import static vn.eledevo.vksbe.utils.FileUtils.*;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
@@ -350,11 +342,11 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
         Accounts accounts =
-                accountRepository.findById(accountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+                accountRepository.findById(accountId).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         Computers computers =
-                computerRepository.findById(computerId).orElseThrow(() -> new ApiException(COMPUTER_NOT_FOUND));
+                computerRepository.findById(computerId).orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
         if (!computers.getAccounts().getId().equals(accountId)) {
-            throw new ApiException(COMPUTER_NOT_CONNECT_TO_ACCOUNT);
+            throw new ApiException(ComputerErrorCode.PC_NOT_LINKED_TO_ACCOUNT);
         }
         computers.setAccounts(null);
         computers.setStatus(Status.DISCONNECTED.name());
@@ -388,19 +380,19 @@ public class AccountServiceImpl implements AccountService {
             List<Computers> connectedComputers = new ArrayList<>();
             Map<Long, Computers> computersMap = computers.stream().collect(Collectors.toMap(Computers::getId, c -> c));
             if (CollectionUtils.isEmpty(computers)) {
-                throw new ApiException(COMPUTER_NOT_FOUND);
+                throw new ApiException(ComputerErrorCode.PC_NOT_FOUND);
             }
             for (Long computerId : computerIds) {
                 if (computersMap.get(computerId) != null) {
                     String nameUpdate = SecurityUtils.getUserName();
                     var computer = computersMap.get(computerId);
-                    if (computer.getStatus().equals(Const.CONNECTED)) {
+                    if (computer.getStatus().equals(Status.CONNECTED.name())) {
                         computerResponses.add(ConnectComputerResponse.builder()
                                 .id(computer.getId())
                                 .name(computer.getName())
                                 .computerCode(computer.getCode())
                                 .isConnected(false)
-                                .reason(COMPUTER_CONNECTED_WITH_ANOTHER_ACCOUNT)
+                                .reason(ResponseMessage.COMPUTER_CONNECTED_WITH_ANOTHER_ACCOUNT)
                                 .build());
                     } else {
                         computerResponses.add(ConnectComputerResponse.builder()
@@ -408,10 +400,10 @@ public class AccountServiceImpl implements AccountService {
                                 .name(computer.getName())
                                 .computerCode(computer.getCode())
                                 .isConnected(true)
-                                .reason(COMPUTER_CONNECTED_SUCCESS)
+                                .reason(ResponseMessage.COMPUTER_CONNECTED_SUCCESS)
                                 .build());
                         computer.setAccounts(accounts);
-                        computer.setStatus(Const.CONNECTED);
+                        computer.setStatus(Status.CONNECTED.name());
                         computer.setUpdatedAt(LocalDate.now());
                         computer.setUpdatedBy(nameUpdate);
                         connectedComputers.add(computer);
@@ -426,7 +418,7 @@ public class AccountServiceImpl implements AccountService {
                             .name(null)
                             .computerCode(null)
                             .isConnected(false)
-                            .reason(COMPUTER_NOT_FOUND_SYSTEM)
+                            .reason(ResponseMessage.COMPUTER_NOT_FOUND_SYSTEM)
                             .build());
                 }
             }
@@ -479,9 +471,7 @@ public class AccountServiceImpl implements AccountService {
         if (activedAcc.getStatus().equals(Const.ACTIVE)) {
             throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_ACTIVATED);
         }
-        activedAcc.setStatus(Const.ACTIVE);
-        activedAcc.setUpdatedAt(LocalDate.now());
-        activedAcc.setUpdatedBy(SecurityUtils.getUserName());
+        activedAcc.setStatus(Status.ACTIVE.name());
         accountRepository.save(activedAcc);
         return new ActivedAccountResponse();
     }
@@ -493,10 +483,10 @@ public class AccountServiceImpl implements AccountService {
 
     private AccountSwapResponse swap(Long newAccountId, Long oldAccountId) throws ApiException {
         Accounts existingAccount =
-                accountRepository.findById(newAccountId).orElseThrow(() -> new ApiException(ACCOUNT_NOT_FOUND));
+                accountRepository.findById(newAccountId).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         if (!existingAccount.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
                 && !existingAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) {
-            throw new ApiException(ROLE_NOT_TRUE);
+            throw new ApiException(RoleErrorCode.CURRENT_ROLE_NOT_CHANGEABLE);
         }
 
         Long departmentId = existingAccount.getDepartments().getId();
@@ -578,7 +568,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Resource downloadAvatar(String fileName) throws ApiException, IOException {
         if (fileName == null || fileName.isEmpty()) {
-            throw new ApiException(AVATAR_NOT_FOUND);
+            throw new ApiException(AccountErrorCode.AVATAR_NOT_FOUND);
         }
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         return new UrlResource(filePath.toUri());
@@ -614,8 +604,9 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.DEPARTMENT_AND_ROLE_INVALID);
         }
 
-        if (!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name())) {
+        if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
+                        && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
+                || !accountUpdate.getStatus().equals(Status.ACTIVE.name())) {
             accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
         }
@@ -650,7 +641,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws ApiException {
-        Accounts account = accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        Accounts account =
+                accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         account.getProfile().setAvatar(request.getAvatar());
         accountRepository.save(account);
         return AccountResponse.builder().build();
@@ -718,12 +710,12 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
 
         if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
-            throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
         }
 
         Optional<Usbs> usbToken = usbRepository.findById(usbID);
         if (usbToken.isEmpty()) {
-            throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
+            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
         }
         usbToken.get().setAccounts(null);
         usbToken.get().setStatus(Status.DISCONNECTED.name());
@@ -876,28 +868,28 @@ public class AccountServiceImpl implements AccountService {
 
             String scheme = uri.getScheme();
             if (!"http".equals(scheme) && !"https".equals(scheme)) {
-                errors.put(keyError, AVATAR_URL_INVALID);
+                errors.put(keyError, ResponseMessage.AVATAR_URL_INVALID);
                 return;
             }
 
             String host = uri.getHost();
             if (host == null || !appHost.contains(host)) {
-                errors.put(keyError, AVATAR_URL_INVALID);
+                errors.put(keyError, ResponseMessage.AVATAR_URL_INVALID);
                 return;
             }
 
             String path = uri.getPath();
             if (path == null || !path.startsWith(AVATAR_URI)) {
-                errors.put(keyError, AVATAR_URL_INVALID);
+                errors.put(keyError, ResponseMessage.AVATAR_URL_INVALID);
                 return;
             }
 
             if (!isPathAllowedExtension(path, AVATAR_ALLOWED_EXTENSIONS)) {
-                errors.put(keyError, AVATAR_URL_INVALID);
+                errors.put(keyError, ResponseMessage.AVATAR_URL_INVALID);
             }
 
         } catch (URISyntaxException e) {
-            errors.put("avatar", AVATAR_URL_INVALID);
+            errors.put("avatar", ResponseMessage.AVATAR_URL_INVALID);
         }
     }
 
@@ -930,14 +922,14 @@ public class AccountServiceImpl implements AccountService {
         }
 
         String fileExtension = getFileExtension(file.getOriginalFilename());
-        if (!isAllowedExtension(fileExtension, AVATAR_ALLOWED_EXTENSIONS)) {
+        if (!isAllowedExtension(fileExtension, FileConst.AVATAR_ALLOWED_EXTENSIONS)) {
             String msg = MessageFormat.format(
-                    AccountErrorCode.AVATAR_INVALID_FORMAT.getMessage(), String.join(", ", AVATAR_ALLOWED_EXTENSIONS));
+                    AccountErrorCode.AVATAR_INVALID_FORMAT.getMessage(), String.join(", ", FileConst.AVATAR_ALLOWED_EXTENSIONS));
             throw new ApiException(AccountErrorCode.AVATAR_INVALID_FORMAT, msg);
         }
 
-        if (file.getSize() > MAX_AVATAR_SIZE * BYTES_IN_MB) {
-            String msg = MessageFormat.format(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT.getMessage(), MAX_AVATAR_SIZE);
+        if (file.getSize() > FileConst.MAX_AVATAR_SIZE * FileConst.BYTES_IN_MB) {
+            String msg = MessageFormat.format(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT.getMessage(), FileConst.MAX_AVATAR_SIZE);
             throw new ApiException(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT, msg);
         }
     }

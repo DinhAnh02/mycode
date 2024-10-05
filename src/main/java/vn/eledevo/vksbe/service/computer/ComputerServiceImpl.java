@@ -56,11 +56,11 @@ public class ComputerServiceImpl implements ComputerService {
 
     @Override
     public HashMap<String, String> updateComputer(Long requestId, ComputersModel computerRequest) throws ApiException {
-        Computers computer = computerRepository.findById(requestId).orElseThrow(() -> new ApiException(PC_NOT_FOUND));
+        Computers computer = computerRepository.findById(requestId).orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
         Computers computerByName = computerRepository.findByName(computerRequest.getName());
         if (computerRepository.existsByName(computerRequest.getName())
                 && !computerByName.getId().equals(requestId)) {
-            throw new ApiException(PC_NAME_ALREADY_EXISTS);
+            throw new ApiException(ComputerErrorCode.PC_NAME_ALREADY_EXISTS);
         }
 
         computer.setName(computerRequest.getName());
@@ -84,10 +84,10 @@ public class ComputerServiceImpl implements ComputerService {
     public HashMap<String, String> createComputer(ComputerRequestForCreate request) throws ApiException {
         Boolean computerExist = computerRepository.existsByCode(request.getCode());
         if (Objects.equals(computerExist, Boolean.TRUE)) {
-            throw new ApiException(PC_CODE_ALREADY_EXISTS);
+            throw new ApiException(ComputerErrorCode.PC_CODE_ALREADY_EXISTS);
         }
         if (computerRepository.existsByName(request.getName())) {
-            throw new ApiException(PC_NAME_ALREADY_EXISTS);
+            throw new ApiException(ComputerErrorCode.PC_NAME_ALREADY_EXISTS);
         }
 
         Computers computersCreate = computerRepository.save(computerMapper.toResource(request));
