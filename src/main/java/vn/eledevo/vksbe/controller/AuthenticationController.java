@@ -40,6 +40,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
+    @Operation(summary = "Lấy lại token")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         service.refreshToken(request, response);
     }
