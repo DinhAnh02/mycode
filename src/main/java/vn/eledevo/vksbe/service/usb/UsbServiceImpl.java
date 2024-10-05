@@ -1,6 +1,30 @@
 package vn.eledevo.vksbe.service.usb;
 
-import static vn.eledevo.vksbe.constant.ErrorCode.*;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
+import vn.eledevo.vksbe.constant.Status;
+import vn.eledevo.vksbe.dto.request.DataChange;
+import vn.eledevo.vksbe.dto.request.UsbRequest;
+import vn.eledevo.vksbe.dto.request.usb.UsbToken;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
+import vn.eledevo.vksbe.entity.Accounts;
+import vn.eledevo.vksbe.entity.Computers;
+import vn.eledevo.vksbe.entity.Usbs;
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.repository.AccountRepository;
+import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.service.ChangeData;
 
 import java.io.*;
 import java.net.URL;
@@ -17,36 +41,6 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
-import vn.eledevo.vksbe.constant.ErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
-import vn.eledevo.vksbe.constant.Status;
-import vn.eledevo.vksbe.dto.request.AccountActive;
-import vn.eledevo.vksbe.dto.request.DataChange;
-import vn.eledevo.vksbe.dto.request.UsbRequest;
-import vn.eledevo.vksbe.dto.request.usb.UsbToken;
-import vn.eledevo.vksbe.dto.response.ResponseFilter;
-import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
-import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Computers;
-import vn.eledevo.vksbe.entity.Usbs;
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.repository.AccountRepository;
-import vn.eledevo.vksbe.repository.UsbRepository;
-import vn.eledevo.vksbe.service.ChangeData;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +60,7 @@ public class UsbServiceImpl implements UsbService {
             usbRequest.setToDate(LocalDate.now());
         }
         if (usbRequest.getFromDate().isAfter(usbRequest.getToDate())) {
-            throw new ApiException(ErrorCode.CHECK_FROM_DATE);
+            throw new ApiException(AccountErrorCode.START_TIME_GREATER_THAN_END_TIME);
         }
         Pageable pageable =
                 PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
