@@ -123,8 +123,6 @@ public class AccountServiceImpl implements AccountService {
         accounts.setPin(null);
         accounts.setIsConditionLogin1(false);
         accounts.setIsConditionLogin2(false);
-        accounts.setUpdatedBy(getUserName());
-        accounts.setUpdatedAt(LocalDate.now());
         accounts.setStatus(String.valueOf(Status.INACTIVE));
         accountRepository.save(accounts);
         tokenRepository.deleteByAccounts_Id(id);
@@ -220,7 +218,8 @@ public class AccountServiceImpl implements AccountService {
             account.setIsShowUnlockButton(true);
             account.setIsEnabledUnlockButton(true);
         }
-        if ((loginAccRole.equals(Role.TRUONG_PHONG) || loginAccRole.equals(Role.PHO_PHONG))
+        boolean isSameLoginRole = loginAccRole.equals(Role.TRUONG_PHONG) || loginAccRole.equals(Role.PHO_PHONG);
+        if (isSameLoginRole
                 && accSecurity.getDepartments().getId().equals(account.getDepartmentId())
                 && account.getStatus().equals(Status.ACTIVE.name())
                 && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)) {
@@ -228,7 +227,7 @@ public class AccountServiceImpl implements AccountService {
             account.setIsEnabledLockButton(true);
         }
 
-        if ((loginAccRole.equals(Role.TRUONG_PHONG) || loginAccRole.equals(Role.PHO_PHONG))
+        if (isSameLoginRole
                 && (account.getStatus().equals(Status.INACTIVE.name())
                         || account.getStatus().equals(Status.INITIAL.name())
                                 && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
@@ -550,7 +549,7 @@ public class AccountServiceImpl implements AccountService {
         return AccountResponse.builder().id(savedAccount.getId()).build();
     }
 
-    private void validateRoleAndDepartment(Roles newAccountRole, Departments newAccountDepartment) throws ApiException{
+    private void validateRoleAndDepartment(Roles newAccountRole, Departments newAccountDepartment) throws ApiException {
         Accounts curLoginAcc = SecurityUtils.getUser();
 
         if (!curLoginAcc.getRoles().getCode().equals(Role.IT_ADMIN.name())
@@ -591,6 +590,18 @@ public class AccountServiceImpl implements AccountService {
         Accounts accountLogin = SecurityUtils.getUser();
         Accounts accountUpdate = validAccount(updatedAccId);
 
+        Roles requestRole = roleRepository
+                .findById(req.getRoleId())
+                .orElseThrow(() -> new ApiException(RoleErrorCode.ROLE_NOT_FOUND));
+        Departments requestDepartment = departmentRepository
+                .findById(req.getDepartmentId())
+                .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
+
+        if (requestRole.getCode().equals(Role.IT_ADMIN.name())
+                || requestDepartment.getCode().equals(Department.PB_KY_THUAT.name())) {
+            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH);
+        }
+
         int priorityRoleUpdate =
                 priorityRoles(Role.valueOf(accountUpdate.getRoles().getCode()));
         int priorityRoleLogin =
@@ -599,18 +610,19 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
-//        validateRoleAndDepartment(accountUpdate.getRoles(), accountUpdate.getDepartments());
+        if (Boolean.FALSE.equals(isAllowedToCreateAccount(requestRole, requestDepartment))) {
+            throw new ApiException(AccountErrorCode.DEPARTMENT_AND_ROLE_INVALID);
+        }
 
-        Roles updateAccRole = roleRepository.findById(req.getRoleId()).orElseThrow();
-        if (!updateAccRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !updateAccRole.getCode().equals(Role.TRUONG_PHONG.name())) {
-            accountToUpdate(req, updatedAccId, updateAccRole);
+        if (!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
+                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name())) {
+            accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
         }
 
         AccountSwapResponse oldPositionAccInfo = accountRepository.getOldPositionAccInfo(req.getDepartmentId());
         if (Objects.equals(oldPositionAccInfo, null)) {
-            accountToUpdate(req, updatedAccId, updateAccRole);
+            accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
         }
 
@@ -621,7 +633,7 @@ public class AccountServiceImpl implements AccountService {
 
         Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
         accountLead.setStatus(Status.INACTIVE.name());
-        Accounts account = accountToUpdate(req, updatedAccId, updateAccRole);
+        Accounts account = accountToUpdate(req, updatedAccId, requestRole);
         account.setStatus(Status.ACTIVE.name());
         return AccountSwapResponse.builder().build();
     }
@@ -706,6 +718,7 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(ACCOUNT_NOT_LINKED_TO_USB);
         }
         usbToken.get().setAccounts(null);
+        usbToken.get().setStatus(Status.DISCONNECTED.name());
         usbRepository.save(usbToken.get());
         accounts.setIsConnectUsb(false);
         accountRepository.save(accounts);
