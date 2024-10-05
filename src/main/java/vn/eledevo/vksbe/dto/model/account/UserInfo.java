@@ -20,6 +20,7 @@ public class UserInfo {
     String roleCode;
     String departmentCode;
     Long organizationId;
+    String organizationName;
     Boolean isConditionLogin1;
     Boolean isConditionLogin2;
 }
