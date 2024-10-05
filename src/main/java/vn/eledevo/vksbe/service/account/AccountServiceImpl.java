@@ -901,16 +901,12 @@ public class AccountServiceImpl implements AccountService {
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
-        if (Objects.nonNull(req.getAvatar())
-                && !req.getAvatar().isEmpty()
-                && !req.getAvatar().equals(profile.getAvatar())) {
-            clearPathImg(profile.getAvatar());
-            String pathFile = getPathImg(req.getAvatar());
-            if (!Files.exists(Paths.get(pathFile))) {
-                throw new ApiException(AccountErrorCode.PATH_AVATAR_NOT_FOUND);
-            }
-            profile.setAvatar(req.getAvatar());
-        }
+//        clearPathImg(profile.getAvatar());
+//        String pathFile = getPathImg(req.getAvatar());
+//        if (!Files.exists(Paths.get(pathFile))) {
+//            throw new ApiException(AccountErrorCode.PATH_AVATAR_NOT_FOUND);
+//        }
+        profile.setAvatar(req.getAvatar());
         Profiles profileSave = profileRepository.save(profile);
 
         updatedAcc.setProfile(profileSave);
