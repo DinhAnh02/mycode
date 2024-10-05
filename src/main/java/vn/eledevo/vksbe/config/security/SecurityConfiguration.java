@@ -52,7 +52,8 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/private/accounts/get-user-info",
-                                "/api/v1/private/accounts/change-pin-code")
+                                "/api/v1/private/accounts/change-pin-code",
+                                "/api/v1/private/accounts/{id}/update-avatar-user-info")
                         .hasAnyAuthority(
                                 Role.IT_ADMIN.name(),
                                 Role.KIEM_SAT_VIEN.name(),

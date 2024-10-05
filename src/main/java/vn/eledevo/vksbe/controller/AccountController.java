@@ -19,6 +19,7 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.PinChangeRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
+import vn.eledevo.vksbe.dto.request.account.AvatarRequest;
 import vn.eledevo.vksbe.dto.response.*;
 import vn.eledevo.vksbe.dto.response.account.AccountResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
@@ -168,6 +169,13 @@ public class AccountController {
     @Operation(summary = "Thông tin cá nhân của tài khoản đăng nhập")
     public ApiResponse<UserInfo> userDetail() throws ApiException {
         return ApiResponse.ok(accountService.userInfo());
+    }
+
+    @PostMapping("/{id}/update-avatar-user-info")
+    @Operation(summary = "Chỉnh sửa avatar của tài khoản đăng nhập")
+    public ApiResponse<AccountResponse> updateAvatarUserInfo(@PathVariable Long id, @RequestBody AvatarRequest request)
+            throws ApiException {
+        return ApiResponse.ok(accountService.updateAvatarUserInfo(id, request));
     }
 
     @PostMapping("/change-pin-code")

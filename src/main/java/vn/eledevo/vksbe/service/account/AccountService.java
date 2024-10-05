@@ -8,6 +8,7 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.PinChangeRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountCreateRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
+import vn.eledevo.vksbe.dto.request.account.AvatarRequest;
 import vn.eledevo.vksbe.dto.response.account.AccountResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
@@ -58,6 +59,8 @@ public interface AccountService {
     AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException;
 
     UserInfo userInfo() throws ApiException;
+
+    AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws ApiException;
 
     HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException;
 }
