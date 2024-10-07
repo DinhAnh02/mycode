@@ -170,7 +170,7 @@ public class AccountController {
         return ApiResponse.ok(accountService.userInfo());
     }
 
-    @PostMapping("/{id}/update-avatar-user-info")
+    @PatchMapping("/{id}/update-avatar-user-info")
     @Operation(summary = "Chỉnh sửa avatar của tài khoản đăng nhập")
     public ApiResponse<AccountResponse> updateAvatarUserInfo(@PathVariable Long id, @RequestBody AvatarRequest request)
             throws ApiException {
