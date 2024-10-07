@@ -9,8 +9,8 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.OK;
 
 public enum RoleErrorCode implements BaseErrorCode{
-    ROLE_NOT_FOUND(OK, "TK-16", "Chức vụ không tồn tại", new HashMap<>()),
-    CURRENT_ROLE_NOT_CHANGEABLE(OK, "TK-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
+    ROLE_NOT_FOUND(OK, "Role-16", "Chức vụ không tồn tại", new HashMap<>()),
+    CURRENT_ROLE_NOT_CHANGEABLE(OK, "Role-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;
