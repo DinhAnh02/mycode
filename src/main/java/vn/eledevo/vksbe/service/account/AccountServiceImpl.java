@@ -165,7 +165,7 @@ public class AccountServiceImpl implements AccountService {
             accountRequest.setToDate(LocalDate.now());
         }
         if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
-            throw new ApiException(AccountErrorCode.CHECK_FROM_DATE);
+            throw new ApiException(AccountErrorCode.START_TIME_GREATER_THAN_END_TIME);
         }
         if (Boolean.FALSE.equals(isBoss(loginAccount))) {
             accountRequest.setDepartmentId(loginAccount.getDepartments().getId());
@@ -896,7 +896,7 @@ public class AccountServiceImpl implements AccountService {
     private Accounts accountToUpdate(AccountUpdateRequest req, Long updatedAccId, Roles updateAccRole)
             throws ApiException {
         Profiles profile = profileRepository.findByAccounts_Id(updatedAccId);
-        Accounts updatedAcc = accountRepository.findById(updatedAccId).orElseThrow();
+        Accounts account = accountRepository.findById(updatedAccId).orElseThrow();
 
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
@@ -909,11 +909,14 @@ public class AccountServiceImpl implements AccountService {
         profile.setAvatar(req.getAvatar());
         Profiles profileSave = profileRepository.save(profile);
 
-        updatedAcc.setProfile(profileSave);
-        updatedAcc.setRoles(updateAccRole);
-        updatedAcc.setDepartments(
+        account.setProfile(profileSave);
+        account.setRoles(updateAccRole);
+        account.setDepartments(
                 departmentRepository.findById(req.getDepartmentId()).orElseThrow());
-        return accountRepository.save(updatedAcc);
+        if(account.getRoles().getCode().equals(updateAccRole.getCode())){
+            tokenRepository.deleteByAccounts_Id(updatedAccId);
+        }
+        return accountRepository.save(account);
     }
 
     private void validateAvatarFile(MultipartFile file) throws ApiException {

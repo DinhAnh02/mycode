@@ -13,6 +13,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Getter
 public enum AccountErrorCode implements BaseErrorCode {
     NOT_ENOUGH_PERMISSION(OK, "TK-403", "Bạn không có đủ quyền sử dụng chức năng này", new HashMap<>()),
+    ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>()),
     ACCOUNT_NOT_FOUND(OK, "TK-01", "Tài khoản không tồn tại", new HashMap<>()),
     ACCOUNT_ALREADY_EXISTS(OK, "TK-02", "Tài khoản đã tồn tại", new HashMap<>()),
     INVALID_ACCOUNT_OR_PASSWORD(OK, "TK-03", "Sai tài khoản hoặc mật khẩu", new HashMap<>()),
@@ -41,19 +42,17 @@ public enum AccountErrorCode implements BaseErrorCode {
     ACCOUNT_IS_LOCK(OK, "TK-24", "Tài khoản bạn chọn đã bị khóa trước đó ", new HashMap<>()),
     ACCOUNT_ACTIVE(OK, "TK-25", "Tài khoản đang hoạt", new HashMap<>()),
     CHANGE_FIRST_LOGIN(OK, "TK-26", "Chức năng này chỉ khả dụng khi bạn đăng nhập lần đầu", new HashMap<>()),
-    PATH_AVATAR_NOT_FOUND(OK, "TK-27", "Không tồn tại đường dẫn avatar ", new HashMap<>()),
+    PATH_AVATAR_NOT_FOUND(OK, "TK-27", "Đường dẫn avatar không tồn tại", new HashMap<>()),
     CHANGE_PIN_LOGIN(OK, "TK-28", "Chức năng không khả dụng do tài khoản chưa được tạo mã PIN", new HashMap<>()),
     OLD_PIN_INCORRECT(OK, "TK-29", "Mã PIN cũ không chính xác", new HashMap<>()),
     NEW_PIN_SAME_AS_OLD(OK, "TK-30", "Mã PIN mới không được trùng với mã PIN cũ", new HashMap<>()),
     CONFIRM_PIN_MISMATCH(OK, "TK-31", "Mã PIN nhập lại không được trùng với mã PIN mới", new HashMap<>()),
     URL_NOT_FOUND(OK, "TK-32", "Đường dẫn ảnh không hợp lệ", new HashMap<>()),
     ACCOUNT_LINKED_USB(OK,"TK-33","Tài khoản đã được liên kết usb . Vui lòng gỡ usb cũ và thử lại",new HashMap<>()),
-    ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>()),
     ACCOUNT_SWAP_EXITS(OK, "TK-34", "Tài khoản bị hoán đổi không tồn tại", new HashMap<>()),
     ACCOUNT_INVALID(OK, "TK-35", "Tài khoản không hợp lệ. Vui lòng liên hệ IT Admin để được hỗ trợ", new HashMap<>()),
     NOT_PERMISSION_CREATE_ACCOUNT(OK, "TK-36", "Bạn không có quyền tạo tài khoản IT Admin", new HashMap<>()),
     ACCOUNT_NOT_READ_DATA_DEPARTMENT(OK, "TK-37", "Bạn không có quyền xem dữ liệu của phòng ban khác", new HashMap<>()),
-    CHECK_FROM_DATE(OK, "TK-38", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc.", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;
