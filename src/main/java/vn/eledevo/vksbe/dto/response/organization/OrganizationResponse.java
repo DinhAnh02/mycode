@@ -13,6 +13,6 @@ public class OrganizationResponse {
     Long id;
 
     String name;
-    String abbreviatedName;
+    String code;
     String address;
 }

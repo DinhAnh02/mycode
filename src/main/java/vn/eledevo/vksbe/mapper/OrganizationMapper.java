@@ -17,7 +17,7 @@ public class OrganizationMapper {
         return OrganizationResponse.builder()
                 .id(e.getId())
                 .name(e.getName())
-                .abbreviatedName(e.getAbbreviatedName())
+                .code(e.getCode())
                 .address(e.getAddress())
                 .build();
     }
