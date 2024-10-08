@@ -21,8 +21,8 @@ public class Organizations {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    String code;
     String name;
-    String abbreviatedName;
     String address;
     Boolean isDefault;
     LocalDate createdAt;
