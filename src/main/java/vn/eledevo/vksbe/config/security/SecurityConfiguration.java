@@ -75,6 +75,14 @@ public class SecurityConfiguration {
                                 Role.PHO_PHONG.name(),
                                 Role.IT_ADMIN.name())
                         .requestMatchers(
+                                "/api/v1/private/mindmapTemplate/{departmentId}/department"
+                        )
+                        .hasAnyAuthority(
+                                Role.VIEN_TRUONG.name(),
+                                Role.VIEN_PHO.name(),
+                                Role.TRUONG_PHONG.name(),
+                                Role.PHO_PHONG.name())
+                        .requestMatchers(
                                 "/api/v1/private/accounts/reset-password/{id}",
                                 "/api/v1/private/computers/**",
                                 "/api/v1/private/usbs/**",
