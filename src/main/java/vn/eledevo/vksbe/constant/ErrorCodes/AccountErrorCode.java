@@ -1,19 +1,20 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import lombok.Getter;
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.OK;
+import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
 
 @Getter
 public enum AccountErrorCode implements BaseErrorCode {
     NOT_ENOUGH_PERMISSION(OK, "TK-403", "Bạn không có đủ quyền sử dụng chức năng này", new HashMap<>()),
-    ACCOUNT_LIST_EXIT(OK,"TK-010","Viện trưởng/Trưởng phòng đã tồn tại",new HashMap<>()),
+    ACCOUNT_LIST_EXIT(OK, "TK-010", "Viện trưởng/Trưởng phòng đã tồn tại", new HashMap<>()),
     ACCOUNT_NOT_FOUND(OK, "TK-01", "Tài khoản không tồn tại", new HashMap<>()),
     ACCOUNT_ALREADY_EXISTS(OK, "TK-02", "Tài khoản đã tồn tại", new HashMap<>()),
     INVALID_ACCOUNT_OR_PASSWORD(OK, "TK-03", "Sai tài khoản hoặc mật khẩu", new HashMap<>()),
@@ -30,7 +31,8 @@ public enum AccountErrorCode implements BaseErrorCode {
     AVATAR_SIZE_EXCEEDS_LIMIT(OK, "TK-13", "Ảnh đại diện không được vượt quá {0}", new HashMap<>()),
     AVATAR_INVALID_FORMAT(OK, "TK-14", "Ảnh đại diện chỉ chấp nhận định dạng {0}", new HashMap<>()),
     AVATAR_NOT_FOUND(OK, "TK-15", "Không tìm thấy ảnh đại diện", new HashMap<>()),
-    NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH(OK, "TK-16", "Bạn không có quyền thao tác với tài khoản trong phòng ban Kỹ thuật", new HashMap<>()),
+    NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH(
+            OK, "TK-16", "Bạn không có quyền thao tác với tài khoản trong phòng ban Kỹ thuật", new HashMap<>()),
     DIRECTORY_NOT_FOUND(OK, "TK-17", "Không tìm thấy thư mục", new HashMap<>()),
     ACCOUNT_NOT_ACTIVATED(OK, "TK-18", "Tài khoản chưa được kích hoạt", new HashMap<>()),
     DEPARTMENT_AND_ROLE_INVALID(OK, "TK-19", "Chức vụ không phù hợp với phòng ban", new HashMap<>()),
@@ -48,7 +50,7 @@ public enum AccountErrorCode implements BaseErrorCode {
     NEW_PIN_SAME_AS_OLD(OK, "TK-30", "Mã PIN mới không được trùng với mã PIN cũ", new HashMap<>()),
     CONFIRM_PIN_MISMATCH(OK, "TK-31", "Mã PIN nhập lại không được trùng với mã PIN mới", new HashMap<>()),
     URL_NOT_FOUND(OK, "TK-32", "Đường dẫn ảnh không hợp lệ", new HashMap<>()),
-    ACCOUNT_LINKED_USB(OK,"TK-33","Tài khoản đã được liên kết usb . Vui lòng gỡ usb cũ và thử lại",new HashMap<>()),
+    ACCOUNT_LINKED_USB(OK, "TK-33", "Tài khoản đã được liên kết usb . Vui lòng gỡ usb cũ và thử lại", new HashMap<>()),
     ACCOUNT_SWAP_EXITS(OK, "TK-34", "Tài khoản bị hoán đổi không tồn tại", new HashMap<>()),
     ACCOUNT_INVALID(OK, "TK-35", "Tài khoản không hợp lệ. Vui lòng liên hệ IT Admin để được hỗ trợ", new HashMap<>()),
     NOT_PERMISSION_CREATE_ACCOUNT(OK, "TK-36", "Bạn không có quyền tạo tài khoản IT Admin", new HashMap<>()),

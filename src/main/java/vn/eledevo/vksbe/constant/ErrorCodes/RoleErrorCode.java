@@ -1,14 +1,14 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.OK;
+import org.springframework.http.HttpStatusCode;
 
-public enum RoleErrorCode implements BaseErrorCode{
+public enum RoleErrorCode implements BaseErrorCode {
     ROLE_NOT_FOUND(OK, "Role-16", "Chức vụ không tồn tại", new HashMap<>()),
     CURRENT_ROLE_NOT_CHANGEABLE(OK, "Role-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
     ;
@@ -46,7 +46,5 @@ public enum RoleErrorCode implements BaseErrorCode{
     }
 
     @Override
-    public void setResult(Optional<?> value) {
-
-    }
+    public void setResult(Optional<?> value) {}
 }

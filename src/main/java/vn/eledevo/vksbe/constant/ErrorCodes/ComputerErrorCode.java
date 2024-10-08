@@ -38,9 +38,7 @@ public enum ComputerErrorCode implements BaseErrorCode {
     }
 
     @Override
-    public void setResult(Optional<?> value) {
-
-    }
+    public void setResult(Optional<?> value) {}
 
     @Override
     public HttpStatusCode getStatusCode() {

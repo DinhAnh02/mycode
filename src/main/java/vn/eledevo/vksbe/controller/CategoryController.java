@@ -24,7 +24,7 @@ public class CategoryController {
 
     @GetMapping("")
     @Operation(summary = "Category")
-    public ResponseEntity<ApiResponse<InformationResponse>> getAllInformation() {
-        return ResponseEntity.ok(service.getAllInformation());
+    public ApiResponse<InformationResponse> getAllInformation() {
+        return ApiResponse.ok(service.getAllInformation());
     }
 }
