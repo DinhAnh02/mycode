@@ -11,9 +11,10 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
         info = @Info(description = "OpenApi documentation for VKS", title = "VKS", version = "1.0"),
         servers = {
-            @Server(description = "Local ENV", url = "http://localhost:8081"),
-            @Server(description = "Develop ENV", url = "https://dev-vks.eledevo.com"),
-            @Server(description = "Test ENV", url = "http://192.168.1.17:8082")
+            @Server(description = "Local", url = "http://localhost:8081"),
+            @Server(description = "Develop", url = "https://dev-vks.eledevo.com"),
+            @Server(description = "Tester", url = "http://192.168.1.17:8082"),
+                @Server(description = "Staging", url = "https://uat-vks.eledevo.com")
         },
         security = {@SecurityRequirement(name = "bearerAuth")})
 @SecurityScheme(
