@@ -26,22 +26,22 @@ public enum DepartmentErrorCode implements BaseErrorCode {
 
     @Override
     public HttpStatusCode getStatusCode() {
-        return null;
+        return statusCode;
     }
 
     @Override
     public Map<String, Optional<?>> getResult() {
-        return Map.of();
+        return result;
     }
 
     @Override
     public String getCode() {
-        return "";
+        return code;
     }
 
     @Override
     public String getMessage() {
-        return "";
+        return message;
     }
 
     @Override
