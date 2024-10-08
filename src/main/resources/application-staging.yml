@@ -1,0 +1,12 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    username: vienkiemsat
+    password: vks@2024
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://100.67.168.11:3309/uat-db
+app:
+  host: https://uat-vks.eledevo.com
+
