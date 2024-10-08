@@ -30,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
     RoleRepository roleRepository;
 
     @Override
-    public ApiResponse<InformationResponse> getAllInformation() {
+    public InformationResponse getAllInformation() {
         List<DepartmentResponse> departmentsList = departmentRepository.findAll().stream()
                 .map(DepartmentMapper::toResponse)
                 .toList();
@@ -40,11 +40,10 @@ public class CategoryServiceImpl implements CategoryService {
         List<RoleResponse> rolesList =
                 roleRepository.findAll().stream().map(RoleMapper::toResponse).toList();
 
-        InformationResponse response = InformationResponse.builder()
+        return InformationResponse.builder()
                 .departments(departmentsList)
                 .organizations(organizationsList)
                 .roles(rolesList)
                 .build();
-        return ApiResponse.ok(response);
     }
 }

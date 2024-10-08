@@ -1,15 +1,23 @@
 package vn.eledevo.vksbe.service.authenticate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.config.security.JwtService;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
@@ -36,12 +44,6 @@ import vn.eledevo.vksbe.repository.TokenRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.service.ChangeData;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -221,7 +223,8 @@ public class AuthenticationService {
                 accounts.get(),
                 UUID.fromString(usbToken.get().getKeyUsb()),
                 accounts.get().getRoles().getCode());
-        var refreshToken = jwtService.generateRefreshToken(accounts.get(),
+        var refreshToken = jwtService.generateRefreshToken(
+                accounts.get(),
                 UUID.fromString(usbToken.get().getKeyUsb()),
                 accounts.get().getRoles().getCode());
         // Hủy tất cả các token hiện có của người dùng
@@ -267,9 +270,8 @@ public class AuthenticationService {
      * @throws IOException Ngoại lệ xảy ra khi ghi dữ liệu vào luồng đầu ra
      */
     public void refreshToken(
-            jakarta.servlet.http.HttpServletRequest request,
-            jakarta.servlet.http.HttpServletResponse response
-    ) throws IOException {
+            jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response)
+            throws IOException {
 
         // Lấy token làm mới từ header yêu cầu
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -291,9 +293,12 @@ public class AuthenticationService {
                 //   - Hủy tất cả các token hiện có của người dùng
                 //   - Lưu token truy cập mới vào cơ sở dữ liệu
                 //   - Trả về đối tượng AuthenticationResponse chứa các token mới
-                var accessToken = jwtService.generateToken(user, UUID.fromString(user.getUsb().getKeyUsb()),user.getRoles().getCode());
+                var accessToken = jwtService.generateToken(
+                        user,
+                        UUID.fromString(user.getUsb().getKeyUsb()),
+                        user.getRoles().getCode());
                 revokeAllUserTokens(user);
-                saveUserToken(user, accessToken,TokenType.ACCESS.name());
+                saveUserToken(user, accessToken, TokenType.ACCESS.name());
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)

@@ -1,9 +1,12 @@
 package vn.eledevo.vksbe.service.organizational_structure;
 
+import java.util.Objects;
+
+import org.springframework.stereotype.Service;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.request.account.AccountUpdateRequest;
@@ -11,8 +14,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.department.DepartmentService;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
 import vn.eledevo.vksbe.service.role.RoleService;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

@@ -1,14 +1,14 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.OK;
+import org.springframework.http.HttpStatusCode;
 
-public enum DepartmentErrorCode implements BaseErrorCode{
+public enum DepartmentErrorCode implements BaseErrorCode {
     DEPARTMENT_NOT_FOUND(OK, "DPM-01", "Phòng ban không tồn tại", new HashMap<>()),
     ;
 
@@ -45,7 +45,5 @@ public enum DepartmentErrorCode implements BaseErrorCode{
     }
 
     @Override
-    public void setResult(Optional<?> value) {
-
-    }
+    public void setResult(Optional<?> value) {}
 }

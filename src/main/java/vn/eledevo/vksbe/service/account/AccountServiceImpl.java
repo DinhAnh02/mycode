@@ -1,10 +1,23 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_URI;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -18,6 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
@@ -46,24 +65,6 @@ import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_URI;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -341,10 +342,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
-        Accounts accounts =
-                accountRepository.findById(accountId).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
-        Computers computers =
-                computerRepository.findById(computerId).orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
+        Accounts accounts = accountRepository
+                .findById(accountId)
+                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        Computers computers = computerRepository
+                .findById(computerId)
+                .orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
         if (!computers.getAccounts().getId().equals(accountId)) {
             throw new ApiException(ComputerErrorCode.PC_NOT_LINKED_TO_ACCOUNT);
         }
@@ -482,8 +485,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private AccountSwapResponse swap(Long newAccountId, Long oldAccountId) throws ApiException {
-        Accounts existingAccount =
-                accountRepository.findById(newAccountId).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        Accounts existingAccount = accountRepository
+                .findById(newAccountId)
+                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         if (!existingAccount.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
                 && !existingAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) {
             throw new ApiException(RoleErrorCode.CURRENT_ROLE_NOT_CHANGEABLE);
@@ -901,11 +905,11 @@ public class AccountServiceImpl implements AccountService {
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
-//        clearPathImg(profile.getAvatar());
-//        String pathFile = getPathImg(req.getAvatar());
-//        if (!Files.exists(Paths.get(pathFile))) {
-//            throw new ApiException(AccountErrorCode.PATH_AVATAR_NOT_FOUND);
-//        }
+        //        clearPathImg(profile.getAvatar());
+        //        String pathFile = getPathImg(req.getAvatar());
+        //        if (!Files.exists(Paths.get(pathFile))) {
+        //            throw new ApiException(AccountErrorCode.PATH_AVATAR_NOT_FOUND);
+        //        }
         profile.setAvatar(req.getAvatar());
         Profiles profileSave = profileRepository.save(profile);
 
@@ -913,7 +917,7 @@ public class AccountServiceImpl implements AccountService {
         account.setRoles(updateAccRole);
         account.setDepartments(
                 departmentRepository.findById(req.getDepartmentId()).orElseThrow());
-        if(account.getRoles().getCode().equals(updateAccRole.getCode())){
+        if (account.getRoles().getCode().equals(updateAccRole.getCode())) {
             tokenRepository.deleteByAccounts_Id(updatedAccId);
         }
         return accountRepository.save(account);
@@ -927,12 +931,14 @@ public class AccountServiceImpl implements AccountService {
         String fileExtension = getFileExtension(file.getOriginalFilename());
         if (!isAllowedExtension(fileExtension, FileConst.AVATAR_ALLOWED_EXTENSIONS)) {
             String msg = MessageFormat.format(
-                    AccountErrorCode.AVATAR_INVALID_FORMAT.getMessage(), String.join(", ", FileConst.AVATAR_ALLOWED_EXTENSIONS));
+                    AccountErrorCode.AVATAR_INVALID_FORMAT.getMessage(),
+                    String.join(", ", FileConst.AVATAR_ALLOWED_EXTENSIONS));
             throw new ApiException(AccountErrorCode.AVATAR_INVALID_FORMAT, msg);
         }
 
         if (file.getSize() > FileConst.MAX_AVATAR_SIZE * FileConst.BYTES_IN_MB) {
-            String msg = MessageFormat.format(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT.getMessage(), FileConst.MAX_AVATAR_SIZE);
+            String msg = MessageFormat.format(
+                    AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT.getMessage(), FileConst.MAX_AVATAR_SIZE);
             throw new ApiException(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT, msg);
         }
     }

@@ -1,18 +1,19 @@
 package vn.eledevo.vksbe.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountActive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.entity.Accounts;
-
-import java.util.Optional;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
     @Query("SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username")

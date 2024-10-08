@@ -1,15 +1,19 @@
 package vn.eledevo.vksbe.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import java.io.File;
+import java.io.FileInputStream;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
 import vn.eledevo.vksbe.dto.request.usb.UsbToken;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -17,9 +21,6 @@ import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.usb.UsbService;
-
-import java.io.File;
-import java.io.FileInputStream;
 
 @RestController
 @RequestMapping("/api/v1/private/usbs")
@@ -42,8 +43,9 @@ public class UsbController {
 
     @PostMapping("/download/{idAccount}")
     @Operation(summary = "Tạo USB token liên kết với tài khoản")
-    public ResponseEntity<InputStreamResource> createUsbToken(@PathVariable Long idAccount, @RequestBody UsbToken usbToken) throws Exception {
-        String zipFilePath = usbService.createUsbToken(idAccount,usbToken);
+    public ResponseEntity<InputStreamResource> createUsbToken(
+            @PathVariable Long idAccount, @RequestBody UsbToken usbToken) throws Exception {
+        String zipFilePath = usbService.createUsbToken(idAccount, usbToken);
 
         // Trả về file ZIP cho frontend
         File zipFile = new File(zipFilePath);

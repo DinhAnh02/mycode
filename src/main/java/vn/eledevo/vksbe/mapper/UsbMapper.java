@@ -21,6 +21,8 @@ public interface UsbMapper {
 
     @Named("mapLocalDateToLong")
     default Long mapLocalDateToLong(LocalDate localDate) {
-        return localDate != null ? localDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli() : null;
+        return localDate != null
+                ? localDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
+                : null;
     }
 }

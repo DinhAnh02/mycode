@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.service.computer;
 
 import static vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode.*;
 
+import java.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -22,16 +23,14 @@ import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
 import vn.eledevo.vksbe.dto.request.computer.ComputerToCheckExist;
-import vn.eledevo.vksbe.dto.response.computer.ComputerResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
+import vn.eledevo.vksbe.dto.response.computer.ComputerResponseFilter;
 import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.ComputerRepository;
-
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +55,9 @@ public class ComputerServiceImpl implements ComputerService {
 
     @Override
     public HashMap<String, String> updateComputer(Long requestId, ComputersModel computerRequest) throws ApiException {
-        Computers computer = computerRepository.findById(requestId).orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
+        Computers computer = computerRepository
+                .findById(requestId)
+                .orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
         Computers computerByName = computerRepository.findByName(computerRequest.getName());
         if (computerRepository.existsByName(computerRequest.getName())
                 && !computerByName.getId().equals(requestId)) {

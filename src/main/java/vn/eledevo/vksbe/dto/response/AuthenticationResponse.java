@@ -2,7 +2,6 @@ package vn.eledevo.vksbe.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import vn.eledevo.vksbe.dto.model.account.UserInfo;
 
 @Getter
 @Setter

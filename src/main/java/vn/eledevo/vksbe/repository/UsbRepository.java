@@ -38,5 +38,5 @@ public interface UsbRepository extends BaseRepository<Usbs, Long> {
     Optional<Usbs> usbByAccountAndConnect(Long accountId);
 
     @Query("select u from Usbs u where u.usbCode =:usbCode and u.usbVendorCode =:usbVendorCode")
-    Optional<Usbs> usbTokenNew(String usbCode , String usbVendorCode);
+    Optional<Usbs> usbTokenNew(String usbCode, String usbVendorCode);
 }

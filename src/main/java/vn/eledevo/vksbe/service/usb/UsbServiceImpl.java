@@ -1,14 +1,31 @@
 package vn.eledevo.vksbe.service.usb;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
@@ -25,22 +42,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.UsbRepository;
 import vn.eledevo.vksbe.service.ChangeData;
-
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDate;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 @Service
 @RequiredArgsConstructor
@@ -92,17 +93,17 @@ public class UsbServiceImpl implements UsbService {
         unzipFile(zipFilePath.toString(), unzippedFolderPath.toString());
 
         Optional<Accounts> account = accountRepository.findById(idAccount);
-        if(account.isEmpty()){
+        if (account.isEmpty()) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
         }
-        if(Boolean.TRUE.equals(account.get().getIsConnectUsb())){
+        if (Boolean.TRUE.equals(account.get().getIsConnectUsb())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_LINKED_USB);
         }
-        Optional<Usbs> usbInfo = usbRepository.usbTokenNew(usbToken.getUsbCode(),usbToken.getUsbVendorCode());
-        if(usbInfo.isEmpty()){
+        Optional<Usbs> usbInfo = usbRepository.usbTokenNew(usbToken.getUsbCode(), usbToken.getUsbVendorCode());
+        if (usbInfo.isEmpty()) {
             throw new ApiException(UsbErrorCode.USB_NOT_FOUND);
         }
-        if(usbInfo.get().getKeyUsb() != null && !usbInfo.get().getKeyUsb().isEmpty()){
+        if (usbInfo.get().getKeyUsb() != null && !usbInfo.get().getKeyUsb().isEmpty()) {
             throw new ApiException(UsbErrorCode.USB_IS_CONNECTED);
         }
         UUID keyUsb = UUID.randomUUID();
@@ -115,16 +116,15 @@ public class UsbServiceImpl implements UsbService {
         accountUpdate.setUsb(usbInfo.get());
         accountRepository.save(accountUpdate);
         List<Computers> computers = accountUpdate.getComputers();
-        String[] computerCode =
-                        computers.stream().map(Computers::getCode).toArray(String[]::new);
-        //Thông tin cần mã hoá
+        String[] computerCode = computers.stream().map(Computers::getCode).toArray(String[]::new);
+        // Thông tin cần mã hoá
         DataChange usbInfoToEncrypt = DataChange.builder()
-                        .maPin(accountUpdate.getPin())
-                        .keyUsb(accountUpdate.getUsb().getKeyUsb())
-                        .listDevices(computerCode)
-                        .usbVendorCode(accountUpdate.getUsb().getUsbVendorCode())
-                        .usbCode(accountUpdate.getUsb().getUsbCode())
-                        .build();
+                .maPin(accountUpdate.getPin())
+                .keyUsb(accountUpdate.getUsb().getKeyUsb())
+                .listDevices(computerCode)
+                .usbVendorCode(accountUpdate.getUsb().getUsbVendorCode())
+                .usbCode(accountUpdate.getUsb().getUsbCode())
+                .build();
         // Mã hóa chuỗi JSON
         String encryptedData = ChangeData.encrypt(usbInfoToEncrypt);
         // Ghi đè vào file setup.vks
@@ -133,7 +133,6 @@ public class UsbServiceImpl implements UsbService {
         deleteDirectory(unzippedFolderPath);
         return zipFilePath.toString();
     }
-
 
     private void unzipFile(String zipFilePath, String destDirectory) throws IOException {
         // Tạo thư mục đích nếu chưa tồn tại
@@ -162,11 +161,10 @@ public class UsbServiceImpl implements UsbService {
         }
     }
 
-
     private void zipFiles(String sourceFolder, String zipFilePath) throws IOException {
         // Tạo stream ghi file zip
         try (FileOutputStream fos = new FileOutputStream(zipFilePath);
-             ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+                ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
             File folderToZip = new File(sourceFolder);
             // Kiểm tra thư mục nguồn có tồn tại không
@@ -199,7 +197,6 @@ public class UsbServiceImpl implements UsbService {
         }
     }
 
-
     private void writeToFile(String data, String unzippedFolderPath) throws ApiException {
         File file = getFile(unzippedFolderPath);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
@@ -217,7 +214,6 @@ public class UsbServiceImpl implements UsbService {
         }
         return new File(directory, "setup.vks");
     }
-
 
     private void deleteDirectory(Path path) throws IOException {
         if (Files.exists(path)) {

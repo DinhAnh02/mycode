@@ -35,8 +35,9 @@ public class GlobalExceptionHandler {
         String displayMessage = (ex instanceof ApiException) ? ex.getMessage() : errorCode.getMessage();
 
         // Lấy kết quả với kiểu dữ liệu `Map<String, String>`
-        Map<String, Optional<?>> result =
-                errorCode.getResult() instanceof Map ? (Map<String, Optional<?>>) errorCode.getResult() : new HashMap<>();
+        Map<String, Optional<?>> result = errorCode.getResult() instanceof Map
+                ? (Map<String, Optional<?>>) errorCode.getResult()
+                : new HashMap<>();
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(new HashMap<String, Object>() {
             {
