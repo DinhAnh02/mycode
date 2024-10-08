@@ -763,9 +763,6 @@ public class AccountServiceImpl implements AccountService {
                 && account.getStatus().equals(Status.ACTIVE.name())) {
             detailResponse.setIsShowLockButton(true);
             detailResponse.setIsEnabledLockButton(true);
-        } else {
-            detailResponse.setIsShowLockButton(false);
-            detailResponse.setIsEnabledLockButton(false);
         }
     }
 
