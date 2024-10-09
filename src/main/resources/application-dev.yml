@@ -8,5 +8,5 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://100.67.168.11:3306/vks-db
 app:
-  host: https://dev-vks.eledevo.com
+  host: http://100.113.61.3:9000
 

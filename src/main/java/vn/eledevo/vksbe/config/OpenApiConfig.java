@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
         servers = {
             @Server(description = "Local", url = "http://localhost:8081"),
             @Server(description = "Develop", url = "https://dev-vks.eledevo.com"),
-            @Server(description = "Tester", url = "http://192.168.1.17:8082"),
-                @Server(description = "Staging", url = "https://uat-vks.eledevo.com")
+            @Server(description = "Tester", url = "http://test-vks.eledevo.com"),
+            @Server(description = "Staging", url = "https://uat-vks.eledevo.com")
         },
         security = {@SecurityRequirement(name = "bearerAuth")})
 @SecurityScheme(
