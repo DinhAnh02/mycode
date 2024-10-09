@@ -411,6 +411,8 @@ public class AccountServiceImpl implements AccountService {
                         computer.setUpdatedAt(LocalDate.now());
                         computer.setUpdatedBy(nameUpdate);
                         connectedComputers.add(computer);
+                        accounts.setIsConnectComputer(true);
+                        accountRepository.save(accounts);
                         Optional<Usbs> usb = usbRepository.findByAccounts_Id(id);
                         if (usb.isPresent()) {
                             removeUSB(id, usb.get().getId());
