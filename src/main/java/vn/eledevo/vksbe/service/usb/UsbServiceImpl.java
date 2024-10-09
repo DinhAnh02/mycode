@@ -1,5 +1,32 @@
 package vn.eledevo.vksbe.service.usb;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
+import vn.eledevo.vksbe.constant.Status;
+import vn.eledevo.vksbe.dto.request.DataChange;
+import vn.eledevo.vksbe.dto.request.UsbRequest;
+import vn.eledevo.vksbe.dto.request.usb.UsbToken;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
+import vn.eledevo.vksbe.entity.Accounts;
+import vn.eledevo.vksbe.entity.Computers;
+import vn.eledevo.vksbe.entity.Usbs;
+import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.repository.AccountRepository;
+import vn.eledevo.vksbe.repository.UsbRepository;
+import vn.eledevo.vksbe.service.ChangeData;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -15,33 +42,6 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
-import vn.eledevo.vksbe.constant.Status;
-import vn.eledevo.vksbe.dto.request.DataChange;
-import vn.eledevo.vksbe.dto.request.UsbRequest;
-import vn.eledevo.vksbe.dto.request.usb.UsbToken;
-import vn.eledevo.vksbe.dto.response.ResponseFilter;
-import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
-import vn.eledevo.vksbe.entity.Accounts;
-import vn.eledevo.vksbe.entity.Computers;
-import vn.eledevo.vksbe.entity.Usbs;
-import vn.eledevo.vksbe.exception.ApiException;
-import vn.eledevo.vksbe.repository.AccountRepository;
-import vn.eledevo.vksbe.repository.UsbRepository;
-import vn.eledevo.vksbe.service.ChangeData;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +81,7 @@ public class UsbServiceImpl implements UsbService {
         ClassLoader classLoader = getClass().getClassLoader();
         URL resource = classLoader.getResource("AppUsb/app_usb.zip");
         if (resource == null) {
-            throw new ApiException(UsbErrorCode.FOLDER_NOT_FOUND, "Tài nguyên app_usb.zip không tồn tại");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tài nguyên app_usb.zip không tồn tại");
         }
         // Copy file zip từ tài nguyên ra một thư mục tạm để giải nén
         Path tempDir = Files.createTempDirectory("usbTemp");
@@ -94,17 +94,17 @@ public class UsbServiceImpl implements UsbService {
 
         Optional<Accounts> account = accountRepository.findById(idAccount);
         if (account.isEmpty()) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,AccountErrorCode.ACCOUNT_NOT_FOUND.getMessage());
         }
         if (Boolean.TRUE.equals(account.get().getIsConnectUsb())) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_LINKED_USB);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, AccountErrorCode.ACCOUNT_LINKED_USB.getMessage());
         }
         Optional<Usbs> usbInfo = usbRepository.usbTokenNew(usbToken.getUsbCode(), usbToken.getUsbVendorCode());
         if (usbInfo.isEmpty()) {
-            throw new ApiException(UsbErrorCode.USB_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,UsbErrorCode.USB_NOT_FOUND.getMessage());
         }
         if (usbInfo.get().getKeyUsb() != null && !usbInfo.get().getKeyUsb().isEmpty()) {
-            throw new ApiException(UsbErrorCode.USB_IS_CONNECTED);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,UsbErrorCode.USB_IS_CONNECTED.getMessage());
         }
         UUID keyUsb = UUID.randomUUID();
         account.get().setIsConnectUsb(Boolean.TRUE);
@@ -203,14 +203,14 @@ public class UsbServiceImpl implements UsbService {
             writer.write(data);
             writer.flush();
         } catch (IOException e) {
-            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private File getFile(String unzippedFolderPath) throws ApiException {
+    private File getFile(String unzippedFolderPath) {
         File directory = new File(unzippedFolderPath);
         if (!directory.exists()) {
-            throw new ApiException(UsbErrorCode.FOLDER_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,UsbErrorCode.FOLDER_NOT_FOUND.getMessage());
         }
         return new File(directory, "setup.vks");
     }
