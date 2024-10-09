@@ -27,7 +27,6 @@ public class Profiles {
 
     @Size(max = 1000)
     String avatar;
-
     String gender;
     LocalDate createdAt;
     LocalDate updatedAt;

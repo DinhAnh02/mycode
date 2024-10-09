@@ -65,6 +65,8 @@ import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
+import vn.eledevo.vksbe.utils.minio.MinioProperties;
+import vn.eledevo.vksbe.utils.minio.MinioService;
 
 @Service
 @RequiredArgsConstructor
@@ -81,10 +83,9 @@ public class AccountServiceImpl implements AccountService {
     DepartmentRepository departmentRepository;
     OrganizationRepository organizationRepository;
     ProfileRepository profileRepository;
+    MinioService minioService;
+    MinioProperties minioProperties;
 
-    @Value("${file.upload-dir}")
-    @NonFinal
-    String uploadDir;
 
     @Value("${app.host}")
     @NonFinal
@@ -136,7 +137,7 @@ public class AccountServiceImpl implements AccountService {
         Accounts loginAccount = SecurityUtils.getUser();
         if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
                 || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name())
-                        && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))) {
+                && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_READ_DATA_DEPARTMENT);
         }
 
@@ -204,9 +205,9 @@ public class AccountServiceImpl implements AccountService {
             account.setIsEnabledLockButton(true);
         }
         if (Boolean.TRUE.equals((account.getStatus().equals(Status.INACTIVE.name())
-                                || account.getStatus().equals(Status.INITIAL.name()))
-                        && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
-                        && account.getIsConnectComputer())
+                || account.getStatus().equals(Status.INITIAL.name()))
+                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
+                && account.getIsConnectComputer())
                 && Boolean.TRUE.equals(account.getIsConnectUsb())) {
             account.setIsShowUnlockButton(true);
             account.setIsEnabledUnlockButton(true);
@@ -222,10 +223,10 @@ public class AccountServiceImpl implements AccountService {
 
         if (isSameLoginRole
                 && (account.getStatus().equals(Status.INACTIVE.name())
-                        || account.getStatus().equals(Status.INITIAL.name())
-                                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
-                                && account.getIsConnectComputer()
-                                && account.getIsConnectUsb())) {
+                || account.getStatus().equals(Status.INITIAL.name())
+                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
+                && account.getIsConnectComputer()
+                && account.getIsConnectUsb())) {
             account.setIsShowUnlockButton(true);
             account.setIsEnabledUnlockButton(true);
         }
@@ -559,28 +560,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ResultUrl uploadAvatar(MultipartFile file) throws ApiException, IOException {
+    public ResultUrl uploadAvatar(MultipartFile file) throws Exception {
         validateAvatarFile(file);
-
-        Path uploadPath = Files.createDirectories(Paths.get(uploadDir));
-        String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
-        Path filePath = uploadPath.resolve(uniqueFileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        return new ResultUrl(appHost + AVATAR_URI + uniqueFileName);
+        return new ResultUrl(minioService.uploadFile(file));
     }
 
-    @Override
-    public Resource downloadAvatar(String fileName) throws ApiException, IOException {
-        if (fileName == null || fileName.isEmpty()) {
-            throw new ApiException(AccountErrorCode.AVATAR_NOT_FOUND);
-        }
-        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-        return new UrlResource(filePath.toUri());
-    }
 
     @Override
     @Transactional
-    public AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException {
+    public AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws Exception {
         Accounts accountLogin = SecurityUtils.getUser();
         Accounts accountUpdate = validAccount(updatedAccId);
 
@@ -609,7 +597,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
-                        && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
+                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
                 || !accountUpdate.getStatus().equals(Status.ACTIVE.name())) {
             accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
@@ -644,9 +632,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws ApiException {
+    public AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws Exception {
         Accounts account =
                 accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        minioService.deleteFile(account.getProfile().getAvatar());
         account.getProfile().setAvatar(request.getAvatar());
         accountRepository.save(account);
         return AccountResponse.builder().build();
@@ -678,35 +667,6 @@ public class AccountServiceImpl implements AccountService {
         return new HashMap<>();
     }
 
-    private void clearPathImg(String path) throws ApiException {
-        Path filePath = Paths.get(getPathImg(path));
-        try {
-            if (Files.exists(filePath)) {
-                // Xóa tệp nếu tồn tại
-                Files.delete(filePath);
-            }
-        } catch (IOException e) {
-            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
-        }
-    }
-
-    private String getPathImg(String url) throws ApiException {
-        // Kiểm tra nếu url là null hoặc rỗng
-        if (url == null || url.isEmpty()) {
-            // Ném ra một ngoại lệ ApiException với mã lỗi URL_NOT_FOUND
-            throw new ApiException(AccountErrorCode.URL_NOT_FOUND);
-        }
-        // Tạo prefix từ appHost và AVATAR_URI
-        String prefix = appHost + AVATAR_URI;
-        // Kiểm tra nếu url bắt đầu với prefix
-        if (url.startsWith(prefix)) {
-            // Tính toán đường dẫn dựa trên url và trả về kết quả
-            return uploadDir + "/" + url.substring(prefix.length());
-        } else {
-            // Nếu url không bắt đầu với prefix, ném ra ngoại lệ
-            throw new ApiException(AccountErrorCode.URL_NOT_FOUND);
-        }
-    }
 
     private void removeUSB(Long accountID, Long usbID) throws ApiException {
         Accounts accounts = accountRepository
@@ -757,9 +717,9 @@ public class AccountServiceImpl implements AccountService {
         if ((loginAcc.equals(Role.TRUONG_PHONG) || loginAcc.equals(Role.PHO_PHONG))
                 && priorityRoles(loginAcc) > priorityRoles(detailedAcc)
                 && accSecurity
-                        .getDepartments()
-                        .getId()
-                        .equals(account.getDepartments().getId())
+                .getDepartments()
+                .getId()
+                .equals(account.getDepartments().getId())
                 && account.getStatus().equals(Status.ACTIVE.name())) {
             detailResponse.setIsShowLockButton(true);
             detailResponse.setIsEnabledLockButton(true);
@@ -880,7 +840,7 @@ public class AccountServiceImpl implements AccountService {
             }
 
             String path = uri.getPath();
-            if (path == null || !path.startsWith(AVATAR_URI)) {
+            if (path == null || !path.contains("/" + minioProperties.getBucketName() + "/")) {
                 errors.put(keyError, ResponseMessage.AVATAR_URL_INVALID);
                 return;
             }
@@ -895,18 +855,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Accounts accountToUpdate(AccountUpdateRequest req, Long updatedAccId, Roles updateAccRole)
-            throws ApiException {
+            throws Exception {
         Profiles profile = profileRepository.findByAccounts_Id(updatedAccId);
         Accounts account = accountRepository.findById(updatedAccId).orElseThrow();
 
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
-        //        clearPathImg(profile.getAvatar());
-        //        String pathFile = getPathImg(req.getAvatar());
-        //        if (!Files.exists(Paths.get(pathFile))) {
-        //            throw new ApiException(AccountErrorCode.PATH_AVATAR_NOT_FOUND);
-        //        }
+        minioService.deleteFile(profile.getAvatar());
         profile.setAvatar(req.getAvatar());
         Profiles profileSave = profileRepository.save(profile);
 

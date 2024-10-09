@@ -131,16 +131,8 @@ public class AccountController {
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload avatar")
     public ApiResponse<ResultUrl> uploadAvatar(@RequestParam("file") MultipartFile file)
-            throws ApiException, IOException {
+            throws Exception {
         return ApiResponse.ok(accountService.uploadAvatar(file));
-    }
-
-    @GetMapping("/download-image/{fileName:.+}")
-    @Operation(summary = "Download avatar")
-    public ResponseEntity<Resource> downloadAvatar(@PathVariable String fileName) throws ApiException, IOException {
-        return ResponseEntity.ok()
-                .header("Content-Type", getContentType(fileName))
-                .body(accountService.downloadAvatar(fileName));
     }
 
     @PostMapping("/create")
@@ -161,7 +153,7 @@ public class AccountController {
     @Operation(summary = "Chỉnh sửa thông tin tài khoản")
     public ApiResponse<AccountSwapResponse> updateAccountInfo(
             @PathVariable(value = "updatedAccId") Long updatedAccId, @Valid @RequestBody AccountUpdateRequest req)
-            throws ApiException {
+            throws Exception {
         organizationalStructureUtilsService.validateUpdate(req);
         return ApiResponse.ok(accountService.updateAccountInfo(updatedAccId, req));
     }
@@ -175,7 +167,7 @@ public class AccountController {
     @PatchMapping("/{id}/update-avatar-user-info")
     @Operation(summary = "Chỉnh sửa avatar của tài khoản đăng nhập")
     public ApiResponse<AccountResponse> updateAvatarUserInfo(@PathVariable Long id, @RequestBody AvatarRequest request)
-            throws ApiException {
+            throws Exception {
         return ApiResponse.ok(accountService.updateAvatarUserInfo(id, request));
     }
 

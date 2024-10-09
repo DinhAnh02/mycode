@@ -53,15 +53,13 @@ public interface AccountService {
 
     AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException;
 
-    ResultUrl uploadAvatar(MultipartFile file) throws ApiException, IOException;
+    ResultUrl uploadAvatar(MultipartFile file) throws Exception;
 
-    Resource downloadAvatar(String fileName) throws ApiException, IOException;
-
-    AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws ApiException;
+    AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws Exception;
 
     UserInfo userInfo() throws ApiException;
 
-    AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws ApiException;
+    AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws Exception;
 
     HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException;
 }
