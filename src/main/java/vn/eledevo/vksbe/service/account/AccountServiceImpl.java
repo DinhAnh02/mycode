@@ -683,6 +683,7 @@ public class AccountServiceImpl implements AccountService {
         }
         usbToken.get().setAccounts(null);
         usbToken.get().setStatus(Status.DISCONNECTED.name());
+        usbToken.get().setKeyUsb(null);
         usbRepository.save(usbToken.get());
         accounts.setIsConnectUsb(false);
         accountRepository.save(accounts);
