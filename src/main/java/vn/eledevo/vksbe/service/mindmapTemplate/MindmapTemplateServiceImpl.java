@@ -25,6 +25,7 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
 import vn.eledevo.vksbe.repository.MindmapTemplateRepository;
 import vn.eledevo.vksbe.utils.SecurityUtils;
+import vn.eledevo.vksbe.utils.minio.MinioService;
 
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
     MindmapTemplateRepository mindmapTemplateRepository;
 
     DepartmentRepository departmentRepository;
+    MinioService minioService;
 
     public ResponseFilter<MindmapTemplateResponse> getListMindMapTemplate(Long departmentId, Integer page, Integer pageSize, String textSearch) throws ApiException {
         Accounts accounts = SecurityUtils.getUser();
@@ -97,6 +99,25 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 .name(mindmapTemplate.getName())
                 .build();
 
+    }
+
+    @Override
+    public MindmapTemplateResponse deleteMindMapTemplate(Long id) throws Exception {
+        Accounts accounts = SecurityUtils.getUser();
+        Optional<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.findById(id);
+        if(mindmapTemplate.isEmpty()){
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_FOUND);
+        }
+        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
+            if (!accounts.getDepartments().getId().equals(mindmapTemplate.get().getDepartments().getId())) {
+                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
+            }
+        }
+        if (mindmapTemplate.get().getUrl() != null){
+            minioService.deleteFile(mindmapTemplate.get().getUrl());
+        }
+        mindmapTemplateRepository.deleteById(id);
+        return null;
     }
 
 }
