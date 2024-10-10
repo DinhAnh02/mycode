@@ -21,13 +21,13 @@ public class CaseStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
     String name;
     String description;
     LocalDate createdAt;
     LocalDate updatedAt;
     String createdBy;
     String updatedBy;
+    Boolean isDefault;
 
     @OneToMany(mappedBy = "case_status", orphanRemoval = true, fetch = FetchType.LAZY)
     List<Cases> cases;
