@@ -3,10 +3,10 @@ server:
 
 spring:
   datasource:
-    username: eledevo
-    password: eledevo@123
+    username: root
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://100.67.168.11:3306/vks-db
+    url: jdbc:mysql://localhost:3306/vks_db
 app:
-  host: http://100.113.61.3:9000
+  host: localhost:3306
 

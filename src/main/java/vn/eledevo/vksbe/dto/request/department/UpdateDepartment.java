@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class UpdateDepartment {
     @NotBlank(message = "Không được để trống tên phòng ban")
