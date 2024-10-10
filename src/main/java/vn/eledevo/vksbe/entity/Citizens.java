@@ -36,7 +36,7 @@ public class Citizens {
     String createdBy;
     String updatedBy;
 
-    @OneToMany(mappedBy = "citizens", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "citizens", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     List<CasePerson> casePersons;
 
     @PrePersist
