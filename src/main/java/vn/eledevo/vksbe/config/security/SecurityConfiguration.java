@@ -76,7 +76,7 @@ public class SecurityConfiguration {
                                 Role.PHO_PHONG.name(),
                                 Role.IT_ADMIN.name())
                         .requestMatchers(
-                                "/api/v1/private/mindmapTemplate/{departmentId}/department"
+                                "/api/v1/private/mindmapTemplate/**"
                         )
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),

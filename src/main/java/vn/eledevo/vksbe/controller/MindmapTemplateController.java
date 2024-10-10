@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
+import vn.eledevo.vksbe.dto.request.MindMapTemplateRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.MindmapTemplateResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
@@ -30,6 +31,13 @@ public class MindmapTemplateController {
             @RequestParam(required = false) String textSearch
     ) throws ApiException {
         return ApiResponse.ok(mindmapTemplateService.getListMindMapTemplate(departmentId, page, pageSize, textSearch));
+    }
+
+    @PostMapping("/create")
+    public ApiResponse <MindmapTemplateResponse> create(
+            @RequestBody MindMapTemplateRequest mindMapTemplateRequest
+    ) throws ApiException{
+        return ApiResponse.ok(mindmapTemplateService.createMindMapTemplate(mindMapTemplateRequest));
     }
 
 }
