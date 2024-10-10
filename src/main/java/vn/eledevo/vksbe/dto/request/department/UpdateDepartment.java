@@ -13,6 +13,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class UpdateDepartment {
     @NotBlank(message = "Không được để trống tên phòng ban")
-    @Size(min = 1, max = 50, message = "Tên phòng ban không được vượt quá 50 ký tự")
+    @Size(min = 1, max = 255, message = "Tên phòng ban không được vượt quá 255 ký tự")
     String departmentName;
 }
