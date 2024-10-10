@@ -29,13 +29,13 @@ public class Departments {
     String createdBy;
     String updatedBy;
 
-    @OneToMany(mappedBy = "departments", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "departments", fetch = FetchType.EAGER)
     List<Accounts> accounts;
 
-    @OneToMany(mappedBy = "departments", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "departments", fetch = FetchType.EAGER)
     List<MindmapTemplate> mindmapTemplates;
 
-    @OneToMany(mappedBy = "departments", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "departments", fetch = FetchType.LAZY)
     List<Cases> cases;
 
     @PrePersist

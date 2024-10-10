@@ -39,16 +39,16 @@ public class Cases {
     @JoinColumn(name = "caseStatusId", nullable = false)
     CaseStatus case_status;
 
-    @OneToMany(mappedBy = "cases", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cases", fetch = FetchType.LAZY)
     List<Documents> documents;
 
     @OneToMany(mappedBy = "cases", orphanRemoval = true, fetch = FetchType.EAGER)
     List<CaseFlow> caseFlows;
 
-    @OneToMany(mappedBy = "cases", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cases", fetch = FetchType.EAGER)
     List<CasePerson> casePersons;
 
-    @OneToMany(mappedBy = "cases", orphanRemoval = true)
+    @OneToMany(mappedBy = "cases")
     List<AccountCase> accountCases;
 
     @PrePersist

@@ -59,10 +59,10 @@ public class Accounts implements UserDetails {
     @OneToMany(mappedBy = "accounts", orphanRemoval = true, fetch = FetchType.EAGER)
     List<Computers> computers;
 
-    @OneToOne(mappedBy = "accounts", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "accounts", fetch = FetchType.EAGER)
     Usbs usb;
 
-    @OneToMany(mappedBy = "accounts", orphanRemoval = true)
+    @OneToMany(mappedBy = "accounts")
     List<AccountCase> accountCases;
 
     @Override

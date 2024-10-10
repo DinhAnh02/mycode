@@ -29,7 +29,7 @@ public class CaseStatus {
     String updatedBy;
     Boolean isDefault;
 
-    @OneToMany(mappedBy = "case_status", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "case_status", fetch = FetchType.LAZY)
     List<Cases> cases;
 
     @PrePersist

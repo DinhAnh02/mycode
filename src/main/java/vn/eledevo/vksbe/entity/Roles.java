@@ -23,6 +23,6 @@ public class Roles {
     String code;
     String name;
 
-    @OneToMany(mappedBy = "roles", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     List<Accounts> accounts;
 }

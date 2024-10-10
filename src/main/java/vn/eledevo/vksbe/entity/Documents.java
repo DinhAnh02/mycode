@@ -41,7 +41,7 @@ public class Documents {
     @JoinColumn(name = "parentId", referencedColumnName = "id")
     Documents parentId;
 
-    @OneToMany(mappedBy = "parentId", cascade = CascadeType.MERGE, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parentId", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     List<Documents> childDocuments;
 
     @PrePersist
