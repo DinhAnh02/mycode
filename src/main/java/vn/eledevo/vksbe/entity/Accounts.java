@@ -56,7 +56,7 @@ public class Accounts implements UserDetails {
     @OneToMany(mappedBy = "accounts", orphanRemoval = true, fetch = FetchType.EAGER)
     List<AuthTokens> authTokens;
 
-    @OneToMany(mappedBy = "accounts", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "accounts", fetch = FetchType.EAGER)
     List<Computers> computers;
 
     @OneToOne(mappedBy = "accounts", fetch = FetchType.EAGER)
