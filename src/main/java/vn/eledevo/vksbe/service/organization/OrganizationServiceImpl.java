@@ -116,6 +116,22 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public OrganizationResponse getOrganizationDetail(Long organizationId) throws ApiException {
+        Optional<Organizations> organizationOptional = organizationRepository.findById(organizationId);
+        if(organizationOptional.isEmpty()){
+            throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
+        }
+
+        OrganizationResponse organizationResponse  = OrganizationResponse.builder()
+                .id(organizationOptional.get().getId())
+                .name(organizationOptional.get().getName())
+                .code(organizationOptional.get().getCode())
+                .address(organizationOptional.get().getAddress())
+                .build();
+        return organizationResponse;
+    }
+
+    @Override
     public HashMap<String, String> deleteOrganization(Long organizationId) throws ApiException {
         Optional<Organizations> organization = organizationRepository.findById(organizationId);
         if(organization.isEmpty()){

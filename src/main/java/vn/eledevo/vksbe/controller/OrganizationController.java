@@ -46,6 +46,12 @@ public class OrganizationController {
         return ApiResponse.ok(organizationService.updateOrganization(id, organizationRequest));
     }
 
+    @PatchMapping("/{id}/detail")
+    @Operation(summary = "Lấy chi tiết đơn vị từ danh sách đơn vị")
+    public ApiResponse<OrganizationResponse> getOrganizationDetail(@PathVariable Long id) throws ApiException {
+        return ApiResponse.ok(organizationService.getOrganizationDetail(id));
+    }
+
     @DeleteMapping("/{id}/delete")
     @Operation(summary = "xóa đơn vị theo id")
     public ApiResponse<HashMap<String,String>> deleteOrganization(@PathVariable Long id) throws ApiException {
