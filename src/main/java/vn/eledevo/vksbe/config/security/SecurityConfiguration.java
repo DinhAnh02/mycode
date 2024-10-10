@@ -100,7 +100,9 @@ public class SecurityConfiguration {
                         .hasAuthority(Role.IT_ADMIN.name())
                         .requestMatchers(
                                 "/api/v1/private/departments/{id}/update-department",
-                                "/api/v1/private/case-status/create", "/api/v1/private/organizations/**")
+                                "/api/v1/private/case-status/create", "/api/v1/private/organizations/{id}/update",
+                                "/api/v1/private/organizations/{id}/delete"
+                        )
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
                                 Role.VIEN_PHO.name(),
