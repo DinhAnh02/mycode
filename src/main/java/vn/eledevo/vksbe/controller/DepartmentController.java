@@ -14,6 +14,21 @@ import vn.eledevo.vksbe.service.department.DepartmentService;
 
 import java.util.HashMap;
 
+import java.util.List;
+
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
+import vn.eledevo.vksbe.service.department.DepartmentService;
+
 @RestController
 @RequestMapping("/api/v1/private/departments")
 @RequiredArgsConstructor
@@ -21,6 +36,12 @@ import java.util.HashMap;
 @Tag(name = "Quản lý phòng ban")
 public class DepartmentController {
     DepartmentService departmentService;
+
+    @GetMapping()
+    @Operation(summary = "Xem danh sách phòng ban")
+    public ApiResponse<List<DepartmentResponse>> getDepartmentList() {
+        return ApiResponse.ok(departmentService.getDepartmentList());
+    }
 
     @PatchMapping("/{id}/update-department")
     @Operation(summary = "Cập nhật phòng ban")

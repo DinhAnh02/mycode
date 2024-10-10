@@ -1,22 +1,24 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.OK;
+import org.springframework.http.HttpStatusCode;
 
 public enum MindmapTemplateErrorCode implements BaseErrorCode {
-
-    MINDMAP_TEMPLATE_NOT_ENOUGH_PERMISSION(OK, "MMT-01", "Bạn không có quyền tạo sơ đồ mẫu trong phòng ban này", new HashMap<>()),
+    MINDMAP_TEMPLATE_NOT_ENOUGH_PERMISSION(
+            OK, "MMT-01", "Bạn không có quyền tạo sơ đồ mẫu trong phòng ban này", new HashMap<>()),
     MINDMAP_TEMPLATE_NAME_ALREADY_EXISTS(OK, "MMT-02", "Tên sơ đồ mẫu không được trùng", new HashMap<>()),
     MINDMAP_TEMPLATE_CREATE_FAILED(OK, "MMT-03", "Tạo mới sơ đồ mindmap thất bại", new HashMap<>()),
-    MINDMAP_TEMPLATE_NAME_EMPTY(OK, "MMT-04", "Tên sơ đồ không được để trống, vui lòng lựa chọn phòng ban", new HashMap<>()),
+    MINDMAP_TEMPLATE_NAME_EMPTY(
+            OK, "MMT-04", "Tên sơ đồ không được để trống, vui lòng lựa chọn phòng ban", new HashMap<>()),
     MINDMAP_TEMPLATE_NOT_FOUND(OK, "MMT-05", "Sơ đồ mẫu không tồn tại", new HashMap<>()),
-    MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS(OK, "MMT-06", "Bạn không có quyền vào sơ đồ mẫu của phòng ban này", new HashMap<>()),
+    MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS(
+            OK, "MMT-06", "Bạn không có quyền vào sơ đồ mẫu của phòng ban này", new HashMap<>()),
     MINDMAP_TEMPLATE_SERVER_ERROR(OK, "MMT-07", "Đã xảy ra lỗi trong quá trình xử lý tại server", new HashMap<>());
 
     private final HttpStatusCode statusCode;
@@ -30,7 +32,6 @@ public enum MindmapTemplateErrorCode implements BaseErrorCode {
         this.statusCode = statusCode;
         this.result = result;
     }
-
 
     @Override
     public HttpStatusCode getStatusCode() {
