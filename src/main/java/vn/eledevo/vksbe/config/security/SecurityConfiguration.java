@@ -72,7 +72,8 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/{accountId}/inactivate",
                                 "/api/v1/private/accounts/{accountId}/swap-account-status/{swapAccountId}",
                                 "/api/v1/private/accounts/{id}/devices",
-                                "/api/v1/private/departments")
+                                "/api/v1/private/departments",
+                                "/api/v1/private/organizations/search")
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
                                 Role.VIEN_PHO.name(),
