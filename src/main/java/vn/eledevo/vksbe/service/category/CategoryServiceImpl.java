@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.InformationResponse;
 import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
