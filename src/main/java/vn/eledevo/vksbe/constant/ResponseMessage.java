@@ -66,4 +66,11 @@ public class ResponseMessage {
     public static final String NAMEMINDMAP_MAX = "Tên không được vượt quá 255 ký tự";
 
     public static final String NAMEMINDMAP_SPECIAL = "Tên không được chứa ký tự đặc biệt";
+
+    public static final String CASE_STATUS_NAME_CANNOT_BE_BLANK = "Tên trạng thái không được để rỗng";
+
+    public static final String CASE_STATUS_NAME_CANNOT_EXCEED_255_CHARACTER  = "Tên trạng thái không được quá 255 kí tự";
+
+    public static final String STATUS_NAME_CAN_ONLY_CONTAIN_LETTER  = "Tên trạng thái chỉ có thể chứa các chữ cái";
+
 }
