@@ -1,8 +1,13 @@
 package vn.eledevo.vksbe.service.organization;
 
 import java.util.HashMap;
+import java.time.LocalDate;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import lombok.AccessLevel;
@@ -10,6 +15,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.OrganizationErrorCode;
 import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.OrganizationErrorCode;
+import vn.eledevo.vksbe.dto.request.OrganizationSearch;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
 import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.OrganizationRepository;
@@ -24,6 +34,34 @@ public class OrganizationServiceImpl implements OrganizationService {
     public Boolean organizationNameChangeDetector(Long organizationId, String organizationName) {
         Optional<Organizations> organization = organizationRepository.findById(organizationId);
         return organization.isPresent() && organization.get().getName().equals(organizationName);
+    }
+
+    @Override
+    public ResponseFilter<OrganizationResponse> getOrganizationList(OrganizationSearch organizationSearch, Integer page, Integer pageSize) throws ApiException {
+        if (page < 1) {
+            throw new ApiException(OrganizationErrorCode.ORGANIZATION_SYSTEM_ERROR);
+        }
+        if (pageSize < 1) {
+            throw new ApiException(OrganizationErrorCode.ORGANIZATION_SYSTEM_ERROR);
+        }
+        if(organizationSearch.getFromDate() == null){
+            organizationSearch.setFromDate(LocalDate.of(1900, 1, 1));
+        }
+        if(organizationSearch.getToDate()== null){
+            organizationSearch.setToDate(LocalDate.now());
+        }
+        if (organizationSearch.getFromDate().isAfter(organizationSearch.getToDate())) {
+            throw new ApiException(AccountErrorCode.START_TIME_GREATER_THAN_END_TIME);
+        }
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("updatedAt").descending());
+        Page<OrganizationResponse> organizationResponsePage = organizationRepository.getOrganizationList(organizationSearch,pageable);
+        return new ResponseFilter<>(
+                organizationResponsePage.getContent(),
+                (int) organizationResponsePage.getTotalElements(),
+                organizationResponsePage.getSize(),
+                organizationResponsePage.getNumber(),
+                organizationResponsePage.getTotalPages()
+        );
     }
 
 

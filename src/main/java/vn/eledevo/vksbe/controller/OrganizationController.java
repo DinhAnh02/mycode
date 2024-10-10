@@ -9,11 +9,15 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
 import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
 
 import java.util.HashMap;
+
+import vn.eledevo.vksbe.dto.request.OrganizationSearch;
+import vn.eledevo.vksbe.dto.response.ResponseFilter;;
 
 @RestController
 @RequestMapping("/api/v1/private/organizations")
@@ -22,6 +26,16 @@ import java.util.HashMap;
 @Tag(name = "Quản lý đơn vị")
 public class OrganizationController {
     OrganizationService organizationService;
+
+    @PostMapping("/search")
+    @Operation(summary = "Xem và tìm kiếm đơn vị")
+    public ApiResponse<ResponseFilter<OrganizationResponse>> getOrganizationList(
+            @RequestBody OrganizationSearch organizationSearch,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ) throws ApiException {
+        return ApiResponse.ok(organizationService.getOrganizationList(organizationSearch, page, pageSize));
+    }
 
     @PatchMapping("/{id}/update")
     @Operation(summary = "Chỉnh sửa đơn vị")
