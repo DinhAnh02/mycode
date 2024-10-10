@@ -42,4 +42,11 @@ public class MindmapTemplateController {
         return ApiResponse.ok(mindmapTemplateService.createMindMapTemplate(mindMapTemplateRequest));
     }
 
+    @DeleteMapping("/{id}/delete")
+    public ApiResponse<MindmapTemplateResponse> delete(
+            @PathVariable Long id
+    ) throws Exception {
+        return ApiResponse.ok(mindmapTemplateService.deleteMindMapTemplate(id));
+    }
+
 }
