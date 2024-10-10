@@ -40,6 +40,7 @@ public class SecurityConfiguration {
         "/swagger-ui.html",
         "/api/v1/private/accounts/download-image/{fileName:.+}",
         "/api/v1/private/minio/**",
+
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -54,7 +55,9 @@ public class SecurityConfiguration {
                                 "/api/v1/auth/**",
                                 "/api/v1/private/accounts/get-user-info",
                                 "/api/v1/private/accounts/change-pin-code",
-                                "/api/v1/private/accounts/{id}/update-avatar-user-info")
+                                "/api/v1/private/accounts/{id}/update-avatar-user-info",
+                                "/api/v1/private/case-status"
+                                )
                         .hasAnyAuthority(
                                 Role.IT_ADMIN.name(),
                                 Role.KIEM_SAT_VIEN.name(),
