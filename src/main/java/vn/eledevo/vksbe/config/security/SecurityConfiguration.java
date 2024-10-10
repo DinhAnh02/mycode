@@ -97,6 +97,12 @@ public class SecurityConfiguration {
                                 "/api/v1/private/computers/check-exist-computer",
                                 "/api/v1/private/accounts/upload-image")
                         .hasAuthority(Role.IT_ADMIN.name())
+                        .requestMatchers("/api/v1/private/departments/{id}/update-department")
+                        .hasAnyAuthority(
+                                Role.VIEN_TRUONG.name(),
+                                Role.VIEN_PHO.name(),
+                                Role.IT_ADMIN.name()
+                        )
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
