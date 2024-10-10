@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.service.organization;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -56,5 +57,18 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationOptional.get().setAddress(organizationRequest.getAddress());
 
         return organizationRepository.save(organizationOptional.get());
+    }
+
+    @Override
+    public HashMap<String, String> deleteOrganization(Long organizationId) throws ApiException {
+        Optional<Organizations> organization = organizationRepository.findById(organizationId);
+        if(organization.isEmpty()){
+            throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
+        }
+        if(organization.get().getIsDefault()){
+            throw new ApiException(OrganizationErrorCode.ORGANIZATION_DEFAULT);
+        }
+        organizationRepository.deleteById(organizationId);
+        return new HashMap<>();
     }
 }
