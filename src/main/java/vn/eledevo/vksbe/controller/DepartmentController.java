@@ -24,7 +24,7 @@ public class DepartmentController {
 
     @PatchMapping("/{id}/update-department")
     @Operation(summary = "Cập nhật phòng ban")
-    public ApiResponse<HashMap<String, String>> updateDepartment(@PathVariable @Valid Long id,
+    public ApiResponse<HashMap<String, String>> updateDepartment(@PathVariable Long id,
                                                                  @RequestBody @Valid UpdateDepartment departmentRequest)throws ApiException {
         return ApiResponse.ok(departmentService.updateDepartment(id, departmentRequest));
     }
