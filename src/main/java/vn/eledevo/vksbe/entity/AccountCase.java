@@ -19,6 +19,7 @@ public class AccountCase {
     Long id;
 
     Boolean hasAccess;
+    Boolean isEditPerson;
     String accountRole;
     String position;
 
