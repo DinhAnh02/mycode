@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.service.department;
 
 import java.util.List;
 
+import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 
 import vn.eledevo.vksbe.dto.request.department.UpdateDepartment;
@@ -11,6 +12,6 @@ import java.util.HashMap;
 
 public interface DepartmentService {
     Boolean departmentNameChangeDetector(Long departmentId, String departmentName);
-    List<DepartmentResponse> getDepartmentList();
+    ResultList<DepartmentResponse> getDepartmentList();
     HashMap<String, String> updateDepartment(Long departmentId, UpdateDepartment departmentRequest) throws ApiException;
 }

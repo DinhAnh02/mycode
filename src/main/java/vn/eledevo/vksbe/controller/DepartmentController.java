@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.department.UpdateDepartment;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.department.DepartmentService;
 
@@ -39,7 +40,7 @@ public class DepartmentController {
 
     @GetMapping()
     @Operation(summary = "Xem danh sách phòng ban")
-    public ApiResponse<List<DepartmentResponse>> getDepartmentList() {
+    public ApiResponse<ResultList<DepartmentResponse>> getDepartmentList() {
         return ApiResponse.ok(departmentService.getDepartmentList());
     }
 

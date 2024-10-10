@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
 import vn.eledevo.vksbe.dto.request.department.UpdateDepartment;
+import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -28,8 +29,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<DepartmentResponse> getDepartmentList() {
-        return departmentRepository.getDepartmentList();
+    public ResultList<DepartmentResponse> getDepartmentList() {
+        List<DepartmentResponse> departments = departmentRepository.getDepartmentList();
+        return ResultList.<DepartmentResponse>builder()
+                .content(departments)
+                .build();
     }
 
     @Override
