@@ -15,7 +15,7 @@ import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 
-public interface AccountRepository extends BaseRepository<Accounts, Long>, JpaSpecificationExecutor<Accounts> {
+public interface AccountRepository extends BaseRepository<Accounts, Long> {
     @Query("SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username")
     Optional<Accounts> findAccountInSystem(String username);
 

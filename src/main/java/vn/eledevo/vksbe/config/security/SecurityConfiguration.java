@@ -98,7 +98,9 @@ public class SecurityConfiguration {
                                 "/api/v1/private/computers/check-exist-computer",
                                 "/api/v1/private/accounts/upload-image")
                         .hasAuthority(Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/departments/{id}/update-department")
+                        .requestMatchers(
+                                "/api/v1/private/departments/{id}/update-department",
+                                "/api/v1/private/case-status/create")
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
                                 Role.VIEN_PHO.name(),
