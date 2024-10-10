@@ -643,7 +643,7 @@ public class AccountServiceImpl implements AccountService {
         Accounts account =
                 accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
         if(account.getProfile().getAvatar().isEmpty() || account.getProfile().getAvatar().isBlank()){
-            account.getProfile().setAvatar(request.getAvatar());
+            account.getProfile().setAvatar(null);
             accountRepository.save(account);
             return AccountResponse.builder().build();
         }
