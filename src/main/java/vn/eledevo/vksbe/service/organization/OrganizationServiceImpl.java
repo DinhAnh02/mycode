@@ -9,14 +9,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.OrganizationErrorCode;
 import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
-import vn.eledevo.vksbe.constant.ErrorCodes.OrganizationErrorCode;
 import vn.eledevo.vksbe.dto.request.OrganizationSearch;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
@@ -64,28 +62,48 @@ public class OrganizationServiceImpl implements OrganizationService {
         );
     }
 
+    @Override
+    public HashMap<String, String> createOrganization(OrganizationRequest organizationRequest) throws ApiException {
+        Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
+        if (Boolean.TRUE.equals(checkOrganizationExistByName)) {
+            throw new ApiException(OrganizationErrorCode.ORGANIZATION_NAME_EXIST);
+        }
+
+        Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
+        if (Boolean.TRUE.equals(checkOrganizationExistByCode)) {
+            throw new ApiException(OrganizationErrorCode.ORGANIZATION_CODE_EXIST);
+        }
+
+        Organizations organization = new Organizations();
+        organization.setName(organizationRequest.getName());
+        organization.setCode(organizationRequest.getCode());
+        organization.setAddress(organizationRequest.getAddress());
+        organization.setIsDefault(false);
+        organizationRepository.save(organization);
+        return new HashMap<>();
+    }
 
     @Override
     public Organizations updateOrganization(Long organizationId, OrganizationRequest organizationRequest) throws ApiException {
         Optional<Organizations> organizationOptional = organizationRepository.findById(organizationId);
-        if(organizationOptional.isEmpty()){
+        if (organizationOptional.isEmpty()) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
         }
 
-        if(organizationOptional.get().getIsDefault()){
+        if (organizationOptional.get().getIsDefault()) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_DEFAULT);
         }
 
-        if(!(organizationRequest.getCode().equals(organizationOptional.get().getCode()))){
+        if (!(organizationRequest.getCode().equals(organizationOptional.get().getCode()))) {
             Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
-            if(checkOrganizationExistByCode){
+            if (checkOrganizationExistByCode) {
                 throw new ApiException(OrganizationErrorCode.ORGANIZATION_CODE_EXIST);
             }
         }
 
-        if(!(organizationRequest.getName().equals(organizationOptional.get().getName()))){
+        if (!(organizationRequest.getName().equals(organizationOptional.get().getName()))) {
             Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
-            if(checkOrganizationExistByName){
+            if (checkOrganizationExistByName) {
                 throw new ApiException(OrganizationErrorCode.ORGANIZATION_NAME_EXIST);
             }
         }
