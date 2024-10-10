@@ -635,8 +635,18 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws Exception {
+        Map<String,String> error = new HashMap<>();
+        validateAvatar(request.getAvatar(),error);
+        if (!error.isEmpty()){
+            throw new ApiException(SystemErrorCode.VALIDATE_FORM);
+        }
         Accounts account =
                 accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        if(account.getProfile().getAvatar().isEmpty() || account.getProfile().getAvatar().isBlank()){
+            account.getProfile().setAvatar(request.getAvatar());
+            accountRepository.save(account);
+            return AccountResponse.builder().build();
+        }
         minioService.deleteFile(account.getProfile().getAvatar());
         account.getProfile().setAvatar(request.getAvatar());
         accountRepository.save(account);
