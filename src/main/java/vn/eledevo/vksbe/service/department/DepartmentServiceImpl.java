@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import static vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
 import vn.eledevo.vksbe.dto.request.department.UpdateDepartment;
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.exception.ApiException;
@@ -28,10 +28,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public HashMap<String, String> updateDepartment(Long departmentId, UpdateDepartment departmentRequest) throws ApiException {
         Departments existingDepartment = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new ApiException(DEPARTMENT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
 
         if(departmentRepository.existsDepartmentsByName(departmentRequest.getDepartmentName())){
-            throw new ApiException(DEPARTMENT_EXISTED);
+            throw new ApiException(DepartmentErrorCode.DEPARTMENT_EXISTED);
         }
 
         existingDepartment.setName(departmentRequest.getDepartmentName());
