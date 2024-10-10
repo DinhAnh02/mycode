@@ -1,12 +1,14 @@
 package vn.eledevo.vksbe.controller;
 
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.*;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
@@ -39,7 +41,8 @@ public class OrganizationController {
 
     @PatchMapping("/{id}/update")
     @Operation(summary = "Chỉnh sửa đơn vị")
-    public ApiResponse<Organizations> updateOrganization(@PathVariable Long id, @Valid @RequestBody OrganizationRequest organizationRequest) throws ApiException {
+    public ApiResponse<Organizations> updateOrganization(
+            @PathVariable Long id, @Valid @RequestBody OrganizationRequest organizationRequest) throws ApiException {
         return ApiResponse.ok(organizationService.updateOrganization(id, organizationRequest));
     }
 
@@ -47,5 +50,12 @@ public class OrganizationController {
     @Operation(summary = "xóa đơn vị theo id")
     public ApiResponse<HashMap<String,String>> deleteOrganization(@PathVariable Long id) throws ApiException {
         return ApiResponse.ok(organizationService.deleteOrganization(id));
+    }
+
+    @PostMapping("/create")
+    @Operation(summary = "Tạo mới đơn vị")
+    public ApiResponse<HashMap<String, String>> createOrganization(
+            @Valid @RequestBody OrganizationRequest organizationRequest) throws ApiException {
+        return ApiResponse.ok(organizationService.createOrganization(organizationRequest));
     }
 }
