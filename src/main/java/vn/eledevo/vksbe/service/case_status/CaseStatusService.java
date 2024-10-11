@@ -10,11 +10,13 @@ import java.util.HashMap;
 
 public interface CaseStatusService {
     ResponseFilter<CaseStatusResponse> getCaseStatus(
-            CaseStatusGetRequest caseStatusGetRequest,Integer page, Integer pageSize) throws ApiException;
+            CaseStatusGetRequest caseStatusGetRequest, Integer page, Integer pageSize) throws ApiException;
 
-    HashMap<String,String> createCaseStatus(CaseStatusCreateRequest caseStatusCreateRequest) throws  ApiException;
+    HashMap<String, String> createCaseStatus(CaseStatusCreateRequest caseStatusCreateRequest) throws ApiException;
 
-    HashMap<String,String> updateCaseStatus(Long id, CaseStatusCreateRequest caseStatusCreateRequest) throws  ApiException;
+    HashMap<String, String> updateCaseStatus(Long id, CaseStatusCreateRequest caseStatusCreateRequest) throws ApiException;
 
     CaseStatusResponse getCaseStatusDetail(Long caseStatusId) throws ApiException;
+
+    HashMap<String, String> deleteCaseStatusById(Long id) throws ApiException;
 }
