@@ -19,7 +19,9 @@ public enum MindmapTemplateErrorCode implements BaseErrorCode {
     MINDMAP_TEMPLATE_NOT_FOUND(OK, "MMT-05", "Sơ đồ mẫu không tồn tại", new HashMap<>()),
     MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS(
             OK, "MMT-06", "Bạn không có quyền vào sơ đồ mẫu của phòng ban này", new HashMap<>()),
-    MINDMAP_TEMPLATE_SERVER_ERROR(OK, "MMT-07", "Đã xảy ra lỗi trong quá trình xử lý tại server", new HashMap<>());
+    MINDMAP_TEMPLATE_SERVER_ERROR(OK, "MMT-07", "Đã xảy ra lỗi trong quá trình xử lý tại server", new HashMap<>()),
+    MINDMAP_TEMPLATE_NAME_MINDMAP(OK, "MMT-08", "Tên sơ đồ đã tồn tại", new HashMap<>());
+
 
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
