@@ -19,9 +19,7 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.CaseStatusMapper;
 import vn.eledevo.vksbe.repository.CaseStatusRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -61,4 +59,25 @@ public class CaseStatusServiceImpl implements CaseStatusService {
         caseStatusRepository.save(caseStatus);
         return new HashMap<>();
     }
+
+    @Override
+    public HashMap<String, String> updateCaseStatus(Long id, CaseStatusCreateRequest caseStatusCreateRequest) throws ApiException {
+        Optional<CaseStatus> caseStatusOptional = caseStatusRepository.findById(id);
+
+        if(caseStatusOptional.isEmpty()){
+            throw new ApiException(CaseStatusErrorCode.CASE_STATUS_NOT_FOUND);
+        }
+        if (!caseStatusCreateRequest.getName().equals(caseStatusOptional.get().getName()) && caseStatusRepository.existsByName(caseStatusCreateRequest.getName())){
+            throw new ApiException(CaseStatusErrorCode.CASE_STATUS_NAME_ALREADY_EXIST );
+        }
+        CaseStatus caseStatus = caseStatusOptional.get();
+        caseStatus.setName(caseStatusCreateRequest.getName());
+        if (Objects.nonNull(caseStatusCreateRequest.getDescription())) {
+            caseStatus.setDescription(caseStatusCreateRequest.getDescription());
+        }
+
+        caseStatusRepository.save(caseStatus);
+        return new HashMap<>();
+    }
+
 }
