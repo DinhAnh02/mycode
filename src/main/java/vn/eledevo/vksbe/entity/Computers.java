@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.Status;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Entity
@@ -42,6 +43,7 @@ public class Computers {
         this.updatedAt = LocalDate.now();
         this.createdBy = SecurityUtils.getUserName();
         this.updatedBy = SecurityUtils.getUserName();
+        this.status = Status.DISCONNECTED.name();
     }
 
     @PreUpdate
