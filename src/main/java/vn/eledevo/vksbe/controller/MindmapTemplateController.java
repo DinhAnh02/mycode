@@ -49,4 +49,11 @@ public class MindmapTemplateController {
         return ApiResponse.ok(mindmapTemplateService.deleteMindMapTemplate(id));
     }
 
+    @GetMapping("/{id}/detail")
+    @Operation(summary = "xem chi tiết sơ đồ mẫu")
+    public ApiResponse<MindmapTemplateResponse> getDetail(
+            @PathVariable Long id
+    ) throws ApiException {
+        return ApiResponse.ok(mindmapTemplateService.detailMindMap(id));
+    }
 }

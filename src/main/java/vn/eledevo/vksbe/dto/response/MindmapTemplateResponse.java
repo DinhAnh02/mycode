@@ -13,4 +13,5 @@ public class MindmapTemplateResponse {
     Long id;
     String name;
     String url;
+    String data;
 }
