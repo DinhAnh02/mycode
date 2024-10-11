@@ -56,7 +56,8 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/get-user-info",
                                 "/api/v1/private/accounts/change-pin-code",
                                 "/api/v1/private/accounts/{id}/update-avatar-user-info",
-                                "/api/v1/private/case-status"
+                                "/api/v1/private/case-status",
+                                "/api/v1/private/case-status/{id}/detail"
                                 )
                         .hasAnyAuthority(
                                 Role.IT_ADMIN.name(),

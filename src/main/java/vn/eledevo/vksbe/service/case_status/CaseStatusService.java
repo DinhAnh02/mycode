@@ -17,4 +17,6 @@ public interface CaseStatusService {
     HashMap<String,String> createCaseStatus(CaseStatusCreateRequest caseStatusCreateRequest) throws  ApiException;
 
     HashMap<String,String> updateCaseStatus(Long id, CaseStatusCreateRequest caseStatusCreateRequest) throws  ApiException;
+
+    CaseStatusResponse getCaseStatusDetail(Long caseStatusId) throws ApiException;
 }
