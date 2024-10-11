@@ -10,7 +10,9 @@ import java.util.Optional;
 
 @Getter
 public enum CaseStatusErrorCode implements BaseErrorCode {
-    CASE_STATUS_NAME_ALREADY_EXIST(OK, "ST-01", "Tên trạng thái vụ án đã tồn tại", new HashMap<>());
+    CASE_STATUS_NAME_ALREADY_EXIST(OK, "ST-01", "Tên trạng thái vụ án đã tồn tại", new HashMap<>()),
+
+    CASE_STATUS_NOT_FOUND(OK, "ST-02", "Trạng thái vụ án không tồn tại", new HashMap<>());
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
     private final String message;

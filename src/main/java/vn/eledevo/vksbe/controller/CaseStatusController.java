@@ -44,4 +44,10 @@ public class CaseStatusController {
             throws ApiException {
         return ApiResponse.ok(caseStatusService.getCaseStatus(caseStatusGetRequest, page, pageSize));
     }
+
+    @PatchMapping("/{id}/update")
+    @Operation(summary = "Chỉnh sửa trạng thái vụ án")
+    public ApiResponse<Map<String, String>> updateCaseStatus(@PathVariable Long id, @Valid @RequestBody CaseStatusCreateRequest caseStatusCreateRequest) throws ApiException {
+        return ApiResponse.ok(caseStatusService.updateCaseStatus(id, caseStatusCreateRequest));
+    }
 }

@@ -106,7 +106,7 @@ public class SecurityConfiguration {
                                 "/api/v1/private/departments/{id}/update-department",
                                 "/api/v1/private/case-status/create", "/api/v1/private/organizations/{id}/update",
                                 "/api/v1/private/organizations/{id}/delete","/api/v1/private/organizations/create",
-                                "/api/v1/private/organizations/{id}/detail"
+                                "/api/v1/private/organizations/{id}/detail", "/api/v1/private/case-status/{id}/update"
                         )
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
