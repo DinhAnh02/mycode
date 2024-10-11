@@ -27,7 +27,6 @@ import vn.eledevo.vksbe.repository.MindmapTemplateRepository;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioService;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,12 +41,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
     public ResponseFilter<MindmapTemplateResponse> getListMindMapTemplate(Long departmentId, Integer page, Integer pageSize, String textSearch) throws ApiException {
         Accounts accounts = SecurityUtils.getUser();
         Optional<Departments> departments = departmentRepository.findById(departmentId);
-        if (page < 1) {
-            page = 1;
-        }
-        if (pageSize < 1) {
-            pageSize = 6;
-        }
+
         if (departments.isEmpty()) {
             throw new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND);
         }
@@ -56,16 +50,28 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
             }
         }
+        if (page < 1) {
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
+        }
+        if (pageSize < 1) {
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
+        }
 
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("updatedAt").descending());
-        Page<MindmapTemplateResponse> mindmapTemplate = mindmapTemplateRepository.getListMindmapTemplate(departmentId, textSearch, pageable);
-
+        Page<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.getListMindmapTemplate(departmentId, textSearch, pageable);
+        Page<MindmapTemplateResponse> mindmapTemplateResponses = mindmapTemplate.map(mindmap ->
+                MindmapTemplateResponse.builder()
+                        .id(mindmap.getId())
+                        .name(mindmap.getName())
+                        .url(mindmap.getUrl())
+                        .build()
+        );
         return new ResponseFilter<>(
-                mindmapTemplate.getContent(),
-                (int) mindmapTemplate.getTotalElements(),
-                mindmapTemplate.getSize(),
-                mindmapTemplate.getNumber(),
-                mindmapTemplate.getTotalPages()
+                mindmapTemplateResponses.getContent(),
+                (int) mindmapTemplateResponses.getTotalElements(),
+                mindmapTemplateResponses.getSize(),
+                mindmapTemplateResponses.getNumber(),
+                mindmapTemplateResponses.getTotalPages()
         );
 
     }
