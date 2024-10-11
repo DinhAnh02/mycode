@@ -50,10 +50,16 @@ public class CaseStatusController {
     public ApiResponse<Map<String, String>> updateCaseStatus(@PathVariable Long id, @Valid @RequestBody CaseStatusCreateRequest caseStatusCreateRequest) throws ApiException {
         return ApiResponse.ok(caseStatusService.updateCaseStatus(id, caseStatusCreateRequest));
     }
-    
+
     @GetMapping("/{id}/detail")
     @Operation(summary = "Xem thông tin chi tiết trạng thái")
     public ApiResponse<CaseStatusResponse> getCaseStatus(@PathVariable("id") Long id) throws ApiException {
         return ApiResponse.ok(caseStatusService.getCaseStatusDetail(id));
+    }
+
+    @DeleteMapping("/{id}/delete")
+    @Operation(summary = "Xóa trạng thái vụ án")
+    public ApiResponse<Map<String,String>> deleteCaseStatusById(@PathVariable Long id) throws ApiException {
+        return ApiResponse.ok(caseStatusService.deleteCaseStatusById(id));
     }
 }

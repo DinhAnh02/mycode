@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import vn.eledevo.vksbe.constant.CaseStatusCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.CaseStatusErrorCode;
 import vn.eledevo.vksbe.dto.request.case_status.CaseStatusCreateRequest;
 import vn.eledevo.vksbe.dto.request.case_status.CaseStatusGetRequest;
@@ -15,8 +17,10 @@ import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.case_status.CaseStatusResponse;
 
 import vn.eledevo.vksbe.entity.CaseStatus;
+import vn.eledevo.vksbe.entity.Cases;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.CaseStatusMapper;
+import vn.eledevo.vksbe.repository.CaseRepository;
 import vn.eledevo.vksbe.repository.CaseStatusRepository;
 
 import java.util.*;
@@ -28,6 +32,7 @@ import java.util.*;
 public class CaseStatusServiceImpl implements CaseStatusService {
     CaseStatusRepository caseStatusRepository;
     CaseStatusMapper caseStatusMapper;
+    CaseRepository caseRepository;
 
     @Override
     public ResponseFilter<CaseStatusResponse> getCaseStatus(CaseStatusGetRequest caseStatusGetRequest, Integer page, Integer pageSize) throws ApiException {
@@ -98,4 +103,30 @@ public class CaseStatusServiceImpl implements CaseStatusService {
                 .build();
     }
 
+
+    private CaseStatus getCaseStatusById(Long id) throws ApiException {
+        return caseStatusRepository.findById(id).orElseThrow(() -> new ApiException(CaseStatusErrorCode.CASE_STATUS_NOT_FOUND));
+    }
+
+    private CaseStatus getCaseStatusByCode(String code) throws ApiException {
+        return caseStatusRepository.findByCode(code).orElseThrow(() -> new ApiException(CaseStatusErrorCode.CASE_STATUS_DEFAULT_EMPTY));
+    }
+
+    @Override
+    @Transactional
+    public HashMap<String, String> deleteCaseStatusById(Long id) throws ApiException {
+        CaseStatus caseStatus = getCaseStatusById(id);
+        if (Boolean.TRUE.equals(caseStatus.getIsDefault())) {
+            throw new ApiException(CaseStatusErrorCode.CASE_STATUS_IS_DEFAULT);
+        }
+        List<Cases> cases = caseStatus.getCases();
+        if (!cases.isEmpty()) {
+            CaseStatus statusDefault = getCaseStatusByCode(CaseStatusCode.CASE_INITIALIZATION.name());
+            cases.forEach(casesItem -> casesItem.setCase_status(statusDefault));
+            caseRepository.saveAll(cases);
+        }
+        caseStatus.setCases(null);
+        caseStatusRepository.delete(caseStatus);
+        return new HashMap<>();
+    }
 }

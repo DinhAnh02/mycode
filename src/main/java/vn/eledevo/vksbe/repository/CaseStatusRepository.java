@@ -8,6 +8,7 @@ import vn.eledevo.vksbe.dto.response.case_status.CaseStatusResponse;
 import vn.eledevo.vksbe.entity.CaseStatus;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public interface CaseStatusRepository extends BaseRepository<CaseStatus, Long> {
     @Query("SELECT new vn.eledevo.vksbe.dto.response.case_status.CaseStatusResponse(c.id, c.name, c.description, c.createdBy, c.updatedBy, c.createdAt, c.updatedAt, c.isDefault) " +
@@ -21,4 +22,5 @@ public interface CaseStatusRepository extends BaseRepository<CaseStatus, Long> {
                                            Pageable pageable);
 
     Boolean existsByName(String name);
+    Optional<CaseStatus> findByCode(String code);
 }
