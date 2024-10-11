@@ -7,6 +7,10 @@ import vn.eledevo.vksbe.exception.ApiException;
 
 public interface MindmapTemplateService {
     ResponseFilter<MindmapTemplateResponse> getListMindMapTemplate(Long departmentId, Integer page, Integer pageSize, String textSearch) throws ApiException;
+
     MindmapTemplateResponse createMindMapTemplate(MindMapTemplateRequest request) throws ApiException;
-    MindmapTemplateResponse deleteMindMapTemplate(Long id ) throws Exception;
+
+    MindmapTemplateResponse deleteMindMapTemplate(Long id) throws Exception;
+
+    MindmapTemplateResponse detailMindMap(Long id) throws ApiException;
 }

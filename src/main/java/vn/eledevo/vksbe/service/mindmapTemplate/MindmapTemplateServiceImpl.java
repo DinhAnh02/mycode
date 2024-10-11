@@ -80,19 +80,19 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
     public MindmapTemplateResponse createMindMapTemplate(MindMapTemplateRequest request) throws ApiException {
         Accounts accounts = SecurityUtils.getUser();
         Optional<Departments> departments = departmentRepository.findById(request.getDepartmentId());
-        if (departments.isEmpty()){
+        if (departments.isEmpty()) {
             throw new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND);
         }
-        if(!request.getDepartmentName().equals(departments.get().getName())) {
+        if (!request.getDepartmentName().equals(departments.get().getName())) {
             throw new ApiException(SystemErrorCode.ORGANIZATION_STRUCTURE);
         }
         if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
                 && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))
                 && !accounts.getDepartments().getId().equals(request.getDepartmentId())) {
-                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_ENOUGH_PERMISSION);
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_ENOUGH_PERMISSION);
         }
-        if(mindmapTemplateRepository.existsByNameAndDepartments_Id(request.getName(), departments.get().getId())){
-            throw new ApiException(MindmapTemplateErrorCode. MINDMAP_TEMPLATE_NAME_ALREADY_EXISTS);
+        if (mindmapTemplateRepository.existsByNameAndDepartments_Id(request.getName(), departments.get().getId())) {
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NAME_ALREADY_EXISTS);
         }
         MindmapTemplate mindmapTemplate = MindmapTemplate.builder()
                 .name(request.getName())
@@ -111,7 +111,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
     public MindmapTemplateResponse deleteMindMapTemplate(Long id) throws Exception {
         Accounts accounts = SecurityUtils.getUser();
         Optional<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.findById(id);
-        if(mindmapTemplate.isEmpty()){
+        if (mindmapTemplate.isEmpty()) {
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_FOUND);
         }
         if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
@@ -119,11 +119,32 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
             }
         }
-        if (mindmapTemplate.get().getUrl() != null){
+        if (mindmapTemplate.get().getUrl() != null) {
             minioService.deleteFile(mindmapTemplate.get().getUrl());
         }
         mindmapTemplateRepository.deleteById(id);
         return null;
+    }
+
+    @Override
+    public MindmapTemplateResponse detailMindMap(Long id) throws ApiException {
+        Accounts accounts = SecurityUtils.getUser();
+        Optional<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.findById(id);
+        if (mindmapTemplate.isEmpty()) {
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_FOUND);
+        }
+
+        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
+            if (!accounts.getDepartments().getId().equals(mindmapTemplate.get().getId())) {
+                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
+            }
+        }
+
+        return MindmapTemplateResponse.builder()
+                .id(mindmapTemplate.get().getId())
+                .name(mindmapTemplate.get().getName())
+                .data(mindmapTemplate.get().getData())
+                .build();
     }
 
 }
