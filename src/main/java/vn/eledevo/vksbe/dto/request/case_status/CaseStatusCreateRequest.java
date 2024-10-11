@@ -1,4 +1,4 @@
-package vn.eledevo.vksbe.dto.request.CaseStatus;
+package vn.eledevo.vksbe.dto.request.case_status;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

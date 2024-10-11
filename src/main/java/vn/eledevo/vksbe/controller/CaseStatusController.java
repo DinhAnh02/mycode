@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import vn.eledevo.vksbe.dto.request.CaseStatus.CaseStatusCreateRequest;
+import vn.eledevo.vksbe.dto.request.case_status.CaseStatusCreateRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.exception.ApiException;
 

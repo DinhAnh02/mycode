@@ -8,21 +8,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.CaseStatusErrorCode;
-import vn.eledevo.vksbe.constant.Role;
-import vn.eledevo.vksbe.dto.request.CaseStatus.CaseStatusCreateRequest;
+import vn.eledevo.vksbe.dto.request.case_status.CaseStatusCreateRequest;
 import vn.eledevo.vksbe.dto.request.case_status.CaseStatusGetRequest;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.case_status.CaseStatusResponse;
 
-import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.CaseStatus;
-import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.mapper.CaseStatusMapper;
 import vn.eledevo.vksbe.repository.CaseStatusRepository;
-import vn.eledevo.vksbe.utils.SecurityUtils;
 
 import java.util.*;
 
