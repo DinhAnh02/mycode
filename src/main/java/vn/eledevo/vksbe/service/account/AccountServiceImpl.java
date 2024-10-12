@@ -1,17 +1,10 @@
 package vn.eledevo.vksbe.service.account;
 
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -23,12 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
@@ -59,6 +46,18 @@ import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -372,6 +371,9 @@ public class AccountServiceImpl implements AccountService {
         List<ConnectComputerResponse> computerResponses = new ArrayList<>();
         if (!CollectionUtils.isEmpty(computerIds)) {
             List<Computers> computers = computerRepository.findByIdIn(computerIds);
+
+            List<Long> currentLinkedComputerIds = computerRepository.findComputerIdsByAccountId(id);
+
             List<Computers> connectedComputers = new ArrayList<>();
             Map<Long, Computers> computersMap = computers.stream().collect(Collectors.toMap(Computers::getId, c -> c));
             if (CollectionUtils.isEmpty(computers)) {
@@ -381,7 +383,17 @@ public class AccountServiceImpl implements AccountService {
                 if (computersMap.get(computerId) != null) {
                     String nameUpdate = SecurityUtils.getUserName();
                     var computer = computersMap.get(computerId);
-                    if (computer.getStatus().equals(Status.CONNECTED.name())) {
+                    if (computer.getStatus().equals(Status.CONNECTED.name())
+                            && currentLinkedComputerIds.contains(computerId)) {
+                        computerResponses.add(ConnectComputerResponse.builder()
+                                .id(computer.getId())
+                                .name(computer.getName())
+                                .computerCode(computer.getCode())
+                                .isConnected(false)
+                                .reason(ResponseMessage.COMPUTER_CONNECTED_WITH_THIS_ACCOUNT)
+                                .build());
+                    } else if (computer.getStatus().equals(Status.CONNECTED.name())
+                            && !currentLinkedComputerIds.contains(computerId)) {
                         computerResponses.add(ConnectComputerResponse.builder()
                                 .id(computer.getId())
                                 .name(computer.getName())

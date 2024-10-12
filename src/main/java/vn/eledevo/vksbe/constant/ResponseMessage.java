@@ -85,4 +85,6 @@ public class ResponseMessage {
     public static final String  ORGANIZATION_ADDRESS_NOT_BLANK = "Địa chỉ không được để trống";
 
     public static final String  ORGANIZATION_ADDRESS_SIZE = "Địa chỉ tối đa 225 kí tự";
+
+    public static final String COMPUTER_CONNECTED_WITH_THIS_ACCOUNT = "Thiết bị đã được kết nối với tài khoản này";
 }
