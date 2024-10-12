@@ -1,4 +1,4 @@
-package vn.eledevo.vksbe.dto.request;
+package vn.eledevo.vksbe.dto.request.mindmapTemplate;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

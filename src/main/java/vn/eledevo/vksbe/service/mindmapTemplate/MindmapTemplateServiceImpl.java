@@ -2,20 +2,21 @@ package vn.eledevo.vksbe.service.mindmapTemplate;
 
 import java.util.Optional;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.MindmapTemplateErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.Role;
-import vn.eledevo.vksbe.dto.request.MindMapTemplateRequest;
+import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindMapTemplateRequest;
+import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindmapTemplateUpdateRequest;
 import vn.eledevo.vksbe.dto.response.MindmapTemplateResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.entity.Accounts;
@@ -26,6 +27,9 @@ import vn.eledevo.vksbe.repository.DepartmentRepository;
 import vn.eledevo.vksbe.repository.MindmapTemplateRepository;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioService;
+
+import java.util.HashMap;
+import java.util.Objects;
 
 
 @Service
@@ -145,6 +149,55 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 .name(mindmapTemplate.get().getName())
                 .data(mindmapTemplate.get().getData())
                 .build();
+    }
+
+    @Override
+    public HashMap<String, String> updateMindMapTemplate(Long id, MindmapTemplateUpdateRequest request) throws Exception {
+        Accounts accounts = SecurityUtils.getUser();
+        Optional<Departments> departments = departmentRepository.findById(request.getDepartmentId());
+        Optional<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.findById(id);
+
+        if (departments.isEmpty()) {
+            throw new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND);
+        }
+        if (mindmapTemplate.isEmpty()) {
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_FOUND);
+        }
+        if (!request.getDepartmentName().equals(departments.get().getName())) {
+            throw new ApiException(SystemErrorCode.ORGANIZATION_STRUCTURE);
+        }
+        if (!request.getDepartmentId().equals(mindmapTemplate.get().getDepartments().getId())) {
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_INVALID_DEPARTMENT);
+        }
+        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
+            if (!accounts.getDepartments().getId().equals(request.getDepartmentId())) {
+                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
+            }
+            if (!accounts.getDepartments().getId().equals(mindmapTemplate.get().getDepartments().getId())) {
+                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
+            }
+        }
+
+        if (Objects.nonNull(request.getUrl())) {
+            if (Objects.nonNull(mindmapTemplate.get().getUrl()) && !Objects.equals(mindmapTemplate.get().getUrl(), "")) {
+                minioService.deleteFile(mindmapTemplate.get().getUrl());
+            }
+            mindmapTemplate.get().setUrl(request.getUrl());
+        }
+
+        if (Objects.nonNull(request.getData())) {
+            mindmapTemplate.get().setData(request.getData());
+        }
+
+        if (!request.getName().equals(mindmapTemplate.get().getName())) {
+            if (mindmapTemplateRepository.existsByNameAndDepartments_Id(request.getName(), departments.get().getId())) {
+                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NAME_ALREADY_EXISTS);
+            }
+            mindmapTemplate.get().setName(request.getName());
+        }
+
+        mindmapTemplateRepository.save(mindmapTemplate.get());
+        return new HashMap<>();
     }
 
 }
