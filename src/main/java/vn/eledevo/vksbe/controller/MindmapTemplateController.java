@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,13 +8,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
-import vn.eledevo.vksbe.dto.request.MindMapTemplateRequest;
+import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindMapTemplateRequest;
+import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindmapTemplateUpdateRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.MindmapTemplateResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.mindmapTemplate.MindmapTemplateService;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/private/mindmapTemplate")
@@ -36,13 +39,15 @@ public class MindmapTemplateController {
     }
 
     @PostMapping("/create")
-    public ApiResponse <MindmapTemplateResponse> create(
+    @Operation(summary = "Thêm mới sơ đồ mẫu")
+    public ApiResponse<MindmapTemplateResponse> create(
             @RequestBody MindMapTemplateRequest mindMapTemplateRequest
-    ) throws ApiException{
+    ) throws ApiException {
         return ApiResponse.ok(mindmapTemplateService.createMindMapTemplate(mindMapTemplateRequest));
     }
 
     @DeleteMapping("/{id}/delete")
+    @Operation(summary = "Xóa sơ đồ mẫu")
     public ApiResponse<MindmapTemplateResponse> delete(
             @PathVariable Long id
     ) throws Exception {
@@ -55,5 +60,14 @@ public class MindmapTemplateController {
             @PathVariable Long id
     ) throws ApiException {
         return ApiResponse.ok(mindmapTemplateService.detailMindMap(id));
+    }
+
+    @PatchMapping("/{id}/update")
+    @Operation(summary = "Chỉnh sửa sơ đồ mẫu")
+    public ApiResponse<HashMap<String, String>> update(
+            @PathVariable Long id,
+            @Valid @RequestBody MindmapTemplateUpdateRequest mindmapTemplateUpdateRequest
+    ) throws Exception {
+        return ApiResponse.ok(mindmapTemplateService.updateMindMapTemplate(id, mindmapTemplateUpdateRequest));
     }
 }
