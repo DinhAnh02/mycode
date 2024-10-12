@@ -1,18 +1,12 @@
 package vn.eledevo.vksbe.service.account;
 
 import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_URI;
 import static vn.eledevo.vksbe.constant.RoleCodes.*;
 import static vn.eledevo.vksbe.utils.FileUtils.*;
 import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -20,8 +14,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -86,7 +78,6 @@ public class AccountServiceImpl implements AccountService {
     MinioService minioService;
     MinioProperties minioProperties;
 
-
     @Value("${app.host}")
     @NonFinal
     private String appHost;
@@ -137,7 +128,7 @@ public class AccountServiceImpl implements AccountService {
         Accounts loginAccount = SecurityUtils.getUser();
         if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
                 || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name())
-                && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))) {
+                        && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_READ_DATA_DEPARTMENT);
         }
 
@@ -205,9 +196,9 @@ public class AccountServiceImpl implements AccountService {
             account.setIsEnabledLockButton(true);
         }
         if (Boolean.TRUE.equals((account.getStatus().equals(Status.INACTIVE.name())
-                || account.getStatus().equals(Status.INITIAL.name()))
-                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
-                && account.getIsConnectComputer())
+                                || account.getStatus().equals(Status.INITIAL.name()))
+                        && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
+                        && account.getIsConnectComputer())
                 && Boolean.TRUE.equals(account.getIsConnectUsb())) {
             account.setIsShowUnlockButton(true);
             account.setIsEnabledUnlockButton(true);
@@ -223,10 +214,10 @@ public class AccountServiceImpl implements AccountService {
 
         if (isSameLoginRole
                 && (account.getStatus().equals(Status.INACTIVE.name())
-                || account.getStatus().equals(Status.INITIAL.name())
-                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
-                && account.getIsConnectComputer()
-                && account.getIsConnectUsb())) {
+                        || account.getStatus().equals(Status.INITIAL.name())
+                                && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
+                                && account.getIsConnectComputer()
+                                && account.getIsConnectUsb())) {
             account.setIsShowUnlockButton(true);
             account.setIsEnabledUnlockButton(true);
         }
@@ -567,7 +558,6 @@ public class AccountServiceImpl implements AccountService {
         return new ResultUrl(minioService.uploadFile(file));
     }
 
-
     @Override
     @Transactional
     public AccountSwapResponse updateAccountInfo(Long updatedAccId, AccountUpdateRequest req) throws Exception {
@@ -599,7 +589,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
+                        && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
                 || !accountUpdate.getStatus().equals(Status.ACTIVE.name())) {
             accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
@@ -611,15 +601,21 @@ public class AccountServiceImpl implements AccountService {
             return AccountSwapResponse.builder().build();
         }
 
-        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+        if (!req.getSwappedAccId().equals(0L) && !oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
 
-        Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
-        accountLead.setStatus(Status.INACTIVE.name());
-        Accounts account = accountToUpdate(req, updatedAccId, requestRole);
-        account.setStatus(Status.ACTIVE.name());
+        if (!req.getSwappedAccId().equals(0L)) {
+            Accounts accountLead =
+                    accountRepository.findById(req.getSwappedAccId()).orElseThrow();
+            accountLead.setStatus(Status.INACTIVE.name());
+            Accounts account = accountToUpdate(req, updatedAccId, requestRole);
+            account.setStatus(Status.ACTIVE.name());
+            return AccountSwapResponse.builder().build();
+        }
+
+        accountToUpdate(req, updatedAccId, requestRole);
         return AccountSwapResponse.builder().build();
     }
 
@@ -635,14 +631,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws Exception {
-        Map<String,String> error = new HashMap<>();
-        validateAvatar(request.getAvatar(),error);
-        if (!error.isEmpty()){
+        Map<String, String> error = new HashMap<>();
+        validateAvatar(request.getAvatar(), error);
+        if (!error.isEmpty()) {
             throw new ApiException(SystemErrorCode.VALIDATE_FORM);
         }
         Accounts account =
                 accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
-        if(account.getProfile().getAvatar().isEmpty() || account.getProfile().getAvatar().isBlank()){
+        if (account.getProfile().getAvatar().isEmpty()
+                || account.getProfile().getAvatar().isBlank()) {
             account.getProfile().setAvatar(null);
             accountRepository.save(account);
             return AccountResponse.builder().build();
@@ -679,13 +676,16 @@ public class AccountServiceImpl implements AccountService {
         return new HashMap<>();
     }
 
-
     private void removeUSB(Long accountID, Long usbID) throws ApiException {
-        Accounts accounts = accountRepository
+        Accounts account = accountRepository
                 .findById(accountID)
                 .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
 
-        if (!Objects.equals(accounts.getUsb().getId(), usbID)) {
+        if (Role.valueOf(account.getRoles().getCode()).equals(Role.IT_ADMIN)) {
+            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH);
+        }
+
+        if (!Objects.equals(account.getUsb().getId(), usbID)) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
         }
 
@@ -697,29 +697,30 @@ public class AccountServiceImpl implements AccountService {
         usbToken.get().setStatus(Status.DISCONNECTED.name());
         usbToken.get().setKeyUsb(null);
         usbRepository.save(usbToken.get());
-        accounts.setIsConnectUsb(false);
-        accountRepository.save(accounts);
+        account.setIsConnectUsb(false);
+        accountRepository.save(account);
     }
 
     private void validateRoleForViewButton(
             AccountDetailResponse detailResponse, Accounts accSecurity, Accounts account) {
         Role loginAcc = Role.valueOf(accSecurity.getRoles().getCode());
         Role detailedAcc = Role.valueOf(account.getRoles().getCode());
+        boolean isLoginAdminAndDetailedNotAdmin = loginAcc.equals(Role.IT_ADMIN) && !detailedAcc.equals(Role.IT_ADMIN);
 
-        if (loginAcc.equals(Role.IT_ADMIN)) {
+        if (isLoginAdminAndDetailedNotAdmin) {
             detailResponse.setIsEnabledEditButton(true);
             detailResponse.setIsShowEditButton(true);
             detailResponse.setIsEnabledResetPasswordButton(true);
             detailResponse.setIsShowResetPasswordButton(true);
         }
 
-        if (loginAcc.equals(Role.IT_ADMIN) || priorityRoles(loginAcc) > priorityRoles(detailedAcc)) {
+        if (isLoginAdminAndDetailedNotAdmin || priorityRoles(loginAcc) > priorityRoles(detailedAcc)) {
             detailResponse.setIsEnabledLockButton(true);
         }
         if (account.getStatus().equals(Status.ACTIVE.name()) && priorityRoles(loginAcc) > priorityRoles(detailedAcc)) {
             detailResponse.setIsShowLockButton(true);
         }
-        if ((loginAcc.equals(Role.IT_ADMIN) || priorityRoles(loginAcc) > priorityRoles(detailedAcc))
+        if ((isLoginAdminAndDetailedNotAdmin || priorityRoles(loginAcc) > priorityRoles(detailedAcc))
                 && account.getIsConnectUsb().equals(Boolean.TRUE)
                 && account.getIsConnectComputer().equals(Boolean.TRUE)) {
             detailResponse.setIsEnabledActivateButton(true);
@@ -730,9 +731,9 @@ public class AccountServiceImpl implements AccountService {
         if ((loginAcc.equals(Role.TRUONG_PHONG) || loginAcc.equals(Role.PHO_PHONG))
                 && priorityRoles(loginAcc) > priorityRoles(detailedAcc)
                 && accSecurity
-                .getDepartments()
-                .getId()
-                .equals(account.getDepartments().getId())
+                        .getDepartments()
+                        .getId()
+                        .equals(account.getDepartments().getId())
                 && account.getStatus().equals(Status.ACTIVE.name())) {
             detailResponse.setIsShowLockButton(true);
             detailResponse.setIsEnabledLockButton(true);
@@ -876,7 +877,7 @@ public class AccountServiceImpl implements AccountService {
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
         minioService.deleteFile(profile.getAvatar());
-        profile.setAvatar(req.getAvatar());
+        profile.setAvatar(req.getAvatar().isEmpty() ? null : req.getAvatar());
         Profiles profileSave = profileRepository.save(profile);
 
         account.setProfile(profileSave);
