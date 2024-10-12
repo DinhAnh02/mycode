@@ -59,13 +59,13 @@ public interface AccountRepository extends BaseRepository<Accounts, Long> {
                     + "JOIN a.roles r "
                     + "JOIN a.departments d "
                     + "JOIN a.profile p "
-                    + "WHERE a.id = :accountId")
+                    + "WHERE a.id =:accountId")
     Optional<UserInfo> findAccountProfileById(@Param("accountId") Long accountId);
 
     @Query("SELECT new vn.eledevo.vksbe.dto.response.account.AccountSwapResponse(a.id, a.username, p.fullName) "
             + "FROM Accounts a "
             + "JOIN a.profile p "
-            + "WHERE a.departments.id = :departmentId "
+            + "WHERE a.departments.id =:departmentId "
             + "AND a.status = 'ACTIVE' "
             + "AND a.roles.id IN(1, 4)")
     AccountSwapResponse getOldPositionAccInfo(@Param("departmentId") Long departmentId);
