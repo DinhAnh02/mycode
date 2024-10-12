@@ -42,4 +42,7 @@ public interface ComputerRepository extends BaseRepository<Computers, Long> {
     Optional<Computers> findComputersByCode(String code);
 
     Computers findByName(String name);
+
+    @Query("SELECT c.id FROM Computers c WHERE c.accounts.id = :accountId")
+    List<Long> findComputerIdsByAccountId(@Param("accountId") Long accountId);
 }
