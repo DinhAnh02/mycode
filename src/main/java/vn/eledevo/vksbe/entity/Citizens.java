@@ -5,6 +5,7 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.utils.SecurityUtils;
@@ -28,6 +29,7 @@ public class Citizens {
     String address;
     String gender;
     String identification;
+    @Size(max = 1000)
     String avatar;
     String organization;
     String position;

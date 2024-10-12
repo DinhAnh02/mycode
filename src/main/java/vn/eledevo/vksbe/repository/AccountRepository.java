@@ -53,13 +53,14 @@ public interface AccountRepository extends BaseRepository<Accounts, Long> {
 
     boolean existsByUsername(String username);
 
+    @Transactional
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.model.account.UserInfo(a.id,a.username, p.avatar, p.fullName, p.gender, p.phoneNumber, r.code, d.code, o.id,o.name , a.isConditionLogin1, a.isConditionLogin2) "
+            "SELECT distinct new vn.eledevo.vksbe.dto.model.account.UserInfo(a.id,a.username, p.avatar, p.fullName, p.gender, p.phoneNumber, r.code, d.code, o.id,o.name , a.isConditionLogin1, a.isConditionLogin2) "
                     + "FROM Accounts a, Organizations o "
                     + "JOIN a.roles r "
                     + "JOIN a.departments d "
                     + "JOIN a.profile p "
-                    + "WHERE a.id =:accountId")
+                    + "WHERE a.id =:accountId AND o.id=1")
     Optional<UserInfo> findAccountProfileById(@Param("accountId") Long accountId);
 
     @Query("SELECT new vn.eledevo.vksbe.dto.response.account.AccountSwapResponse(a.id, a.username, p.fullName) "

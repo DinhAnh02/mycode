@@ -5,6 +5,7 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.utils.SecurityUtils;
@@ -23,6 +24,7 @@ public class Documents {
     Long id;
 
     String name;
+    @Size(max = 1000)
     String path;
     String type;
     Long size;
