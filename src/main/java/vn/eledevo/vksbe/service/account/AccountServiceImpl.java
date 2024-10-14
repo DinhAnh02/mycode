@@ -126,8 +126,8 @@ public class AccountServiceImpl implements AccountService {
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
         Accounts loginAccount = SecurityUtils.getUser();
         if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
-                || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name())
-                        && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId()))) {
+                || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name()))
+                        && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_READ_DATA_DEPARTMENT);
         }
 
@@ -598,7 +598,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
-                        && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
+                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
                 || !accountUpdate.getStatus().equals(Status.ACTIVE.name())) {
             accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
@@ -610,21 +610,15 @@ public class AccountServiceImpl implements AccountService {
             return AccountSwapResponse.builder().build();
         }
 
-        if (!req.getSwappedAccId().equals(0L) && !oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
 
-        if (!req.getSwappedAccId().equals(0L)) {
-            Accounts accountLead =
-                    accountRepository.findById(req.getSwappedAccId()).orElseThrow();
-            accountLead.setStatus(Status.INACTIVE.name());
-            Accounts account = accountToUpdate(req, updatedAccId, requestRole);
-            account.setStatus(Status.ACTIVE.name());
-            return AccountSwapResponse.builder().build();
-        }
-
-        accountToUpdate(req, updatedAccId, requestRole);
+        Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
+        accountLead.setStatus(Status.INACTIVE.name());
+        Accounts account = accountToUpdate(req, updatedAccId, requestRole);
+        account.setStatus(Status.ACTIVE.name());
         return AccountSwapResponse.builder().build();
     }
 
