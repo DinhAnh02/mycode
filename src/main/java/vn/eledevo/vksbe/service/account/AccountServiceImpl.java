@@ -42,7 +42,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
-import vn.eledevo.vksbe.utils.Const;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
@@ -66,7 +65,6 @@ import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 public class AccountServiceImpl implements AccountService {
     AccountRepository accountRepository;
     TokenRepository tokenRepository;
-    AccountMapper accountMapper;
     PasswordEncoder passwordEncoder;
     ComputerRepository computerRepository;
     UsbRepository usbRepository;
@@ -598,7 +596,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
+                        && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
                 || !accountUpdate.getStatus().equals(Status.ACTIVE.name())) {
             accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
@@ -610,15 +608,21 @@ public class AccountServiceImpl implements AccountService {
             return AccountSwapResponse.builder().build();
         }
 
-        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+        if (!req.getSwappedAccId().equals(0L) && !oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
 
-        Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
-        accountLead.setStatus(Status.INACTIVE.name());
-        Accounts account = accountToUpdate(req, updatedAccId, requestRole);
-        account.setStatus(Status.ACTIVE.name());
+        if (!req.getSwappedAccId().equals(0L)) {
+            Accounts accountLead =
+                    accountRepository.findById(req.getSwappedAccId()).orElseThrow();
+            accountLead.setStatus(Status.INACTIVE.name());
+            Accounts account = accountToUpdate(req, updatedAccId, requestRole);
+            account.setStatus(Status.ACTIVE.name());
+            return AccountSwapResponse.builder().build();
+        }
+
+        accountToUpdate(req, updatedAccId, requestRole);
         return AccountSwapResponse.builder().build();
     }
 

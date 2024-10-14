@@ -24,6 +24,7 @@ public class MindmapTemplate {
 
     String name;
     String dataLink;
+    @Column(columnDefinition = "LONGTEXT")
     String dataNode;
     @Size(max = 1000)
     String url;
