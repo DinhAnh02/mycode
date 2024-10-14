@@ -94,6 +94,15 @@ public enum AccountErrorCode implements BaseErrorCode {
         // Kiểm tra nếu Optional chứa giá trị
         if (value.isPresent()) {
             Object object = value.get();
+            if (object instanceof HashMap) {
+                HashMap<?, ?> map = (HashMap<?, ?>) object;
+                map.forEach((key, val) -> {
+                    this.result.put(key.toString(), Optional.ofNullable(val));
+                });
+            }
+        }
+        if (value.isPresent()) {
+            Object object = value.get();
             // Sử dụng reflection để lấy tất cả các trường (fields) của object
             Field[] fields = object.getClass().getDeclaredFields();
 

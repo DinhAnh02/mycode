@@ -74,7 +74,9 @@ public interface AccountRepository extends BaseRepository<Accounts, Long> {
     @Query("SELECT new vn.eledevo.vksbe.dto.response.account.AccountSwapResponse(a.id, a.username, p.fullName) "
             + "FROM Accounts a "
             + "JOIN a.profile p "
+            + "JOIN a.departments d "
             + "WHERE a.status = 'ACTIVE' "
-            + "AND a.roles.id =:id ")
-    Optional<AccountSwapResponse> getOldLeader(Long id);
+            + "AND a.roles.code =:roleCode "
+            + "AND a.departments.code =:departmentCode")
+    Optional<AccountSwapResponse> getOldLeader(String roleCode,String departmentCode);
 }
