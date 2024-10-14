@@ -23,7 +23,8 @@ public class MindmapTemplate {
     Long id;
 
     String name;
-    String data;
+    String dataLink;
+    String dataNode;
     @Size(max = 1000)
     String url;
     LocalDate createdAt;

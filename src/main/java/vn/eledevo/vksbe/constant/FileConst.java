@@ -11,4 +11,7 @@ public class FileConst {
     public static final String[] AVATAR_ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"};
 
     public static final String AVATAR_URI = "/api/v1/private/accounts/download-image/";
+
+    public static final long MAX_IMG_MIND_MAP_SIZE = 3L; // 10MB
+
 }

@@ -1,24 +1,37 @@
 package vn.eledevo.vksbe.service.mindmapTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.util.Map;
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.multipart.MultipartFile;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.MindmapTemplateErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.FileConst;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindMapTemplateRequest;
 import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindmapTemplateUpdateRequest;
 import vn.eledevo.vksbe.dto.response.MindmapTemplateResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.ResultUrl;
 import vn.eledevo.vksbe.entity.Accounts;
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.entity.MindmapTemplate;
@@ -26,10 +39,14 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
 import vn.eledevo.vksbe.repository.MindmapTemplateRepository;
 import vn.eledevo.vksbe.utils.SecurityUtils;
+import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
 
 import java.util.HashMap;
 import java.util.Objects;
+
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
 
 
 @Service
@@ -38,9 +55,13 @@ import java.util.Objects;
 public class MindmapTemplateServiceImpl implements MindmapTemplateService {
 
     MindmapTemplateRepository mindmapTemplateRepository;
-
     DepartmentRepository departmentRepository;
     MinioService minioService;
+    MinioProperties minioProperties;
+
+    @Value("${app.host}")
+    @NonFinal
+    private String appHost;
 
     public ResponseFilter<MindmapTemplateResponse> getListMindMapTemplate(Long departmentId, Integer page, Integer pageSize, String textSearch) throws ApiException {
         Accounts accounts = SecurityUtils.getUser();
@@ -112,6 +133,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
     }
 
     @Override
+    @Transactional
     public MindmapTemplateResponse deleteMindMapTemplate(Long id) throws Exception {
         Accounts accounts = SecurityUtils.getUser();
         Optional<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.findById(id);
@@ -147,11 +169,13 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         return MindmapTemplateResponse.builder()
                 .id(mindmapTemplate.get().getId())
                 .name(mindmapTemplate.get().getName())
-                .data(mindmapTemplate.get().getData())
+                .dataLink(mindmapTemplate.get().getDataLink())
+                .dataNode(mindmapTemplate.get().getDataNode())
                 .build();
     }
 
     @Override
+    @Transactional
     public HashMap<String, String> updateMindMapTemplate(Long id, MindmapTemplateUpdateRequest request) throws Exception {
         Accounts accounts = SecurityUtils.getUser();
         Optional<Departments> departments = departmentRepository.findById(request.getDepartmentId());
@@ -179,14 +203,23 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         }
 
         if (Objects.nonNull(request.getUrl())) {
+            Map<String, String> error = new HashMap<>();
+            validateUrlImg(request.getUrl(), error);
+            if (!error.isEmpty()) {
+                throw new ApiException(SystemErrorCode.VALIDATE_FORM);
+            }
             if (Objects.nonNull(mindmapTemplate.get().getUrl()) && !Objects.equals(mindmapTemplate.get().getUrl(), "")) {
                 minioService.deleteFile(mindmapTemplate.get().getUrl());
             }
             mindmapTemplate.get().setUrl(request.getUrl());
         }
 
-        if (Objects.nonNull(request.getData())) {
-            mindmapTemplate.get().setData(request.getData());
+        if (Objects.nonNull(request.getDataLink())) {
+            mindmapTemplate.get().setDataLink(request.getDataLink());
+        }
+
+        if (Objects.nonNull(request.getDataNode())) {
+            mindmapTemplate.get().setDataNode(request.getDataNode());
         }
 
         if (!request.getName().equals(mindmapTemplate.get().getName())) {
@@ -200,4 +233,65 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         return new HashMap<>();
     }
 
+    @Override
+    public ResultUrl uploadImg(MultipartFile file) throws Exception {
+        validateFileImg(file);
+        return new ResultUrl(minioService.uploadFile(file));
+    }
+
+    private void validateFileImg(MultipartFile file) throws ApiException {
+        if (file == null || file.isEmpty()) {
+            return;
+        }
+
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        if (!isAllowedExtension(fileExtension, FileConst.AVATAR_ALLOWED_EXTENSIONS)) {
+            String msg = MessageFormat.format(
+                    MindmapTemplateErrorCode.MINDMAP_IMG_INVALID_FORMAT.getMessage(),
+                    String.join(", ", FileConst.AVATAR_ALLOWED_EXTENSIONS));
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_IMG_INVALID_FORMAT, msg);
+        }
+
+        if (file.getSize() > FileConst.MAX_IMG_MIND_MAP_SIZE * FileConst.BYTES_IN_MB) {
+            String msg = MessageFormat.format(
+                    MindmapTemplateErrorCode.MINDMAP_IMG_SIZE_EXCEEDS_LIMIT.getMessage(), FileConst.MAX_IMG_MIND_MAP_SIZE);
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_IMG_SIZE_EXCEEDS_LIMIT, msg);
+        }
+    }
+
+    public void validateUrlImg(String avatarUrl, Map<String, String> errors) {
+        if (StringUtils.isBlank(avatarUrl)) {
+            return;
+        }
+        String keyError = "url";
+
+        try {
+            URI uri = new URI(avatarUrl);
+
+            String scheme = uri.getScheme();
+            if (!"http".equals(scheme) && !"https".equals(scheme)) {
+                errors.put(keyError, ResponseMessage.MIND_MAP_IMG_URL_INVALID);
+                return;
+            }
+
+            String host = uri.getHost();
+            if (host == null || !appHost.contains(host)) {
+                errors.put(keyError, ResponseMessage.MIND_MAP_IMG_URL_INVALID);
+                return;
+            }
+
+            String path = uri.getPath();
+            if (path == null || !path.contains("/" + minioProperties.getBucketName() + "/")) {
+                errors.put(keyError, ResponseMessage.MIND_MAP_IMG_URL_INVALID);
+                return;
+            }
+
+            if (!isPathAllowedExtension(path, AVATAR_ALLOWED_EXTENSIONS)) {
+                errors.put(keyError, ResponseMessage.MIND_MAP_IMG_URL_INVALID);
+            }
+
+        } catch (URISyntaxException e) {
+            errors.put("url", ResponseMessage.MIND_MAP_IMG_URL_INVALID);
+        }
+    }
 }
