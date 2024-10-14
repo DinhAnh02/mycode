@@ -60,16 +60,11 @@ public enum MindmapTemplateErrorCode implements BaseErrorCode {
     public void setResult(Optional<?> value) {
         if (value.isPresent()) {
             Object object = value.get();
-            Field[] fields = object.getClass().getDeclaredFields();
-            for (Field field : fields) {
-                field.setAccessible(true);
-                try {
-                    String key = field.getName();
-                    Object fieldValue = field.get(object);
-                    this.result.put(key, Optional.ofNullable(fieldValue));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+            if (object instanceof HashMap) {
+                HashMap<?, ?> map = (HashMap<?, ?>) object;
+                map.forEach((key, val) -> {
+                    this.result.put(key.toString(), Optional.ofNullable(val));
+                });
             }
         }
     }

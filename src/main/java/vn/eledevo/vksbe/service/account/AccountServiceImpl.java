@@ -460,9 +460,9 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
         if (activedAccRole.equals(Role.VIEN_TRUONG) || activedAccRole.equals(Role.TRUONG_PHONG)) {
-            Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(1L);
-            if (accountsLeader.isPresent()) {
-                AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(accountsLeader));
+            Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(activedAccRole.name(),activedAcc.getDepartments().getCode());
+            if (accountsLeader.isPresent() && !activedAcc.getId().equals(accountsLeader.get().getId())) {
+                AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(accountsLeader);
                 throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
             }
         }
@@ -476,9 +476,6 @@ public class AccountServiceImpl implements AccountService {
 
         if (Boolean.FALSE.equals(activedAcc.getIsConnectUsb())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
-        }
-        if (activedAcc.getStatus().equals(Const.ACTIVE)) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_ALREADY_ACTIVATED);
         }
         activedAcc.setStatus(Status.ACTIVE.name());
         accountRepository.save(activedAcc);
