@@ -20,10 +20,8 @@ public enum MindmapTemplateErrorCode implements BaseErrorCode {
     MINDMAP_TEMPLATE_NOT_FOUND(OK, "MMT-05", "Sơ đồ mẫu không tồn tại", new HashMap<>()),
     MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS(
             OK, "MMT-06", "Bạn không có quyền vào sơ đồ mẫu của phòng ban này", new HashMap<>()),
-    MINDMAP_TEMPLATE_INVALID_DEPARTMENT(
-            OK, "MMT-07", "ID của phòng ban cảu bạn và ID phòng ban của sơ đồ không trùng khớp", new HashMap<>()),
-    MINDMAP_IMG_INVALID_FORMAT(BAD_REQUEST, "MMT-08", "Ảnh chỉ chấp nhận định dạng {0}", new HashMap<>()),
-    MINDMAP_IMG_SIZE_EXCEEDS_LIMIT(BAD_REQUEST, "MMT-09", "Ảnh không được vượt quá {0}", new HashMap<>()),
+    MINDMAP_IMG_INVALID_FORMAT(BAD_REQUEST, "MMT-07", "Ảnh chỉ chấp nhận định dạng {0}", new HashMap<>()),
+    MINDMAP_IMG_SIZE_EXCEEDS_LIMIT(BAD_REQUEST, "MMT-08", "Ảnh không được vượt quá {0}", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

@@ -191,7 +191,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
             throw new ApiException(SystemErrorCode.ORGANIZATION_STRUCTURE);
         }
         if (!request.getDepartmentId().equals(mindmapTemplate.get().getDepartments().getId())) {
-            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_INVALID_DEPARTMENT);
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
         if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
             if (!accounts.getDepartments().getId().equals(request.getDepartmentId())) {
@@ -206,7 +206,9 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
             Map<String, String> error = new HashMap<>();
             validateUrlImg(request.getUrl(), error);
             if (!error.isEmpty()) {
-                throw new ApiException(SystemErrorCode.VALIDATE_FORM);
+                SystemErrorCode errorCode = SystemErrorCode.VALIDATE_FORM;
+                errorCode.setResult(Optional.of(error));
+                throw new ApiException(errorCode);
             }
             if (Objects.nonNull(mindmapTemplate.get().getUrl()) && !Objects.equals(mindmapTemplate.get().getUrl(), "")) {
                 minioService.deleteFile(mindmapTemplate.get().getUrl());

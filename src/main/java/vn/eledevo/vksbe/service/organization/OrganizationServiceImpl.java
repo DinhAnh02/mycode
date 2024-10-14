@@ -66,24 +66,19 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public HashMap<String, String> createOrganization(OrganizationRequest organizationRequest) throws ApiException {
+        HashMap<String, String> errorDetails = new HashMap<>();
         Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
         if (checkOrganizationExistByName) {
-            SystemErrorCode errorCode = SystemErrorCode.VALIDATE_FORM;
-
-            HashMap<String, String> errorDetails = new HashMap<>();
             errorDetails.put("name", ResponseMessage.ORGANIZATION_NAME_SIZE);
-
-            errorCode.setResult(Optional.of(errorDetails));
-            throw new ApiException(errorCode);
         }
-
+        // Kiểm tra mã tổ chức có tồn tại hay không
         Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
         if (checkOrganizationExistByCode) {
-            SystemErrorCode errorCode = SystemErrorCode.VALIDATE_FORM;
-
-            HashMap<String, String> errorDetails = new HashMap<>();
             errorDetails.put("code", ResponseMessage.ORGANIZATION_CODE_SIZE);
-
+        }
+        // Nếu có lỗi thì ném ra ApiException với các chi tiết lỗi
+        if (!errorDetails.isEmpty()) {
+            SystemErrorCode errorCode = SystemErrorCode.VALIDATE_FORM;
             errorCode.setResult(Optional.of(errorDetails));
             throw new ApiException(errorCode);
         }
