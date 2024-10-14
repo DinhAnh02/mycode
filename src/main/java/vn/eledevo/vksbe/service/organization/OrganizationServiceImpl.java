@@ -13,6 +13,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.OrganizationErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.dto.request.OrganizationSearch;
@@ -65,13 +67,25 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public HashMap<String, String> createOrganization(OrganizationRequest organizationRequest) throws ApiException {
         Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
-        if (Boolean.TRUE.equals(checkOrganizationExistByName)) {
-            throw new ApiException(OrganizationErrorCode.ORGANIZATION_NAME_EXIST);
+        if (checkOrganizationExistByName) {
+            SystemErrorCode errorCode = SystemErrorCode.VALIDATE_FORM;
+
+            HashMap<String, String> errorDetails = new HashMap<>();
+            errorDetails.put("name", ResponseMessage.ORGANIZATION_NAME_SIZE);
+
+            errorCode.setResult(Optional.of(errorDetails));
+            throw new ApiException(errorCode);
         }
 
         Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
-        if (Boolean.TRUE.equals(checkOrganizationExistByCode)) {
-            throw new ApiException(OrganizationErrorCode.ORGANIZATION_CODE_EXIST);
+        if (checkOrganizationExistByCode) {
+            SystemErrorCode errorCode = SystemErrorCode.VALIDATE_FORM;
+
+            HashMap<String, String> errorDetails = new HashMap<>();
+            errorDetails.put("code", ResponseMessage.ORGANIZATION_CODE_SIZE);
+
+            errorCode.setResult(Optional.of(errorDetails));
+            throw new ApiException(errorCode);
         }
 
         Organizations organization = new Organizations();
