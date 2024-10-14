@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 
 import static vn.eledevo.vksbe.constant.RegexPattern.MINDMAP_NAME;
@@ -14,6 +15,7 @@ import static vn.eledevo.vksbe.constant.RegexPattern.MINDMAP_NAME;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MindmapTemplateUpdateRequest {
     @NotNull(message = ResponseMessage.DEPARTMENT_ID_NOT_NULL)
     Long departmentId;
@@ -27,6 +29,7 @@ public class MindmapTemplateUpdateRequest {
     @Pattern(regexp = MINDMAP_NAME, message = ResponseMessage.NAMEMINDMAP_SPECIAL)
     String name;
     
-    String data;
+    String dataLink;
+    String dataNode;
     String url;
 }

@@ -1,9 +1,11 @@
 package vn.eledevo.vksbe.service.mindmapTemplate;
 
+import org.springframework.web.multipart.MultipartFile;
 import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindMapTemplateRequest;
 import vn.eledevo.vksbe.dto.request.mindmapTemplate.MindmapTemplateUpdateRequest;
 import vn.eledevo.vksbe.dto.response.MindmapTemplateResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.ResultUrl;
 import vn.eledevo.vksbe.exception.ApiException;
 
 import java.util.HashMap;
@@ -18,4 +20,6 @@ public interface MindmapTemplateService {
     MindmapTemplateResponse detailMindMap(Long id) throws ApiException;
 
     HashMap<String, String> updateMindMapTemplate(Long id, MindmapTemplateUpdateRequest mindmapTemplateUpdateRequest) throws Exception;
+
+    ResultUrl uploadImg(MultipartFile file) throws Exception;
 }
