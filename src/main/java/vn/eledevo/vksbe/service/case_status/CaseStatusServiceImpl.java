@@ -92,10 +92,6 @@ public class CaseStatusServiceImpl implements CaseStatusService {
                 .findById(caseStatusId)
                 .orElseThrow(() -> new ApiException(CaseStatusErrorCode.CASE_STATUS_NOT_FOUND));
 
-        if (existingCaseStatus.getCases().isEmpty()) {
-            throw new ApiException(CaseStatusErrorCode.CASE_STATUS_NOT_FOUND_IN_CASE);
-        }
-
         return CaseStatusResponse.builder()
                 .id(existingCaseStatus.getId())
                 .name(existingCaseStatus.getName())
