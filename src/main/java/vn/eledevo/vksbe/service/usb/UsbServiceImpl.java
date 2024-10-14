@@ -96,7 +96,7 @@ public class UsbServiceImpl implements UsbService {
         if (account.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,AccountErrorCode.ACCOUNT_NOT_FOUND.getMessage());
         }
-        if (Boolean.TRUE.equals(account.get().getIsConnectComputer())) {
+        if (Boolean.FALSE.equals(account.get().getIsConnectComputer())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, AccountErrorCode.ACCOUNT_NOT_LINKED_TO_COMPUTER.getMessage());
         }
