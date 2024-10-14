@@ -3,10 +3,12 @@ package vn.eledevo.vksbe.constant.ErrorCodes;
 import static org.springframework.http.HttpStatus.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.gson.Gson;
 import org.springframework.http.HttpStatusCode;
 
 public enum SystemErrorCode implements BaseErrorCode {
@@ -51,21 +53,11 @@ public enum SystemErrorCode implements BaseErrorCode {
     public void setResult(Optional<?> value) {
         if (value.isPresent()) {
             Object object = value.get();
-            // Sử dụng reflection để lấy tất cả các trường (fields) của object
-            Field[] fields = object.getClass().getDeclaredFields();
-
-            for (Field field : fields) {
-                field.setAccessible(true); // Cho phép truy cập vào các trường private
-
-                try {
-                    // Lấy tên trường (field name) làm key
-                    String key = field.getName();
-                    // Lấy giá trị của trường (field value) làm value và gán vào result
-                    Object fieldValue = field.get(object);
-                    this.result.put(key, Optional.ofNullable(fieldValue)); // Sử dụng Optional để bọc giá trị
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace(); // Xử lý ngoại lệ nếu không thể truy cập vào trường
-                }
+            if (object instanceof HashMap) {
+                HashMap<?, ?> map = (HashMap<?, ?>) object;
+                map.forEach((key, val) -> {
+                    this.result.put(key.toString(), Optional.ofNullable(val));
+                });
             }
         }
     }
