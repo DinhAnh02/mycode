@@ -165,9 +165,6 @@ public class AuthenticationService {
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
-        //        if (Boolean.TRUE.equals(accountRequest.getIsConditionLogin1())) {
-        //            throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
-        //        }
         if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
             throw new ApiException(AccountErrorCode.OLD_PASSWORD_INCORRECT);
         }

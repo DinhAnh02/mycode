@@ -1,7 +1,7 @@
 package vn.eledevo.vksbe.service.organization;
 
-import java.util.HashMap;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -9,15 +9,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.OrganizationErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.ResponseMessage;
-import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.dto.request.OrganizationSearch;
+import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
 import vn.eledevo.vksbe.entity.Organizations;
@@ -37,43 +38,45 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public ResponseFilter<OrganizationResponse> getOrganizationList(OrganizationSearch organizationSearch, Integer page, Integer pageSize) throws ApiException {
+    public ResponseFilter<OrganizationResponse> getOrganizationList(
+            OrganizationSearch organizationSearch, Integer page, Integer pageSize) throws ApiException {
         if (page < 1) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_SYSTEM_ERROR);
         }
         if (pageSize < 1) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_SYSTEM_ERROR);
         }
-        if(organizationSearch.getFromDate() == null){
+        if (organizationSearch.getFromDate() == null) {
             organizationSearch.setFromDate(LocalDate.of(1900, 1, 1));
         }
-        if(organizationSearch.getToDate()== null){
+        if (organizationSearch.getToDate() == null) {
             organizationSearch.setToDate(LocalDate.now());
         }
         if (organizationSearch.getFromDate().isAfter(organizationSearch.getToDate())) {
             throw new ApiException(AccountErrorCode.START_TIME_GREATER_THAN_END_TIME);
         }
-        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("updatedAt").descending());
-        Page<OrganizationResponse> organizationResponsePage = organizationRepository.getOrganizationList(organizationSearch,pageable);
+        Pageable pageable =
+                PageRequest.of(page - 1, pageSize, Sort.by("updatedAt").descending());
+        Page<OrganizationResponse> organizationResponsePage =
+                organizationRepository.getOrganizationList(organizationSearch, pageable);
         return new ResponseFilter<>(
                 organizationResponsePage.getContent(),
                 (int) organizationResponsePage.getTotalElements(),
                 organizationResponsePage.getSize(),
                 organizationResponsePage.getNumber(),
-                organizationResponsePage.getTotalPages()
-        );
+                organizationResponsePage.getTotalPages());
     }
 
     @Override
     public HashMap<String, String> createOrganization(OrganizationRequest organizationRequest) throws ApiException {
         HashMap<String, String> errorDetails = new HashMap<>();
         Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
-        if (checkOrganizationExistByName) {
+        if (Boolean.TRUE.equals(checkOrganizationExistByName)) {
             errorDetails.put("name", ResponseMessage.ORGANIZATION_NAME_SIZE);
         }
         // Kiểm tra mã tổ chức có tồn tại hay không
         Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
-        if (checkOrganizationExistByCode) {
+        if (Boolean.TRUE.equals(checkOrganizationExistByCode)) {
             errorDetails.put("code", ResponseMessage.ORGANIZATION_CODE_SIZE);
         }
         // Nếu có lỗi thì ném ra ApiException với các chi tiết lỗi
@@ -93,26 +96,27 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Organizations updateOrganization(Long organizationId, OrganizationRequest organizationRequest) throws ApiException {
+    public Organizations updateOrganization(Long organizationId, OrganizationRequest organizationRequest)
+            throws ApiException {
         Optional<Organizations> organizationOptional = organizationRepository.findById(organizationId);
         if (organizationOptional.isEmpty()) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
         }
 
-        if (organizationOptional.get().getIsDefault()) {
+        if (Boolean.TRUE.equals(organizationOptional.get().getIsDefault())) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_DEFAULT);
         }
 
         if (!(organizationRequest.getCode().equals(organizationOptional.get().getCode()))) {
             Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
-            if (checkOrganizationExistByCode) {
+            if (Boolean.TRUE.equals(checkOrganizationExistByCode)) {
                 throw new ApiException(OrganizationErrorCode.ORGANIZATION_CODE_EXIST);
             }
         }
 
         if (!(organizationRequest.getName().equals(organizationOptional.get().getName()))) {
             Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
-            if (checkOrganizationExistByName) {
+            if (Boolean.TRUE.equals(checkOrganizationExistByName)) {
                 throw new ApiException(OrganizationErrorCode.ORGANIZATION_NAME_EXIST);
             }
         }
@@ -127,26 +131,25 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationResponse getOrganizationDetail(Long organizationId) throws ApiException {
         Optional<Organizations> organizationOptional = organizationRepository.findById(organizationId);
-        if(organizationOptional.isEmpty()){
+        if (organizationOptional.isEmpty()) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
         }
 
-        OrganizationResponse organizationResponse  = OrganizationResponse.builder()
+        return OrganizationResponse.builder()
                 .id(organizationOptional.get().getId())
                 .name(organizationOptional.get().getName())
                 .code(organizationOptional.get().getCode())
                 .address(organizationOptional.get().getAddress())
                 .build();
-        return organizationResponse;
     }
 
     @Override
     public HashMap<String, String> deleteOrganization(Long organizationId) throws ApiException {
         Optional<Organizations> organization = organizationRepository.findById(organizationId);
-        if(organization.isEmpty()){
+        if (organization.isEmpty()) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
         }
-        if(organization.get().getIsDefault()){
+        if (Boolean.TRUE.equals(organization.get().getIsDefault())) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_DEFAULT);
         }
         organizationRepository.deleteById(organizationId);

@@ -8,8 +8,6 @@ import vn.eledevo.vksbe.entity.Departments;
 
 public interface DepartmentRepository extends BaseRepository<Departments, Long> {
 
-    Departments findByAccounts_Id(Long accountId);
-
     @Query("SELECT new vn.eledevo.vksbe.dto.response.department.DepartmentResponse("
             + "d.id, d.name, d.code, "
             + "MAX(CASE WHEN a.status = 'ACTIVE' AND r.code IN ('TRUONG_PHONG', 'VIEN_TRUONG') THEN p.fullName END), "
