@@ -1,16 +1,18 @@
 package vn.eledevo.vksbe.service.mindmapTemplate;
 
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -18,9 +20,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.multipart.MultipartFile;
-import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.MindmapTemplateErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
@@ -42,13 +47,6 @@ import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
 
-import java.util.HashMap;
-import java.util.Objects;
-
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -63,18 +61,20 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
     @NonFinal
     private String appHost;
 
-    public ResponseFilter<MindmapTemplateResponse> getListMindMapTemplate(Long departmentId, Integer page, Integer pageSize, String textSearch) throws ApiException {
+    public ResponseFilter<MindmapTemplateResponse> getListMindMapTemplate(
+            Long departmentId, Integer page, Integer pageSize, String textSearch) throws ApiException {
         Accounts accounts = SecurityUtils.getUser();
         Optional<Departments> departments = departmentRepository.findById(departmentId);
 
         if (departments.isEmpty()) {
             throw new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND);
         }
-        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
-            if (!accounts.getDepartments().getId().equals(departmentId)) {
-                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
-            }
+        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
+                && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))
+                && !accounts.getDepartments().getId().equals(departmentId)) {
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
         }
+
         if (page < 1) {
             throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
@@ -82,23 +82,22 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
             throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
 
-        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("updatedAt").descending());
-        Page<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.getListMindmapTemplate(departmentId, textSearch, pageable);
-        Page<MindmapTemplateResponse> mindmapTemplateResponses = mindmapTemplate.map(mindmap ->
-                MindmapTemplateResponse.builder()
+        Pageable pageable =
+                PageRequest.of(page - 1, pageSize, Sort.by("updatedAt").descending());
+        Page<MindmapTemplate> mindmapTemplate =
+                mindmapTemplateRepository.getListMindmapTemplate(departmentId, textSearch, pageable);
+        Page<MindmapTemplateResponse> mindmapTemplateResponses =
+                mindmapTemplate.map(mindmap -> MindmapTemplateResponse.builder()
                         .id(mindmap.getId())
                         .name(mindmap.getName())
                         .url(mindmap.getUrl())
-                        .build()
-        );
+                        .build());
         return new ResponseFilter<>(
                 mindmapTemplateResponses.getContent(),
                 (int) mindmapTemplateResponses.getTotalElements(),
                 mindmapTemplateResponses.getSize(),
                 mindmapTemplateResponses.getNumber(),
-                mindmapTemplateResponses.getTotalPages()
-        );
-
+                mindmapTemplateResponses.getTotalPages());
     }
 
     @Override
@@ -116,7 +115,8 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 && !accounts.getDepartments().getId().equals(request.getDepartmentId())) {
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_ENOUGH_PERMISSION);
         }
-        if (mindmapTemplateRepository.existsByNameAndDepartments_Id(request.getName(), departments.get().getId())) {
+        if (mindmapTemplateRepository.existsByNameAndDepartments_Id(
+                request.getName(), departments.get().getId())) {
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NAME_ALREADY_EXISTS);
         }
         MindmapTemplate mindmapTemplate = MindmapTemplate.builder()
@@ -129,7 +129,6 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 .id(mindmapTemplate.getId())
                 .name(mindmapTemplate.getName())
                 .build();
-
     }
 
     @Override
@@ -140,11 +139,14 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         if (mindmapTemplate.isEmpty()) {
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_FOUND);
         }
-        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
-            if (!accounts.getDepartments().getId().equals(mindmapTemplate.get().getDepartments().getId())) {
-                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
-            }
+        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
+                && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))
+                && !accounts.getDepartments()
+                        .getId()
+                        .equals(mindmapTemplate.get().getDepartments().getId())) {
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
         }
+
         if (mindmapTemplate.get().getUrl() != null) {
             minioService.deleteFile(mindmapTemplate.get().getUrl());
         }
@@ -160,10 +162,12 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_FOUND);
         }
 
-        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
-            if (!accounts.getDepartments().getId().equals(mindmapTemplate.get().getId())) {
-                throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
-            }
+        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
+                && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))
+                && !accounts.getDepartments()
+                        .getId()
+                        .equals(mindmapTemplate.get().getId())) {
+            throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
         }
 
         return MindmapTemplateResponse.builder()
@@ -176,7 +180,8 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
 
     @Override
     @Transactional
-    public HashMap<String, String> updateMindMapTemplate(Long id, MindmapTemplateUpdateRequest request) throws Exception {
+    public HashMap<String, String> updateMindMapTemplate(Long id, MindmapTemplateUpdateRequest request)
+            throws Exception {
         Accounts accounts = SecurityUtils.getUser();
         Optional<Departments> departments = departmentRepository.findById(request.getDepartmentId());
         Optional<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.findById(id);
@@ -190,14 +195,18 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         if (!request.getDepartmentName().equals(departments.get().getName())) {
             throw new ApiException(SystemErrorCode.ORGANIZATION_STRUCTURE);
         }
-        if (!request.getDepartmentId().equals(mindmapTemplate.get().getDepartments().getId())) {
+        if (!request.getDepartmentId()
+                .equals(mindmapTemplate.get().getDepartments().getId())) {
             throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
-        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name()) && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
+        if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
+                && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))) {
             if (!accounts.getDepartments().getId().equals(request.getDepartmentId())) {
                 throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
             }
-            if (!accounts.getDepartments().getId().equals(mindmapTemplate.get().getDepartments().getId())) {
+            if (!accounts.getDepartments()
+                    .getId()
+                    .equals(mindmapTemplate.get().getDepartments().getId())) {
                 throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
             }
         }
@@ -210,7 +219,8 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 errorCode.setResult(Optional.of(error));
                 throw new ApiException(errorCode);
             }
-            if (Objects.nonNull(mindmapTemplate.get().getUrl()) && !Objects.equals(mindmapTemplate.get().getUrl(), "")) {
+            if (Objects.nonNull(mindmapTemplate.get().getUrl())
+                    && !Objects.equals(mindmapTemplate.get().getUrl(), "")) {
                 minioService.deleteFile(mindmapTemplate.get().getUrl());
             }
             mindmapTemplate.get().setUrl(request.getUrl());
@@ -225,7 +235,8 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         }
 
         if (!request.getName().equals(mindmapTemplate.get().getName())) {
-            if (mindmapTemplateRepository.existsByNameAndDepartments_Id(request.getName(), departments.get().getId())) {
+            if (mindmapTemplateRepository.existsByNameAndDepartments_Id(
+                    request.getName(), departments.get().getId())) {
                 throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NAME_ALREADY_EXISTS);
             }
             mindmapTemplate.get().setName(request.getName());
@@ -256,7 +267,8 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
 
         if (file.getSize() > FileConst.MAX_IMG_MIND_MAP_SIZE * FileConst.BYTES_IN_MB) {
             String msg = MessageFormat.format(
-                    MindmapTemplateErrorCode.MINDMAP_IMG_SIZE_EXCEEDS_LIMIT.getMessage(), FileConst.MAX_IMG_MIND_MAP_SIZE);
+                    MindmapTemplateErrorCode.MINDMAP_IMG_SIZE_EXCEEDS_LIMIT.getMessage(),
+                    FileConst.MAX_IMG_MIND_MAP_SIZE);
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_IMG_SIZE_EXCEEDS_LIMIT, msg);
         }
     }

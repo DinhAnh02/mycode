@@ -40,7 +40,6 @@ import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
 import vn.eledevo.vksbe.entity.*;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
-import vn.eledevo.vksbe.mapper.AccountMapper;
 import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
@@ -346,7 +345,6 @@ public class AccountServiceImpl implements AccountService {
         int soThietBiKetNoi = accounts.getComputers().size();
         if (Objects.equals(soThietBiKetNoi, 1)) {
             accounts.setIsConnectComputer(false);
-            accounts.setStatus(Status.ACTIVE.name());
             accountRepository.save(accounts);
         }
         // gỡ usb token
