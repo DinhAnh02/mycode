@@ -1,15 +1,12 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import static org.springframework.http.HttpStatus.*;
+import org.springframework.http.HttpStatusCode;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.gson.Gson;
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.*;
 
 public enum SystemErrorCode implements BaseErrorCode {
     INTERNAL_SERVER(INTERNAL_SERVER_ERROR, "500", "Internal Server Error", new HashMap<>()),
@@ -17,7 +14,7 @@ public enum SystemErrorCode implements BaseErrorCode {
     AUTHENTICATION_SERVER(FORBIDDEN, "403", "Forbidden", new HashMap<>()),
     NOT_FOUND_SERVER(NOT_FOUND, "404", "Not Found", new HashMap<>()),
     BAD_REQUEST_SERVER(BAD_REQUEST, "400", "Bad Request", new HashMap<>()),
-    VALIDATE_FORM(UNPROCESSABLE_ENTITY, "422", "Dữ liệu không hợp lệ", new HashMap<>()),
+    VALIDATE_FORM(OK, "422", "Dữ liệu không hợp lệ", new HashMap<>()),
     ORGANIZATION_STRUCTURE(
             OK, "1000", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất", new HashMap<>()),
     ;
