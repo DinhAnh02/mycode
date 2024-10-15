@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.SecurityUtils;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -20,6 +23,11 @@ public class CasePerson {
 
     String type;
     Boolean isDeleted;
+    String investigatorCode;
+    LocalDate createdAt;
+    LocalDate updatedAt;
+    String createdBy;
+    String updatedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caseId", nullable = false)
@@ -28,4 +36,20 @@ public class CasePerson {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "citizenId", nullable = false)
     Citizens citizens;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+        this.createdBy = SecurityUtils.getUserName();
+        this.updatedBy = SecurityUtils.getUserName();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+        this.createdBy = SecurityUtils.getUserName();
+        this.updatedBy = SecurityUtils.getUserName();
+    }
 }

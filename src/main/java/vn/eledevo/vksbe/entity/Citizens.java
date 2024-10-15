@@ -22,16 +22,13 @@ public class Citizens {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
-    String investigatorCode;
     String name;
-    LocalDate dateOfBirth;
     String address;
     String gender;
-    String identification;
+    String citizenId;
     @Size(max = 1000)
-    String avatar;
-    String organization;
+    String profileImage;
+    String workingAddress;
     String position;
     LocalDate createdAt;
     LocalDate updatedAt;

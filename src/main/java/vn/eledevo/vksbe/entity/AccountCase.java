@@ -17,11 +17,10 @@ public class AccountCase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
     Boolean hasAccess;
-    Boolean isEditPerson;
+    Boolean isProsecutor;
+    Boolean isInCharge;
     String accountRole;
-    String position;
 
     @ManyToOne
     @JoinColumn(name = "accountId", nullable = false)
