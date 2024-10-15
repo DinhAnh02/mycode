@@ -881,7 +881,9 @@ public class AccountServiceImpl implements AccountService {
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
-        minioService.deleteFile(profile.getAvatar());
+        if (!profile.getAvatar().isEmpty()) {
+            minioService.deleteFile(profile.getAvatar());
+        }
         profile.setAvatar(req.getAvatar().isEmpty() ? null : req.getAvatar());
         Profiles profileSave = profileRepository.save(profile);
 
