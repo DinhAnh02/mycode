@@ -40,7 +40,6 @@ public class SecurityConfiguration {
         "/swagger-ui.html",
         "/api/v1/private/accounts/download-image/{fileName:.+}",
         "/api/v1/private/minio/**",
-
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -57,8 +56,7 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/change-pin-code",
                                 "/api/v1/private/accounts/{id}/update-avatar-user-info",
                                 "/api/v1/private/case-status",
-                                "/api/v1/private/case-status/{id}/detail"
-                                )
+                                "/api/v1/private/case-status/{id}/detail")
                         .hasAnyAuthority(
                                 Role.IT_ADMIN.name(),
                                 Role.KIEM_SAT_VIEN.name(),
@@ -81,9 +79,7 @@ public class SecurityConfiguration {
                                 Role.TRUONG_PHONG.name(),
                                 Role.PHO_PHONG.name(),
                                 Role.IT_ADMIN.name())
-                        .requestMatchers(
-                                "/api/v1/private/mindmapTemplate/**"
-                        )
+                        .requestMatchers("/api/v1/private/mindmapTemplate/**")
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
                                 Role.VIEN_PHO.name(),
@@ -105,17 +101,21 @@ public class SecurityConfiguration {
                         .hasAuthority(Role.IT_ADMIN.name())
                         .requestMatchers(
                                 "/api/v1/private/departments/{id}/update-department",
-                                "/api/v1/private/case-status/create", "/api/v1/private/organizations/{id}/update",
-                                "/api/v1/private/organizations/{id}/delete","/api/v1/private/organizations/create",
+                                "/api/v1/private/case-status/create",
+                                "/api/v1/private/organizations/{id}/update",
+                                "/api/v1/private/organizations/{id}/delete",
+                                "/api/v1/private/organizations/create",
                                 "/api/v1/private/organizations/{id}/detail",
                                 "/api/v1/private/case-status/{id}/delete",
-                                "/api/v1/private/case-status/{id}/update"
-                        )
+                                "/api/v1/private/case-status/{id}/update")
+                        .hasAnyAuthority(Role.VIEN_TRUONG.name(), Role.VIEN_PHO.name(), Role.IT_ADMIN.name())
+                        .requestMatchers("/api/v1/private/cases/{id}/investigator")
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
                                 Role.VIEN_PHO.name(),
-                                Role.IT_ADMIN.name()
-                        )
+                                Role.TRUONG_PHONG.name(),
+                                Role.PHO_PHONG.name(),
+                                Role.KIEM_SAT_VIEN.name())
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

@@ -17,6 +17,7 @@ public enum SystemErrorCode implements BaseErrorCode {
     VALIDATE_FORM(OK, "422", "Dữ liệu không hợp lệ", new HashMap<>()),
     ORGANIZATION_STRUCTURE(
             OK, "1000", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất", new HashMap<>()),
+    PAGE_NOT_VALID(BAD_REQUEST,"400","Trang hiện tại hoặc số kích thước trang không được nhỏ hơn 1", new HashMap<>())
     ;
 
     private final HttpStatusCode statusCode;
