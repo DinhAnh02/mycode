@@ -444,20 +444,20 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public ActivedAccountResponse activeAccount(Long id) throws ApiException {
-        Accounts activedAcc = validAccount(id);
+        Accounts activeAcc = validAccount(id);
         Accounts loginAcc = validAccount(SecurityUtils.getUserId());
 
         Role loginAccRole = Role.valueOf(loginAcc.getRoles().getCode());
-        Role activedAccRole = Role.valueOf(activedAcc.getRoles().getCode());
+        Role activedAccRole = Role.valueOf(activeAcc.getRoles().getCode());
         boolean isSameDepartment = loginAcc.getDepartments()
                 .getId()
-                .equals(activedAcc.getDepartments().getId());
+                .equals(activeAcc.getDepartments().getId());
         if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
         if (activedAccRole.equals(Role.VIEN_TRUONG) || activedAccRole.equals(Role.TRUONG_PHONG)) {
-            Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(activedAccRole.name(),activedAcc.getDepartments().getCode());
-            if (accountsLeader.isPresent() && !activedAcc.getId().equals(accountsLeader.get().getId())) {
+            Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(activedAccRole.name(),activeAcc.getDepartments().getCode());
+            if (accountsLeader.isPresent() && !activeAcc.getId().equals(accountsLeader.get().getId())) {
                 AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(accountsLeader);
                 throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
             }
@@ -466,15 +466,15 @@ public class AccountServiceImpl implements AccountService {
                 || loginAccRole.equals(Role.PHO_PHONG) && !isSameDepartment) {
             throw new ApiException(AccountErrorCode.DEPARTMENT_CONFLICT);
         }
-        if (Boolean.FALSE.equals(activedAcc.getIsConnectComputer())) {
+        if (Boolean.FALSE.equals(activeAcc.getIsConnectComputer())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_COMPUTER);
         }
 
-        if (Boolean.FALSE.equals(activedAcc.getIsConnectUsb())) {
+        if (Boolean.FALSE.equals(activeAcc.getIsConnectUsb())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_LINKED_TO_USB);
         }
-        activedAcc.setStatus(Status.ACTIVE.name());
-        accountRepository.save(activedAcc);
+        activeAcc.setStatus(Status.ACTIVE.name());
+        accountRepository.save(activeAcc);
         return new ActivedAccountResponse();
     }
 
@@ -664,7 +664,7 @@ public class AccountServiceImpl implements AccountService {
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
-        if (Boolean.FALSE.equals(accountRequest.getIsConditionLogin1())) {
+        if (Boolean.FALSE.equals(accountRequest.getIsConditionLogin2())) {
             throw new ApiException(AccountErrorCode.CHANGE_PIN_LOGIN);
         }
         if (!passwordEncoder.matches(pinRequest.getOldPinCode(), accountRequest.getPin())) {
@@ -676,9 +676,12 @@ public class AccountServiceImpl implements AccountService {
         if (!pinRequest.getNewPinCode().equals(pinRequest.getConfirmPinCode())) {
             throw new ApiException(AccountErrorCode.CONFIRM_PIN_MISMATCH);
         }
-        accountRequest.setPin(passwordEncoder.encode(pinRequest.getConfirmPinCode()));
+        String hashPin = passwordEncoder.encode(pinRequest.getConfirmPinCode());
+        accountRequest.setPin(hashPin);
         accountRepository.save(accountRequest);
-        return new HashMap<>();
+        HashMap<String,String> result = new HashMap<>();
+        result.put("pin",hashPin);
+        return result;
     }
 
     private void removeUSB(Long accountID, Long usbID) throws ApiException {
