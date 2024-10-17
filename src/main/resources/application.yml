@@ -20,8 +20,9 @@ spring:
     database: mysql
   servlet:
     multipart:
-      max-file-size: 20480MB
-      max-request-size: 20480MB
+      max-file-size: 20GB
+      max-request-size: 20GB
+      enabled: true
 application:
   security:
     jwt:
