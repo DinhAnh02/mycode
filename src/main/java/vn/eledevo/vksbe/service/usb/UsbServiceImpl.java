@@ -7,10 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -123,6 +120,9 @@ public class UsbServiceImpl implements UsbService {
         List<Computers> computers = accountUpdate.getComputers();
         String[] computerCode = computers.stream().map(Computers::getCode).toArray(String[]::new);
         // Thông tin cần mã hoá
+        if(Objects.equals(accountUpdate.getPin(), "") || accountUpdate.getPin() == null){
+            accountUpdate.setPin("");
+        }
         DataChange usbInfoToEncrypt = DataChange.builder()
                 .maPin(accountUpdate.getPin())
                 .keyUsb(accountUpdate.getUsb().getKeyUsb())

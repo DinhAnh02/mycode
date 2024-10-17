@@ -1,10 +1,7 @@
 package vn.eledevo.vksbe.service.authenticate;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -153,8 +150,9 @@ public class AuthenticationService {
         account.setPin(hashedPin);
         account.setIsConditionLogin2(Boolean.TRUE);
         accountRepository.save(account);
-
-        return new HashMap<>();
+        HashMap<String,String> result = new HashMap<>();
+        result.put("pin",hashedPin);
+        return result;
     }
 
     public HashMap<String, String> changePassword(ChangePasswordRequest request) throws ApiException {
