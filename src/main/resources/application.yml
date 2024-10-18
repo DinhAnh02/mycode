@@ -32,7 +32,7 @@ application:
         expiration: 604800000
 
 minio:
-  url: http://192.168.1.80:9000            # URL của MinIO server (thay bằng địa chỉ và cổng của server)
+  url: http://100.113.61.3:9000            # URL của MinIO server (thay bằng địa chỉ và cổng của server)
   access-key: admin                 # Access key của MinIO
   secret-key: admin12345             # Secret key của MinIO
   bucket-name: vks-store                 # Tên bucket mặc định trong MinIO để lưu trữ
