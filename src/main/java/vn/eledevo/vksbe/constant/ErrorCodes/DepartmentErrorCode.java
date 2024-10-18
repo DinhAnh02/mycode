@@ -10,8 +10,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatusCode;
 
 public enum DepartmentErrorCode implements BaseErrorCode {
-    DEPARTMENT_NOT_FOUND(OK, "DEP-01", "Phòng ban không tồn tại", new HashMap<>()),
-    DEPARTMENT_EXISTED(OK, "DEP-03", "Không được trùng tên với các phòng ban khác", new HashMap<>()),
+    DEPARTMENT_EXISTED(OK, "DEP-01", "Không được trùng tên với các phòng ban khác", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

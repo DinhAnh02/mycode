@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
@@ -55,7 +56,7 @@ public class ComputerServiceImpl implements ComputerService {
     public HashMap<String, String> updateComputer(Long requestId, ComputersModel computerRequest) throws ApiException {
         Computers computer = computerRepository
                 .findById(requestId)
-                .orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         Computers computerByName = computerRepository.findByName(computerRequest.getName());
         if (computerRepository.existsByName(computerRequest.getName())
                 && !computerByName.getId().equals(requestId)) {

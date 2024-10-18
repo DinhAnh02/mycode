@@ -301,7 +301,7 @@ public class AccountServiceImpl implements AccountService {
             case VIEN_TRUONG, VIEN_PHO, IT_ADMIN -> handleLeader(Role.valueOf(roleCode), Role.valueOf(lockAccountRole));
             case TRUONG_PHONG, PHO_PHONG -> handleMember(
                     Role.valueOf(roleCode), Role.valueOf(lockAccountRole), sameDepartment);
-            default -> throw new ApiException(RoleErrorCode.ROLE_NOT_FOUND);
+            default -> throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         lockAccount.setStatus(Status.INACTIVE.name());
         accountRepository.save(lockAccount);
@@ -331,7 +331,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         Computers computers = computerRepository
                 .findById(computerId)
-                .orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         if (!computers.getAccounts().getId().equals(accountId)) {
             throw new ApiException(ComputerErrorCode.PC_NOT_LINKED_TO_ACCOUNT);
         }
@@ -369,7 +369,7 @@ public class AccountServiceImpl implements AccountService {
             List<Computers> connectedComputers = new ArrayList<>();
             Map<Long, Computers> computersMap = computers.stream().collect(Collectors.toMap(Computers::getId, c -> c));
             if (CollectionUtils.isEmpty(computers)) {
-                throw new ApiException(ComputerErrorCode.PC_NOT_FOUND);
+                throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
             }
             for (Long computerId : computerIds) {
                 if (computersMap.get(computerId) != null) {
@@ -520,10 +520,10 @@ public class AccountServiceImpl implements AccountService {
     public AccountResponse createAccountInfo(AccountCreateRequest request) throws ValidationException, ApiException {
         Roles newAccountRole = roleRepository
                 .findById(request.getRoleId())
-                .orElseThrow(() -> new ApiException(RoleErrorCode.ROLE_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         Departments newAccountDepartment = departmentRepository
                 .findById(request.getDepartmentId())
-                .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
 
         validateRoleAndDepartment(newAccountRole, newAccountDepartment);
 
@@ -569,10 +569,10 @@ public class AccountServiceImpl implements AccountService {
 
         Roles requestRole = roleRepository
                 .findById(req.getRoleId())
-                .orElseThrow(() -> new ApiException(RoleErrorCode.ROLE_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         Departments requestDepartment = departmentRepository
                 .findById(req.getDepartmentId())
-                .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
 
         if (requestRole.getCode().equals(Role.IT_ADMIN.name())
                 || requestDepartment.getCode().equals(Department.PB_KY_THUAT.name())) {

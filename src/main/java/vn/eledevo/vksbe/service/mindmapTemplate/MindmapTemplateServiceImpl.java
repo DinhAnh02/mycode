@@ -67,7 +67,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         Optional<Departments> departments = departmentRepository.findById(departmentId);
 
         if (departments.isEmpty()) {
-            throw new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         if (!accounts.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
                 && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))
@@ -105,7 +105,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         Accounts accounts = SecurityUtils.getUser();
         Optional<Departments> departments = departmentRepository.findById(request.getDepartmentId());
         if (departments.isEmpty()) {
-            throw new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         if (!request.getDepartmentName().equals(departments.get().getName())) {
             throw new ApiException(SystemErrorCode.ORGANIZATION_STRUCTURE);
@@ -187,7 +187,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
         Optional<MindmapTemplate> mindmapTemplate = mindmapTemplateRepository.findById(id);
 
         if (departments.isEmpty()) {
-            throw new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         if (mindmapTemplate.isEmpty()) {
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NOT_FOUND);

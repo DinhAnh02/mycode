@@ -39,11 +39,11 @@ public class Documents {
     String updatedBy;
 
     @ManyToOne
-    @JoinColumn(name = "caseId", nullable = false)
+    @JoinColumn(name = "case_id", nullable = false)
     Cases cases;
 
     @ManyToOne
-    @JoinColumn(name = "parentId", referencedColumnName = "id")
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
     Documents parentId;
 
     @OneToMany(mappedBy = "parentId", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)

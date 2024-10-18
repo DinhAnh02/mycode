@@ -1,5 +1,6 @@
 package vn.eledevo.vksbe.service.category;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -11,8 +12,8 @@ import vn.eledevo.vksbe.dto.response.InformationResponse;
 import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
 import vn.eledevo.vksbe.dto.response.role.RoleResponse;
+import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.mapper.DepartmentMapper;
-import vn.eledevo.vksbe.mapper.OrganizationMapper;
 import vn.eledevo.vksbe.mapper.RoleMapper;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
 import vn.eledevo.vksbe.repository.OrganizationRepository;
@@ -33,9 +34,19 @@ public class CategoryServiceImpl implements CategoryService {
         List<DepartmentResponse> departmentsList = departmentRepository.findAll().stream()
                 .map(DepartmentMapper::toResponse)
                 .toList();
-        List<OrganizationResponse> organizationsList = organizationRepository.findAll().stream()
-                .map(OrganizationMapper::toResponse)
-                .toList();
+
+        Organizations organizations = organizationRepository.findByCode("VKS00001");
+        OrganizationResponse organizationResponse = OrganizationResponse.builder()
+                .id(organizations.getId())
+                .code(organizations.getCode())
+                .name(organizations.getName())
+                .address(organizations.getAddress())
+                .isDefault(organizations.getIsDefault())
+                .updatedAt(organizations.getUpdatedAt())
+                .build();
+        List<OrganizationResponse> organizationsList = new ArrayList<>();
+        organizationsList.add(organizationResponse);
+
         List<RoleResponse> rolesList =
                 roleRepository.findAll().stream().map(RoleMapper::toResponse).toList();
 
