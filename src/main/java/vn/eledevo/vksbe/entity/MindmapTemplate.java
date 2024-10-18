@@ -23,6 +23,7 @@ public class MindmapTemplate {
     Long id;
 
     String name;
+    @Column(columnDefinition = "LONGTEXT")
     String dataLink;
 
     @Column(columnDefinition = "LONGTEXT")

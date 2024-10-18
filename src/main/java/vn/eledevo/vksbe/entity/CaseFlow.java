@@ -23,8 +23,10 @@ public class CaseFlow {
     Long id;
 
     String name;
+    @Column(columnDefinition = "LONGTEXT")
     String dataLink;
-    String dataNote;
+    @Column(columnDefinition = "LONGTEXT")
+    String dataNode;
     @Size(max = 1000)
     String url;
     LocalDate createdAt;
