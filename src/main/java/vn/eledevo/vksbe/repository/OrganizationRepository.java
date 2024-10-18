@@ -21,4 +21,6 @@ public interface OrganizationRepository extends BaseRepository<Organizations, Lo
     Boolean existsByCode(String code);
 
     Boolean existsByName(String name);
+
+    Organizations findByCode(String code);
 }

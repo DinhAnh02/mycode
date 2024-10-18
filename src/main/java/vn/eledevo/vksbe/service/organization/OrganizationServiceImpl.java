@@ -41,10 +41,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     public ResponseFilter<OrganizationResponse> getOrganizationList(
             OrganizationSearch organizationSearch, Integer page, Integer pageSize) throws ApiException {
         if (page < 1) {
-            throw new ApiException(OrganizationErrorCode.ORGANIZATION_SYSTEM_ERROR);
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
         if (pageSize < 1) {
-            throw new ApiException(OrganizationErrorCode.ORGANIZATION_SYSTEM_ERROR);
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
         if (organizationSearch.getFromDate() == null) {
             organizationSearch.setFromDate(LocalDate.of(1900, 1, 1));
@@ -110,7 +110,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         if (Boolean.TRUE.equals(organizationOptional.get().getIsDefault())) {
-            throw new ApiException(OrganizationErrorCode.ORGANIZATION_DEFAULT);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
 
         if (!(organizationRequest.getCode().equals(organizationOptional.get().getCode()))) {
@@ -156,7 +156,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
         }
         if (Boolean.TRUE.equals(organization.get().getIsDefault())) {
-            throw new ApiException(OrganizationErrorCode.ORGANIZATION_DEFAULT);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         organizationRepository.deleteById(organizationId);
         return new HashMap<>();

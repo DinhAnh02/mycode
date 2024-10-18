@@ -10,10 +10,9 @@ import java.util.Optional;
 import org.springframework.http.HttpStatusCode;
 
 public enum ComputerErrorCode implements BaseErrorCode {
-    PC_NOT_FOUND(OK, "COM-01", "Thiết bị máy tính không tồn tại", new HashMap<>()),
-    PC_NOT_LINKED_TO_ACCOUNT(OK, "COM-02", "Máy tính chưa được liên kết với tài khoản", new HashMap<>()),
-    PC_CODE_ALREADY_EXISTS(OK, "COM-03", "Mã máy tính đã tồn tại trong hệ thống", new HashMap<>()),
-    PC_NAME_ALREADY_EXISTS(OK, "COM-04", "Tên máy tính đã tồn tại trong hệ thống", new HashMap<>()),
+    PC_NOT_LINKED_TO_ACCOUNT(OK, "COM-01", "Máy tính chưa được liên kết với tài khoản", new HashMap<>()),
+    PC_CODE_ALREADY_EXISTS(OK, "COM-02", "Mã máy tính đã tồn tại trong hệ thống", new HashMap<>()),
+    PC_NAME_ALREADY_EXISTS(OK, "COM-03", "Tên máy tính đã tồn tại trong hệ thống", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

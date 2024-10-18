@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.dto.request.department.UpdateDepartment;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
@@ -40,7 +41,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             throws ApiException {
         Departments existingDepartment = departmentRepository
                 .findById(departmentId)
-                .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
 
         if (departmentRepository.existsDepartmentsByName(departmentRequest.getDepartmentName())) {
             throw new ApiException(DepartmentErrorCode.DEPARTMENT_EXISTED);

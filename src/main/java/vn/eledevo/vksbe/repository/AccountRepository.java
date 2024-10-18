@@ -38,7 +38,8 @@ public interface AccountRepository extends BaseRepository<Accounts, Long> {
             + "AND (:#{#filter.organizationId} = 0 OR o.id = :#{#filter.organizationId}) "
             + "AND (:#{#filter.status} IS NULL OR :#{#filter.status} = '' OR a.status = :#{#filter.status}) "
             + "AND (:#{#filter.fromDate} IS NULL OR a.createdAt >= :#{#filter.fromDate}) "
-            + "AND (:#{#filter.toDate} IS NULL OR a.createdAt <= :#{#filter.toDate})")
+            + "AND (:#{#filter.toDate} IS NULL OR a.createdAt <= :#{#filter.toDate})"
+            + "AND o.id = 1 ")
     Page<AccountQueryToFilter> getAccountList(AccountRequest filter, Boolean isBoss, Pageable pageable);
 
     Accounts findAccountsByUsername(String username);

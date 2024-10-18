@@ -19,6 +19,7 @@ public interface DepartmentRepository extends BaseRepository<Departments, Long> 
             + "LEFT JOIN Profiles p ON p.accounts.id = a.id "
             + "LEFT JOIN Roles r ON r.id = a.roles.id "
             + "LEFT JOIN Organizations o ON 1=1 "
+            + "WHERE o.id = 1 "
             + "GROUP BY d.id, d.name, d.code, o.name, d.createdAt, d.updatedAt")
     List<DepartmentResponse> getDepartmentList();
 

@@ -229,7 +229,7 @@ public class CaseServiceImpl implements CaseService {
         Accounts accounts = SecurityUtils.getUser();
         Departments departments = departmentRepository
                 .findById(caseCreateRequest.getDepartmentId())
-                .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         if (!caseCreateRequest.getDepartmentName().equals(departments.getName())) {
             throw new ApiException(SystemErrorCode.ORGANIZATION_STRUCTURE);
         }
