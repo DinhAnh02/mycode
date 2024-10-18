@@ -69,8 +69,6 @@ public enum SystemErrorCode implements BaseErrorCode {
             Field[] fields = object.getClass().getDeclaredFields();
 
             for (Field field : fields) {
-                field.setAccessible(true); // Cho phép truy cập vào các trường private
-
                 try {
                     // Lấy tên trường (field name) làm key
                     String key = field.getName();
