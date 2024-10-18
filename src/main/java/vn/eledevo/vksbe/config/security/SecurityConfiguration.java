@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.config.security;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -17,6 +18,8 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import lombok.RequiredArgsConstructor;
 import vn.eledevo.vksbe.constant.Role;
+import vn.eledevo.vksbe.repository.TokenRepository;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Configuration
 @EnableWebSecurity
@@ -43,6 +46,7 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
+    private final TokenRepository tokenRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -134,16 +138,24 @@ public class SecurityConfiguration {
                         UsernamePasswordAuthenticationFilter
                                 .class) // Thêm bộ lọc xác thực JWT (Mỗi request đều được điều hướng đến doFilter để
                 // kiểm tra)
-                .logout(
-                        logout -> // Cấu hình đăng xuất
+                .logout(logout ->
                         logout.logoutUrl("/api/v1/auth/logout")
-                                .addLogoutHandler(logoutHandler) // Thêm xử lý đăng xuất
-                                .logoutSuccessHandler((request, response, authentication) ->
-                                        SecurityContextHolder
-                                                .clearContext()) // Định nghĩa là đăng xuất thành công và xóa bỏ thông
-                        // tin người dùng trong phiên đăng nhập trong
-                        // SecurityContextHolder
-                        );
+                                .addLogoutHandler(logoutHandler)
+                                .logoutSuccessHandler((request, response, authentication) -> {
+                                    if (authentication != null && authentication.getPrincipal() != null) {
+                                        // Lấy ID người dùng từ Authentication
+                                        Long userId = SecurityUtils.getUserId();
+                                        // Xóa token trong TokenRepository
+                                        tokenRepository.deleteByAccounts_Id(userId);
+                                    }
+
+                                    // Xóa thông tin khỏi SecurityContextHolder
+                                    SecurityContextHolder.clearContext();
+
+                                    // Đặt mã phản hồi HTTP thành 200 OK
+                                    response.setStatus(HttpServletResponse.SC_OK);
+                                })
+                );
         return http.build();
     }
 

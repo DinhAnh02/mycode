@@ -269,6 +269,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public HashMap<String, String> inactivateAccount(Long idAccount) throws ApiException {
         String userName = SecurityUtils.getUserName();
         // account đang đăng nhập
