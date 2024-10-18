@@ -29,7 +29,6 @@ public class Documents {
     String type;
     Long size;
     String description;
-    Boolean isDeleted;
     Boolean isDefault;
     String documentType;
     LocalDate createdAt;

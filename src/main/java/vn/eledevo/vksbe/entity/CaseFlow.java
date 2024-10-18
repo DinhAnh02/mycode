@@ -23,7 +23,8 @@ public class CaseFlow {
     Long id;
 
     String name;
-    String data;
+    String dataLink;
+    String dataNote;
     @Size(max = 1000)
     String url;
     LocalDate createdAt;
