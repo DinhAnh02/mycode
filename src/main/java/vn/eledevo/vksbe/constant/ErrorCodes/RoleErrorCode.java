@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.constant.ErrorCodes;
 
 import static org.springframework.http.HttpStatus.OK;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -9,8 +10,8 @@ import java.util.Optional;
 import org.springframework.http.HttpStatusCode;
 
 public enum RoleErrorCode implements BaseErrorCode {
-    ROLE_NOT_FOUND(OK, "Role-16", "Chức vụ không tồn tại", new HashMap<>()),
-    CURRENT_ROLE_NOT_CHANGEABLE(OK, "Role-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
+    ROLE_NOT_FOUND(OK, "ROL-16", "Chức vụ không tồn tại", new HashMap<>()),
+    CURRENT_ROLE_NOT_CHANGEABLE(OK, "ROL-19", "Chức vụ hiện tại không thể thay đổi", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;
@@ -26,25 +27,55 @@ public enum RoleErrorCode implements BaseErrorCode {
     }
 
     @Override
-    public HttpStatusCode getStatusCode() {
-        return null;
-    }
-
-    @Override
-    public Map<String, Optional<?>> getResult() {
-        return Map.of();
-    }
-
-    @Override
     public String getCode() {
-        return "";
+        return code;
     }
 
     @Override
     public String getMessage() {
-        return "";
+        return message;
     }
 
     @Override
-    public void setResult(Optional<?> value) {}
+    public HttpStatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    @Override
+    public Map<String, Optional<?>> getResult() {
+        return result;
+    }
+
+    @Override
+    public void setResult(Optional<?> value) {
+        // Kiểm tra nếu Optional chứa giá trị
+        if (value.isPresent()) {
+            Object object = value.get();
+            if (object instanceof HashMap) {
+                HashMap<?, ?> map = (HashMap<?, ?>) object;
+                map.forEach((key, val) -> {
+                    this.result.put(key.toString(), Optional.ofNullable(val));
+                });
+            }
+        }
+        if (value.isPresent()) {
+            Object object = value.get();
+            // Sử dụng reflection để lấy tất cả các trường (fields) của object
+            Field[] fields = object.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                field.setAccessible(true); // Cho phép truy cập vào các trường private
+
+                try {
+                    // Lấy tên trường (field name) làm key
+                    String key = field.getName();
+                    // Lấy giá trị của trường (field value) làm value và gán vào result
+                    Object fieldValue = field.get(object);
+                    this.result.put(key, Optional.ofNullable(fieldValue)); // Sử dụng Optional để bọc giá trị
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace(); // Xử lý ngoại lệ nếu không thể truy cập vào trường
+                }
+            }
+        }
+    }
 }

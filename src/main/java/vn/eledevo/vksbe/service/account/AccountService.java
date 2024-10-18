@@ -15,10 +15,7 @@ import vn.eledevo.vksbe.dto.request.account.AvatarRequest;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.ResultUrl;
-import vn.eledevo.vksbe.dto.response.account.AccountResponse;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
-import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
-import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
+import vn.eledevo.vksbe.dto.response.account.*;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
@@ -60,4 +57,7 @@ public interface AccountService {
     AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws Exception;
 
     HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException;
+
+    ResponseFilter<AccountFilterCaseResponse> getAccountCaseFilter(
+            String textSearch, Integer currentPage, Integer limit) throws ApiException;
 }

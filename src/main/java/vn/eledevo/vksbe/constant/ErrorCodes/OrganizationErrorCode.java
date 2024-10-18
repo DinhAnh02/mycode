@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.constant.ErrorCodes;
 
 import static org.springframework.http.HttpStatus.OK;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,16 +32,6 @@ public enum OrganizationErrorCode implements BaseErrorCode {
     }
 
     @Override
-    public HttpStatusCode getStatusCode() {
-        return statusCode;
-    }
-
-    @Override
-    public Map<String, Optional<?>> getResult() {
-        return result;
-    }
-
-    @Override
     public String getCode() {
         return code;
     }
@@ -48,6 +39,16 @@ public enum OrganizationErrorCode implements BaseErrorCode {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public HttpStatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    @Override
+    public Map<String, Optional<?>> getResult() {
+        return result;
     }
 
     @Override
@@ -60,6 +61,25 @@ public enum OrganizationErrorCode implements BaseErrorCode {
                 map.forEach((key, val) -> {
                     this.result.put(key.toString(), Optional.ofNullable(val));
                 });
+            }
+        }
+        if (value.isPresent()) {
+            Object object = value.get();
+            // Sử dụng reflection để lấy tất cả các trường (fields) của object
+            Field[] fields = object.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                field.setAccessible(true); // Cho phép truy cập vào các trường private
+
+                try {
+                    // Lấy tên trường (field name) làm key
+                    String key = field.getName();
+                    // Lấy giá trị của trường (field value) làm value và gán vào result
+                    Object fieldValue = field.get(object);
+                    this.result.put(key, Optional.ofNullable(fieldValue)); // Sử dụng Optional để bọc giá trị
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace(); // Xử lý ngoại lệ nếu không thể truy cập vào trường
+                }
             }
         }
     }

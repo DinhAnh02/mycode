@@ -27,10 +27,7 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.ResultUrl;
-import vn.eledevo.vksbe.dto.response.account.AccountResponse;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
-import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
-import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
+import vn.eledevo.vksbe.dto.response.account.*;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
@@ -170,5 +167,16 @@ public class AccountController {
     public ApiResponse<HashMap<String, String>> changePinCodeUserLogin(@Valid @RequestBody PinChangeRequest pinRequest)
             throws ApiException {
         return ApiResponse.ok(accountService.changePinUserLogin(pinRequest));
+    }
+
+    @GetMapping("/get-account-case-filter")
+    @Operation(summary = "Xem và tìm kiếm danh sách lãnh đạo vụ án và kiểm sát viên trong filter vụ án")
+    public ApiResponse<ResponseFilter<AccountFilterCaseResponse>> getAccountCaseFilter(
+            @RequestParam String textSearch,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize
+    )
+            throws ApiException {
+        return ApiResponse.ok(accountService.getAccountCaseFilter(textSearch,page,pageSize));
     }
 }

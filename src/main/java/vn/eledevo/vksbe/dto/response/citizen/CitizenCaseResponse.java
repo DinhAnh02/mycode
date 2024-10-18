@@ -11,8 +11,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CitizenCaseResponse {
     Long id;
+    String type;
     String fullName;
     String citizenId;
-    String type;
+    String gender;
     String profileImage;
+    String workingAddress;
+    String address;
+    String job;
 }

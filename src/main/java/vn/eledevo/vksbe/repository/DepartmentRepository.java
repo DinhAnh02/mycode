@@ -1,6 +1,7 @@
 package vn.eledevo.vksbe.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,4 +23,6 @@ public interface DepartmentRepository extends BaseRepository<Departments, Long> 
     List<DepartmentResponse> getDepartmentList();
 
     boolean existsDepartmentsByName(String name);
+
+    Optional<Departments> findDepartmentsByName(String name);
 }
