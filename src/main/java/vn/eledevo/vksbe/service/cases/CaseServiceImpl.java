@@ -234,9 +234,9 @@ public class CaseServiceImpl implements CaseService {
             throw new ApiException(SystemErrorCode.ORGANIZATION_STRUCTURE);
         }
         if (!hasPermissionCreateCase(accounts, caseCreateRequest)) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
-        Boolean caseCodeExist =
+        boolean caseCodeExist =
                 caseRepository.existsByCode(caseCreateRequest.getCode().trim());
         if (caseCodeExist) {
             throw new ApiException(CaseErrorCode.CASE_CODE_EXISTED);

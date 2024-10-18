@@ -17,7 +17,8 @@ public enum SystemErrorCode implements BaseErrorCode {
     BAD_REQUEST_SERVER(BAD_REQUEST, "400", "Bad Request", new HashMap<>()),
     VALIDATE_FORM(OK, "422", "Dữ liệu không hợp lệ", new HashMap<>()),
     ORGANIZATION_STRUCTURE(
-            OK, "1000", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất", new HashMap<>());
+            OK, "1000", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất", new HashMap<>()),
+    NOT_ENOUGH_PERMISSION(OK, "SYS-403", "Bạn không có quyền thao tác", new HashMap<>());
 
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String

@@ -58,13 +58,19 @@ public class UsbServiceImpl implements UsbService {
         if (usbRequest.getToDate() == null) {
             usbRequest.setToDate(LocalDate.now());
         }
-        if (usbRequest.getFromDate().isAfter(usbRequest.getToDate())) {
-            throw new ApiException(AccountErrorCode.START_TIME_GREATER_THAN_END_TIME);
-        }
         Pageable pageable =
                 PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
-        Page<UsbResponseFilter> page = usbRepository.getUsbDeviceList(usbRequest, pageable);
+        if (usbRequest.getFromDate().isAfter(usbRequest.getToDate())) {
+            Page<UsbResponseFilter> page = Page.empty(pageable);
+            return new ResponseFilter<>(
+                    page.getContent(),
+                    (int) page.getTotalElements(),
+                    page.getSize(),
+                    page.getNumber(),
+                    page.getTotalPages());
+        }
 
+        Page<UsbResponseFilter> page = usbRepository.getUsbDeviceList(usbRequest, pageable);
         return new ResponseFilter<>(
                 page.getContent(),
                 (int) page.getTotalElements(),

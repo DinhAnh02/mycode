@@ -79,7 +79,7 @@ public class AccountServiceImpl implements AccountService {
     private String appHost;
 
     private Accounts validAccount(Long id) throws ApiException {
-        return accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        return accountRepository.findById(id).orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
     }
 
     /**
@@ -125,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
         if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
                         || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name()))
                 && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId())) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_READ_DATA_DEPARTMENT);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
         Page<AccountResponseByFilter> filters = getListAccount(loginAccount, accountRequest, currentPage, limit);
@@ -139,14 +139,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Page<AccountResponseByFilter> getListAccount(
-            Accounts loginAccount, AccountRequest accountRequest, Integer currentPage, Integer limit)
-            throws ApiException {
+            Accounts loginAccount, AccountRequest accountRequest, Integer currentPage, Integer limit){
         if (currentPage < 1) {
             currentPage = 1;
         }
         if (limit < 1) {
             limit = 10;
         }
+        Pageable pageable =
+                PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
         if (accountRequest.getFromDate() == null) {
             accountRequest.setFromDate(LocalDate.of(1900, 1, 1));
         }
@@ -154,13 +155,11 @@ public class AccountServiceImpl implements AccountService {
             accountRequest.setToDate(LocalDate.now());
         }
         if (accountRequest.getFromDate().isAfter(accountRequest.getToDate())) {
-            throw new ApiException(AccountErrorCode.START_TIME_GREATER_THAN_END_TIME);
+            return Page.empty(pageable);
         }
         if (Boolean.FALSE.equals(isBoss(loginAccount))) {
             accountRequest.setDepartmentId(loginAccount.getDepartments().getId());
         }
-        Pageable pageable =
-                PageRequest.of(currentPage - 1, limit, Sort.by("updatedAt").descending());
         Page<AccountQueryToFilter> page =
                 accountRepository.getAccountList(accountRequest, isBoss(loginAccount), pageable);
         return page.map(account -> {
@@ -255,7 +254,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public ResultList<ComputerResponse> getComputersByIdAccount(Long accountId) throws ApiException {
         if (!accountRepository.existsById(accountId)) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         List<Computers> res = computerRepository.findByAccounts_Id(accountId);
         List<ComputerResponse> list = res.stream()
@@ -277,21 +276,18 @@ public class AccountServiceImpl implements AccountService {
 
         // check account đang đăng nhập có tồn tại không
         if (accountLogin.isEmpty()) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
 
         Accounts lockAccount = accountRepository
                 .findById(idAccount)
-                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_LOCK_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
 
         // check id request có trùng với người khóa
         if (lockAccount.getId().equals(accountLogin.get().getId())) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_TO_BE_LOCKED_IS_LOGGED_IN);
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
 
-        if (!lockAccount.getStatus().equals(Status.ACTIVE.name())) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_IS_LOCK);
-        }
         // Role của người đăng nhập
         String roleCode = accountLogin.get().getRoleCode();
         // Role của người cần khóa
@@ -315,7 +311,7 @@ public class AccountServiceImpl implements AccountService {
 
     private Void handleLeader(Role roleLogin, Role lockAccountRole) throws ApiException {
         if (priorityRoles(roleLogin) <= priorityRoles(lockAccountRole)) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
         return null;
     }
@@ -324,7 +320,7 @@ public class AccountServiceImpl implements AccountService {
         if ((priorityRoles(roleLogin) > priorityRoles(lockAccountRole)) && sameDepartment) {
             return;
         }
-        throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+        throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
     }
 
     @Override
@@ -332,7 +328,7 @@ public class AccountServiceImpl implements AccountService {
     public HashMap<String, String> removeConnectComputer(Long accountId, Long computerId) throws ApiException {
         Accounts accounts = accountRepository
                 .findById(accountId)
-                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         Computers computers = computerRepository
                 .findById(computerId)
                 .orElseThrow(() -> new ApiException(ComputerErrorCode.PC_NOT_FOUND));
@@ -453,7 +449,7 @@ public class AccountServiceImpl implements AccountService {
                 .getId()
                 .equals(activeAcc.getDepartments().getId());
         if (priorityRoles(loginAccRole) <= priorityRoles(activedAccRole)) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
         if (activedAccRole.equals(Role.VIEN_TRUONG) || activedAccRole.equals(Role.TRUONG_PHONG)) {
             Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(
@@ -488,7 +484,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountSwapResponse swap(Long newAccountId, Long oldAccountId) throws ApiException {
         Accounts existingAccount = accountRepository
                 .findById(newAccountId)
-                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         if (!existingAccount.getRoles().getCode().equals(Role.VIEN_TRUONG.name())
                 && !existingAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) {
             throw new ApiException(RoleErrorCode.CURRENT_ROLE_NOT_CHANGEABLE);
@@ -499,7 +495,7 @@ public class AccountServiceImpl implements AccountService {
         Optional<Accounts> accountLeadOptional =
                 accountRepository.findByDepartment(departmentId, roleCode, Status.ACTIVE.name());
         if (accountLeadOptional.isEmpty()) {
-            throw new ApiException(AccountErrorCode.DEPARTMENT_HEAD_INFO_NOT_FOUND);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         Accounts accountLead = accountLeadOptional.get();
         if (!accountLead.getId().equals(oldAccountId)) {
@@ -549,13 +545,13 @@ public class AccountServiceImpl implements AccountService {
 
         if (!curLoginAcc.getRoles().getCode().equals(Role.IT_ADMIN.name())
                 || newAccountRole.getCode().equals(Role.IT_ADMIN.name())) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
         if (newAccountDepartment.getCode().equals(Department.PB_KY_THUAT.name())) {
-            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
         if (Boolean.FALSE.equals(isAllowedToCreateAccount(newAccountRole, newAccountDepartment))) {
-            throw new ApiException(AccountErrorCode.DEPARTMENT_AND_ROLE_INVALID);
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
     }
 
@@ -580,7 +576,7 @@ public class AccountServiceImpl implements AccountService {
 
         if (requestRole.getCode().equals(Role.IT_ADMIN.name())
                 || requestDepartment.getCode().equals(Department.PB_KY_THUAT.name())) {
-            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
         int priorityRoleUpdate =
@@ -588,11 +584,11 @@ public class AccountServiceImpl implements AccountService {
         int priorityRoleLogin =
                 priorityRoles(Role.valueOf(accountLogin.getRoles().getCode()));
         if (priorityRoleLogin <= priorityRoleUpdate) {
-            throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
         if (Boolean.FALSE.equals(isAllowedToCreateAccount(requestRole, requestDepartment))) {
-            throw new ApiException(AccountErrorCode.DEPARTMENT_AND_ROLE_INVALID);
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
         }
 
         if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
@@ -631,7 +627,7 @@ public class AccountServiceImpl implements AccountService {
         Long userId = SecurityUtils.getUserId();
         Optional<UserInfo> userDetail = accountRepository.findAccountProfileById(userId);
         if (userDetail.isEmpty()) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_INVALID);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         return userDetail.get();
     }
@@ -644,7 +640,7 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(SystemErrorCode.VALIDATE_FORM);
         }
         Accounts account =
-                accountRepository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                accountRepository.findById(id).orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         if (account.getProfile().getAvatar().isEmpty()
                 || account.getProfile().getAvatar().isBlank()) {
             account.getProfile().setAvatar(null);
@@ -662,7 +658,7 @@ public class AccountServiceImpl implements AccountService {
         String userName = getUserName();
         Accounts accountRequest = accountRepository
                 .findAccountInSystem(userName)
-                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
@@ -689,10 +685,10 @@ public class AccountServiceImpl implements AccountService {
     private void removeUSB(Long accountID, Long usbID) throws ApiException {
         Accounts account = accountRepository
                 .findById(accountID)
-                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
 
         if (Role.valueOf(account.getRoles().getCode()).equals(Role.IT_ADMIN)) {
-            throw new ApiException(AccountErrorCode.NOT_PERMISSION_CREATE_ACCOUNT_DEPARTMENT_TECH);
+            throw new ApiException(SystemErrorCode.NOT_ENOUGH_PERMISSION);
         }
 
         if (!Objects.equals(account.getUsb().getId(), usbID)) {

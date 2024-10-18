@@ -52,11 +52,17 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (organizationSearch.getToDate() == null) {
             organizationSearch.setToDate(LocalDate.now());
         }
-        if (organizationSearch.getFromDate().isAfter(organizationSearch.getToDate())) {
-            throw new ApiException(AccountErrorCode.START_TIME_GREATER_THAN_END_TIME);
-        }
         Pageable pageable =
                 PageRequest.of(page - 1, pageSize, Sort.by("updatedAt").descending());
+        if (organizationSearch.getFromDate().isAfter(organizationSearch.getToDate())) {
+            Page<OrganizationResponse> page1 =Page.empty(pageable);
+            return new ResponseFilter<>(
+                    page1.getContent(),
+                    (int) page1.getTotalElements(),
+                    page1.getSize(),
+                    page1.getNumber(),
+                    page1.getTotalPages());
+        }
         Page<OrganizationResponse> organizationResponsePage =
                 organizationRepository.getOrganizationList(organizationSearch, pageable);
         return new ResponseFilter<>(

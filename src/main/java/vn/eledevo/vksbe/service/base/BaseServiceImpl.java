@@ -5,6 +5,7 @@ import java.util.*;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.BaseMapper;
@@ -50,7 +51,7 @@ public abstract class BaseServiceImpl<I, O, E, T> implements BaseService<I, O, T
 
     @Override
     public O update(T id, I rq) throws ValidationException, ApiException {
-        E t = repository.findById(id).orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+        E t = repository.findById(id).orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         Map<String, String> errors = toUpdateErrors(id, rq);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);

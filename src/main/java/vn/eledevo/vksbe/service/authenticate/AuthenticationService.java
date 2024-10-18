@@ -70,7 +70,7 @@ public class AuthenticationService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             if (!account.getStatus().equals(Status.ACTIVE.name())) {
-                throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
+                throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
             }
             Boolean isCheck = checkRoleItAdmin(account.getRoles().getCode());
             if (Boolean.FALSE.equals(isCheck)) {
@@ -136,9 +136,9 @@ public class AuthenticationService {
         String username = SecurityUtils.getUserName();
         Accounts account = accountRepository
                 .findAccountInSystem(username)
-                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         if (!account.getStatus().equals(Status.ACTIVE.name())) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
+            throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
         if (Boolean.TRUE.equals(account.getIsConditionLogin2())) {
             throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
@@ -159,7 +159,7 @@ public class AuthenticationService {
         String userName = SecurityUtils.getUserName();
         Accounts accountRequest = accountRepository
                 .findAccountInSystem(userName)
-                .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         if (!accountRequest.getStatus().equals(Status.ACTIVE.name())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
@@ -187,10 +187,10 @@ public class AuthenticationService {
         }
         Optional<Accounts> accounts = accountRepository.findAccountInSystem(employeeCode);
         if (accounts.isEmpty()) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND);
+            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
         }
         if (!accounts.get().getStatus().equals("ACTIVE")) {
-            throw new ApiException(AccountErrorCode.ACCOUNT_NOT_ACTIVATED);
+            throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
         Optional<Usbs> usbToken =
                 usbRepository.usbByAccountAndConnect(accounts.get().getId());
