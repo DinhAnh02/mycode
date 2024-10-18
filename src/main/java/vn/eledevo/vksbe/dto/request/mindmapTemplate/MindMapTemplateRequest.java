@@ -3,6 +3,7 @@ package vn.eledevo.vksbe.dto.request.mindmapTemplate;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import vn.eledevo.vksbe.constant.ResponseMessage;
 

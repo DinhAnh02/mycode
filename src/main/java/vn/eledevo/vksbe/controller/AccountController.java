@@ -1,16 +1,21 @@
 package vn.eledevo.vksbe.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
+import java.util.Set;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
@@ -33,9 +38,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.account.AccountService;
 import vn.eledevo.vksbe.service.organizational_structure.OrganizationalStructureService;
-
-import java.util.HashMap;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/private/accounts")
@@ -123,8 +125,7 @@ public class AccountController {
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload avatar")
-    public ApiResponse<ResultUrl> uploadAvatar(@RequestParam("file") MultipartFile file)
-            throws Exception {
+    public ApiResponse<ResultUrl> uploadAvatar(@RequestParam("file") MultipartFile file) throws Exception {
         return ApiResponse.ok(accountService.uploadAvatar(file));
     }
 

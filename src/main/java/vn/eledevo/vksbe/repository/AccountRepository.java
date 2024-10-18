@@ -1,18 +1,19 @@
 package vn.eledevo.vksbe.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
 import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountActive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.entity.Accounts;
-
-import java.util.Optional;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long> {
     @Query("SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username")
@@ -78,5 +79,5 @@ public interface AccountRepository extends BaseRepository<Accounts, Long> {
             + "WHERE a.status = 'ACTIVE' "
             + "AND a.roles.code =:roleCode "
             + "AND a.departments.code =:departmentCode")
-    Optional<AccountSwapResponse> getOldLeader(String roleCode,String departmentCode);
+    Optional<AccountSwapResponse> getOldLeader(String roleCode, String departmentCode);
 }

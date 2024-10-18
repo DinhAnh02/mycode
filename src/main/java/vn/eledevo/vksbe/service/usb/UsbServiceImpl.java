@@ -120,7 +120,7 @@ public class UsbServiceImpl implements UsbService {
         List<Computers> computers = accountUpdate.getComputers();
         String[] computerCode = computers.stream().map(Computers::getCode).toArray(String[]::new);
         // Thông tin cần mã hoá
-        if(Objects.equals(accountUpdate.getPin(), "") || accountUpdate.getPin() == null){
+        if (Objects.equals(accountUpdate.getPin(), "") || accountUpdate.getPin() == null) {
             accountUpdate.setPin("");
         }
         DataChange usbInfoToEncrypt = DataChange.builder()

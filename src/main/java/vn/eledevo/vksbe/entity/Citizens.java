@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.*;
-
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.utils.SecurityUtils;
@@ -22,12 +22,15 @@ public class Citizens {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     String name;
     String address;
     String gender;
     String citizenId;
+
     @Size(max = 1000)
     String profileImage;
+
     String workingAddress;
     String position;
     LocalDate createdAt;

@@ -1,9 +1,9 @@
 package vn.eledevo.vksbe.dto.response.case_status;
 
+import java.time.LocalDate;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class CaseStatusResponse {
     Long id;
     String name;

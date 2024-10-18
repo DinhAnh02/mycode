@@ -1,14 +1,15 @@
 package vn.eledevo.vksbe.dto.request.mindmapTemplate;
 
+import static vn.eledevo.vksbe.constant.RegexPattern.MINDMAP_NAME;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ResponseMessage;
-
-import static vn.eledevo.vksbe.constant.RegexPattern.MINDMAP_NAME;
 
 @Getter
 @Setter
@@ -28,7 +29,7 @@ public class MindmapTemplateUpdateRequest {
     @Size(max = 255, message = ResponseMessage.NAMEMINDMAP_MAX)
     @Pattern(regexp = MINDMAP_NAME, message = ResponseMessage.NAMEMINDMAP_SPECIAL)
     String name;
-    
+
     String dataLink;
     String dataNode;
     String url;

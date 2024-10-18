@@ -38,7 +38,6 @@ public class SecurityConfiguration {
         "/swagger-ui/**",
         "/webjars/**",
         "/swagger-ui.html",
-        "/api/v1/private/accounts/download-image/{fileName:.+}",
         "/api/v1/private/minio/**",
     };
     private final JwtAuthenticationFilter jwtAuthFilter;

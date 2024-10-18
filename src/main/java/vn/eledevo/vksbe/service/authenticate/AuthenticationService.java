@@ -150,8 +150,8 @@ public class AuthenticationService {
         account.setPin(hashedPin);
         account.setIsConditionLogin2(Boolean.TRUE);
         accountRepository.save(account);
-        HashMap<String,String> result = new HashMap<>();
-        result.put("pin",hashedPin);
+        HashMap<String, String> result = new HashMap<>();
+        result.put("pin", hashedPin);
         return result;
     }
 

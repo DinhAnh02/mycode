@@ -1,12 +1,16 @@
 package vn.eledevo.vksbe.controller;
 
+import java.util.HashMap;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.*;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.OrganizationSearch;
 import vn.eledevo.vksbe.dto.request.organization.OrganizationRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -15,8 +19,6 @@ import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
 import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
-
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/private/organizations")
@@ -31,8 +33,8 @@ public class OrganizationController {
     public ApiResponse<ResponseFilter<OrganizationResponse>> getOrganizationList(
             @RequestBody OrganizationSearch organizationSearch,
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer pageSize
-    ) throws ApiException {
+            @RequestParam(defaultValue = "10") Integer pageSize)
+            throws ApiException {
         return ApiResponse.ok(organizationService.getOrganizationList(organizationSearch, page, pageSize));
     }
 
@@ -51,7 +53,7 @@ public class OrganizationController {
 
     @DeleteMapping("/{id}/delete")
     @Operation(summary = "xóa đơn vị theo id")
-    public ApiResponse<HashMap<String,String>> deleteOrganization(@PathVariable Long id) throws ApiException {
+    public ApiResponse<HashMap<String, String>> deleteOrganization(@PathVariable Long id) throws ApiException {
         return ApiResponse.ok(organizationService.deleteOrganization(id));
     }
 

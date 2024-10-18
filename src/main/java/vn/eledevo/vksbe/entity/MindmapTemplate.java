@@ -3,8 +3,8 @@ package vn.eledevo.vksbe.entity;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
-
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.utils.SecurityUtils;
@@ -24,10 +24,13 @@ public class MindmapTemplate {
 
     String name;
     String dataLink;
+
     @Column(columnDefinition = "LONGTEXT")
     String dataNode;
+
     @Size(max = 1000)
     String url;
+
     LocalDate createdAt;
     LocalDate updatedAt;
     String createdBy;

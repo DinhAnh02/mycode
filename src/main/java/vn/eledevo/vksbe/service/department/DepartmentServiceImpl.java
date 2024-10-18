@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,17 +32,17 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public ResultList<DepartmentResponse> getDepartmentList() {
         List<DepartmentResponse> departments = departmentRepository.getDepartmentList();
-        return ResultList.<DepartmentResponse>builder()
-                .content(departments)
-                .build();
+        return ResultList.<DepartmentResponse>builder().content(departments).build();
     }
 
     @Override
-    public HashMap<String, String> updateDepartment(Long departmentId, UpdateDepartment departmentRequest) throws ApiException {
-        Departments existingDepartment = departmentRepository.findById(departmentId)
+    public HashMap<String, String> updateDepartment(Long departmentId, UpdateDepartment departmentRequest)
+            throws ApiException {
+        Departments existingDepartment = departmentRepository
+                .findById(departmentId)
                 .orElseThrow(() -> new ApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND));
 
-        if(departmentRepository.existsDepartmentsByName(departmentRequest.getDepartmentName())){
+        if (departmentRepository.existsDepartmentsByName(departmentRequest.getDepartmentName())) {
             throw new ApiException(DepartmentErrorCode.DEPARTMENT_EXISTED);
         }
 
