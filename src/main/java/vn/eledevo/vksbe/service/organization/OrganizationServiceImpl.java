@@ -72,12 +72,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         HashMap<String, String> errorDetails = new HashMap<>();
         Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
         if (Boolean.TRUE.equals(checkOrganizationExistByName)) {
-            errorDetails.put("name", ResponseMessage.ORGANIZATION_NAME_SIZE);
+            errorDetails.put("name", ResponseMessage.ORGANIZATION_NAME_EXIST);
         }
         // Kiểm tra mã tổ chức có tồn tại hay không
         Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
         if (Boolean.TRUE.equals(checkOrganizationExistByCode)) {
-            errorDetails.put("code", ResponseMessage.ORGANIZATION_CODE_SIZE);
+            errorDetails.put("code", ResponseMessage.ORGANIZATION_CODE_EXIST);
         }
         // Nếu có lỗi thì ném ra ApiException với các chi tiết lỗi
         if (!errorDetails.isEmpty()) {

@@ -77,6 +77,10 @@ public class ResponseMessage {
 
     public static final String ORGANIZATION_NAME_SIZE = "Tên đơn vị tối thiểu 4 kí tự, tối đa 255 kí tự";
 
+    public static final String ORGANIZATION_NAME_EXIST = "Tên đơn vị đã tồn tại";
+
+    public static final String ORGANIZATION_CODE_EXIST = "Mã đơn vị đã tồn tại";
+
     public static final String ORGANIZATION_CODE_NOT_BLANK = "Mã đơn vị không được để trống";
 
     public static final String ORGANIZATION_CODE_SIZE = "Mã đơn vị tối thiểu 4 kí tự, tối đa 8 kí tự";
