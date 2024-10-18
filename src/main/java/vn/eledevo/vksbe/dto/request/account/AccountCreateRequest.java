@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.RegexPattern;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 import vn.eledevo.vksbe.utils.ValidIds;
 
 @Getter
@@ -19,8 +20,8 @@ import vn.eledevo.vksbe.utils.ValidIds;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ValidIds(fields = {"roleId", "departmentId", "organizationId"})
+@Trimmed
 public class AccountCreateRequest {
-
     @NotBlank(message = USERNAME_REQUIRE)
     @Size(min = 8, max = 8, message = USERNAME_SIZE)
     String username;

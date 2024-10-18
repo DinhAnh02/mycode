@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 
 @Getter
 @Setter
@@ -12,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Trimmed
 public class UpdateDepartment {
     @NotBlank(message = "Không được để trống tên phòng ban")
     @Size(min = 1, max = 255, message = "Tên phòng ban không được vượt quá 255 ký tự")

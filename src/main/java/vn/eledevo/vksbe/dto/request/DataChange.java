@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 
 @AllArgsConstructor
 @NoArgsConstructor

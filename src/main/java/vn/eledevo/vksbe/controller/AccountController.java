@@ -128,7 +128,7 @@ public class AccountController {
 
     @PostMapping("/create")
     @Operation(summary = "Tạo mới tài khoản")
-    public ApiResponse<AccountResponse> createAccount(@RequestBody @Valid AccountCreateRequest request)
+    public ApiResponse<AccountResponse> createAccount(@RequestBody @Valid  AccountCreateRequest request)
             throws ApiException, ValidationException {
         return ApiResponse.ok(accountService.createAccountInfo(request));
     }
