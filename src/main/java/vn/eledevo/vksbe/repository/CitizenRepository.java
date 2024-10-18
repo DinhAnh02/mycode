@@ -18,7 +18,5 @@ public interface CitizenRepository extends BaseRepository<Citizens, Long> {
                     + "AND (cp.citizens.name LIKE %:textSearch% OR cp.citizens.citizenId LIKE %:textSearch%) "
                     + "AND cp.type = 'INVESTIGATOR' ")
     Page<CitizenCaseResponse> searchAllInvestigatorByCaseId(
-            @Param("caseId") Long caseId,
-            @Param("textSearch") String textSearch,
-            Pageable pageable);
+            @Param("caseId") Long caseId, @Param("textSearch") String textSearch, Pageable pageable);
 }

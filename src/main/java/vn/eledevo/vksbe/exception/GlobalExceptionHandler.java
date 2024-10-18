@@ -17,10 +17,10 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
+
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.ErrorCodes.BaseErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
@@ -113,6 +113,7 @@ public class GlobalExceptionHandler {
                 SystemErrorCode.VALIDATE_FORM.getCode(), SystemErrorCode.VALIDATE_FORM.getMessage(), errors);
         return ResponseEntity.ok(response);
     }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();

@@ -69,22 +69,21 @@ public class ResponseMessage {
 
     public static final String CASE_STATUS_NAME_CANNOT_BE_BLANK = "Tên trạng thái không được để rỗng";
 
-    public static final String CASE_STATUS_NAME_CANNOT_EXCEED_255_CHARACTER  = "Tên trạng thái không được quá 255 kí tự";
+    public static final String CASE_STATUS_NAME_CANNOT_EXCEED_255_CHARACTER = "Tên trạng thái không được quá 255 kí tự";
 
-    public static final String STATUS_NAME_CAN_ONLY_CONTAIN_LETTER  = "Tên trạng thái chỉ có thể chứa các chữ cái";
+    public static final String STATUS_NAME_CAN_ONLY_CONTAIN_LETTER = "Tên trạng thái chỉ có thể chứa các chữ cái";
 
+    public static final String ORGANIZATION_NAME_NOT_BLANK = "Tên đơn vị không được để trống";
 
-    public static final String  ORGANIZATION_NAME_NOT_BLANK = "Tên đơn vị không được để trống";
+    public static final String ORGANIZATION_NAME_SIZE = "Tên đơn vị tối thiểu 4 kí tự, tối đa 255 kí tự";
 
-    public static final String  ORGANIZATION_NAME_SIZE = "Tên đơn vị tối thiểu 4 kí tự, tối đa 255 kí tự";
+    public static final String ORGANIZATION_CODE_NOT_BLANK = "Mã đơn vị không được để trống";
 
-    public static final String  ORGANIZATION_CODE_NOT_BLANK = "Mã đơn vị không được để trống";
+    public static final String ORGANIZATION_CODE_SIZE = "Mã đơn vị tối thiểu 4 kí tự, tối đa 8 kí tự";
 
-    public static final String  ORGANIZATION_CODE_SIZE = "Mã đơn vị tối thiểu 4 kí tự, tối đa 8 kí tự";
+    public static final String ORGANIZATION_ADDRESS_NOT_BLANK = "Địa chỉ không được để trống";
 
-    public static final String  ORGANIZATION_ADDRESS_NOT_BLANK = "Địa chỉ không được để trống";
-
-    public static final String  ORGANIZATION_ADDRESS_SIZE = "Địa chỉ tối đa 225 kí tự";
+    public static final String ORGANIZATION_ADDRESS_SIZE = "Địa chỉ tối đa 225 kí tự";
 
     public static final String COMPUTER_CONNECTED_WITH_THIS_ACCOUNT = "Thiết bị đã được kết nối với tài khoản này";
 

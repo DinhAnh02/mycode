@@ -1,12 +1,12 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.*;
+import org.springframework.http.HttpStatusCode;
 
 public enum SystemErrorCode implements BaseErrorCode {
     INTERNAL_SERVER(INTERNAL_SERVER_ERROR, "500", "Internal Server Error", new HashMap<>()),
@@ -17,8 +17,7 @@ public enum SystemErrorCode implements BaseErrorCode {
     VALIDATE_FORM(OK, "422", "Dữ liệu không hợp lệ", new HashMap<>()),
     ORGANIZATION_STRUCTURE(
             OK, "1000", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất", new HashMap<>()),
-    PAGE_NOT_VALID(BAD_REQUEST,"400","Trang hiện tại hoặc số kích thước trang không được nhỏ hơn 1", new HashMap<>())
-    ;
+    PAGE_NOT_VALID(BAD_REQUEST, "400", "Trang hiện tại hoặc số kích thước trang không được nhỏ hơn 1", new HashMap<>());
 
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String

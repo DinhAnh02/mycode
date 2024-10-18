@@ -1,9 +1,9 @@
 package vn.eledevo.vksbe.dto.request.case_status;
 
+import java.time.LocalDate;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,6 +12,6 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CaseStatusGetRequest {
     String name;
-    LocalDate fromDate ;
+    LocalDate fromDate;
     LocalDate toDate;
 }

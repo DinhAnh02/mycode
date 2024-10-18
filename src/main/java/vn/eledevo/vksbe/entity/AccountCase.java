@@ -17,6 +17,7 @@ public class AccountCase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     Boolean hasAccess;
     Boolean isProsecutor;
     Boolean isInCharge;

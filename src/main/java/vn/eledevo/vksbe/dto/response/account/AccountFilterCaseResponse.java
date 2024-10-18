@@ -18,7 +18,8 @@ public class AccountFilterCaseResponse {
     String status;
     Boolean isChecked;
 
-    public AccountFilterCaseResponse(Long id, String username, String fullName, String avatar, String roleName, Boolean isChecked) {
+    public AccountFilterCaseResponse(
+            Long id, String username, String fullName, String avatar, String roleName, Boolean isChecked) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
@@ -27,7 +28,8 @@ public class AccountFilterCaseResponse {
         this.isChecked = isChecked;
     }
 
-    public AccountFilterCaseResponse(Long id, String username, String fullName, String avatar, String roleName, String status) {
+    public AccountFilterCaseResponse(
+            Long id, String username, String fullName, String avatar, String roleName, String status) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;

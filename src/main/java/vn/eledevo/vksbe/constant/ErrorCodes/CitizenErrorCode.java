@@ -1,9 +1,11 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import lombok.Getter;
-import org.springframework.http.HttpStatusCode;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
 
 @Getter
 public enum CitizenErrorCode implements BaseErrorCode {
@@ -20,6 +22,7 @@ public enum CitizenErrorCode implements BaseErrorCode {
         this.statusCode = statusCode;
         this.result = result;
     }
+
     @Override
     public void setResult(Optional<?> value) {
         this.result.put(code, value);

@@ -1,13 +1,14 @@
 package vn.eledevo.vksbe.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-import vn.eledevo.vksbe.utils.SecurityUtils;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.persistence.*;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.SecurityUtils;
 
 @Entity
 @Getter
@@ -21,9 +22,12 @@ public class CaseStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     String name;
+
     @Column(unique = true, nullable = false)
     String code;
+
     String description;
     LocalDate createdAt;
     LocalDate updatedAt;

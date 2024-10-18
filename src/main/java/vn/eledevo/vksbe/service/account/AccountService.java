@@ -1,10 +1,8 @@
 package vn.eledevo.vksbe.service.account;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;

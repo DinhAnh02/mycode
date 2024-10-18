@@ -1,20 +1,19 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import org.springframework.http.HttpStatusCode;
+import static org.springframework.http.HttpStatus.OK;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.OK;
+import org.springframework.http.HttpStatusCode;
 
-public enum OrganizationErrorCode implements BaseErrorCode{
-    ORGANIZATION_NO_PERMISSION_TO_ACCESS(OK,"ORG-01","Bạn không có quyền thao tác", new HashMap<>()),
-    ORGANIZATION_NAME_EXIST(OK,"ORG-02","Tên đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác", new HashMap<>()),
-    ORGANIZATION_CODE_EXIST(OK,"ORG-03", "Mã code đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác", new HashMap<>()),
-    ORGANIZATION_NOT_FOUND(OK, "ORG-04","Đơn vị không tồn tại", new HashMap<>()),
-    ORGANIZATION_DEFAULT(OK,"ORG-05","Đơn vị này là đơn vị mặc định và không được phép chỉnh sửa", new HashMap<>()),
+public enum OrganizationErrorCode implements BaseErrorCode {
+    ORGANIZATION_NO_PERMISSION_TO_ACCESS(OK, "ORG-01", "Bạn không có quyền thao tác", new HashMap<>()),
+    ORGANIZATION_NAME_EXIST(OK, "ORG-02", "Tên đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác", new HashMap<>()),
+    ORGANIZATION_CODE_EXIST(OK, "ORG-03", "Mã code đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác", new HashMap<>()),
+    ORGANIZATION_NOT_FOUND(OK, "ORG-04", "Đơn vị không tồn tại", new HashMap<>()),
+    ORGANIZATION_DEFAULT(OK, "ORG-05", "Đơn vị này là đơn vị mặc định và không được phép chỉnh sửa", new HashMap<>()),
     ORGANIZATION_CODE_EXISTED(OK, "ORG-06", "Mã code đã tồn tại.Vui lòng nhập mã đơn vị khác", new HashMap<>()),
     ORGANIZATION_SYSTEM_ERROR(OK, "ORG-07", "Lỗi hệ thống. Vui lòng thao tác lại", new HashMap<>()),
     ;

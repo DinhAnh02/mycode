@@ -1,10 +1,17 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,6 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.*;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
@@ -44,18 +57,6 @@ import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -123,8 +124,8 @@ public class AccountServiceImpl implements AccountService {
             AccountRequest accountRequest, Integer currentPage, Integer limit) throws ApiException {
         Accounts loginAccount = SecurityUtils.getUser();
         if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
-                || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name()))
-                        && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId())) {
+                        || loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name()))
+                && !loginAccount.getDepartments().getId().equals(accountRequest.getDepartmentId())) {
             throw new ApiException(AccountErrorCode.ACCOUNT_NOT_READ_DATA_DEPARTMENT);
         }
 
@@ -456,8 +457,10 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.NOT_ENOUGH_PERMISSION);
         }
         if (activedAccRole.equals(Role.VIEN_TRUONG) || activedAccRole.equals(Role.TRUONG_PHONG)) {
-            Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(activedAccRole.name(),activeAcc.getDepartments().getCode());
-            if (accountsLeader.isPresent() && !activeAcc.getId().equals(accountsLeader.get().getId())) {
+            Optional<AccountSwapResponse> accountsLeader = accountRepository.getOldLeader(
+                    activedAccRole.name(), activeAcc.getDepartments().getCode());
+            if (accountsLeader.isPresent()
+                    && !activeAcc.getId().equals(accountsLeader.get().getId())) {
                 AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(accountsLeader);
                 throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
             }
@@ -679,8 +682,8 @@ public class AccountServiceImpl implements AccountService {
         String hashPin = passwordEncoder.encode(pinRequest.getConfirmPinCode());
         accountRequest.setPin(hashPin);
         accountRepository.save(accountRequest);
-        HashMap<String,String> result = new HashMap<>();
-        result.put("pin",hashPin);
+        HashMap<String, String> result = new HashMap<>();
+        result.put("pin", hashPin);
         return result;
     }
 

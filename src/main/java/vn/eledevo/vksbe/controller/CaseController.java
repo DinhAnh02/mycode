@@ -1,11 +1,12 @@
 package vn.eledevo.vksbe.controller;
 
+import org.springframework.web.bind.annotation.*;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.citizen.CitizenCaseResponse;
@@ -26,7 +27,8 @@ public class CaseController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "") String textSearch,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int pageSize) throws ApiException {
+            @RequestParam(defaultValue = "20") int pageSize)
+            throws ApiException {
         return ApiResponse.ok(caseService.getAllInvestigatorByCaseId(id, textSearch, page, pageSize));
     }
 }
