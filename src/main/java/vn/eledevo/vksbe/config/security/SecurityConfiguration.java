@@ -108,7 +108,17 @@ public class SecurityConfiguration {
                                 "/api/v1/private/case-status/{id}/delete",
                                 "/api/v1/private/case-status/{id}/update")
                         .hasAnyAuthority(Role.VIEN_TRUONG.name(), Role.VIEN_PHO.name(), Role.IT_ADMIN.name())
-                        .requestMatchers("/api/v1/private/cases/{id}/investigator")
+                        .requestMatchers(
+                                "/api/v1/private/cases/{id}/investigator",
+                                "/api/v1/private/accounts/get-account-case-filter",
+                                "/api/v1/private/citizens",
+                                "/api/v1/private/cases/{id}/infomation-detail",
+                                "/api/v1/private/cases/{id}/update",
+                                "/api/v1/private/cases/create",
+                                "/api/v1/private/cases/{id}/case-person/suspect-defendant",
+                                "/api/v1/private/citizens/{id}/update"
+
+                        )
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),
                                 Role.VIEN_PHO.name(),

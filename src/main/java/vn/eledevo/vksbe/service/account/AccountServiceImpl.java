@@ -18,10 +18,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AccessLevel;
@@ -43,10 +45,7 @@ import vn.eledevo.vksbe.dto.request.account.AvatarRequest;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.ResultUrl;
-import vn.eledevo.vksbe.dto.response.account.AccountResponse;
-import vn.eledevo.vksbe.dto.response.account.AccountResponseByFilter;
-import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
-import vn.eledevo.vksbe.dto.response.account.ActivedAccountResponse;
+import vn.eledevo.vksbe.dto.response.account.*;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ConnectComputerResponse;
 import vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse;
@@ -932,5 +931,35 @@ public class AccountServiceImpl implements AccountService {
             case PHO_PHONG -> 7;
             default -> 0;
         };
+    }
+
+    @Override
+    public ResponseFilter<AccountFilterCaseResponse> getAccountCaseFilter(String textSearch, Integer page, Integer pageSize) throws ApiException {
+        Long departmentId = null;
+        if ((page < 1) || (pageSize < 1)) {
+            throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
+        }
+        if (textSearch.equals("") || textSearch.equals(null)) {
+            textSearch = null;
+        } else {
+            textSearch = textSearch.toLowerCase();
+        }
+        Accounts loginAccount = SecurityUtils.getUser();
+
+        if ((loginAccount.getRoles().getCode().equals(Role.TRUONG_PHONG.name()))
+                || (loginAccount.getRoles().getCode().equals(Role.PHO_PHONG.name()))
+                || (loginAccount.getRoles().getCode().equals(Role.KIEM_SAT_VIEN.name()))) {
+            departmentId = loginAccount.getDepartments().getId();
+        }
+            Pageable pageable =
+                PageRequest.of(page - 1, pageSize);
+        Page<AccountFilterCaseResponse> accountFilterCaseResponses =
+                accountRepository.getAccountCaseListFilter(textSearch, departmentId , pageable);
+        return new ResponseFilter<>(
+                accountFilterCaseResponses.getContent(),
+                (int) accountFilterCaseResponses.getTotalElements(),
+                accountFilterCaseResponses.getSize(),
+                accountFilterCaseResponses.getNumber(),
+                accountFilterCaseResponses.getTotalPages());
     }
 }

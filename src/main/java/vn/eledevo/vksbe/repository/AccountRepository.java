@@ -1,7 +1,5 @@
 package vn.eledevo.vksbe.repository;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +10,11 @@ import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
 import vn.eledevo.vksbe.dto.request.AccountActive;
 import vn.eledevo.vksbe.dto.request.AccountRequest;
+import vn.eledevo.vksbe.dto.response.account.AccountFilterCaseResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.entity.Accounts;
+
+import java.util.Optional;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long> {
     @Query("SELECT a,r.code from Accounts a inner join Roles r on a.roles.id = r.id  where a.username =:username")
@@ -79,5 +80,15 @@ public interface AccountRepository extends BaseRepository<Accounts, Long> {
             + "WHERE a.status = 'ACTIVE' "
             + "AND a.roles.code =:roleCode "
             + "AND a.departments.code =:departmentCode")
-    Optional<AccountSwapResponse> getOldLeader(String roleCode, String departmentCode);
+    Optional<AccountSwapResponse> getOldLeader(String roleCode,String departmentCode);
+
+    @Query("SELECT new vn.eledevo.vksbe.dto.response.account.AccountFilterCaseResponse(a.id,a.username,p.fullName,p.avatar,r.name,a.status)"
+            +"FROM Accounts a "
+            +"JOIN a.profile p "
+            +"JOIN a.roles r "
+            +"JOIN a.departments d "
+            +"WHERE ((COALESCE(:textSearch, NULL) IS NULL) OR LOWER(a.username) LIKE CONCAT('%', LOWER(:textSearch), '%') OR LOWER(p.fullName) LIKE CONCAT('%', LOWER(:textSearch), '%')) "
+            +"AND ((COALESCE(:departmentId, NULL) IS NULL) OR (a.departments.id =:departmentId) OR (r.code IN ('VIEN_TRUONG','VIEN_PHO')) )"
+            +"AND (r.code <> 'IT_ADMIN') ")
+    Page<AccountFilterCaseResponse> getAccountCaseListFilter(@Param("textSearch") String textSearch, Long departmentId, Pageable pageable);
 }

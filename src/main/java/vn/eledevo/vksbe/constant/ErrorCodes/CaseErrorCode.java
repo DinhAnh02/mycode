@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.constant.ErrorCodes;
 
 import static org.springframework.http.HttpStatus.OK;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +13,10 @@ import lombok.Getter;
 
 @Getter
 public enum CaseErrorCode implements BaseErrorCode {
-    CASE_NOT_FOUND(OK, "CS-01", "Vụ án không tồn tại", new HashMap<>()),
+    CASE_NOT_FOUND(OK, "CAS-01", "Vụ án không tồn tại", new HashMap<>()),
+    CASE_NOT_ACCESS(OK, "CAS-02", "Bạn không có quyền truy cập", new HashMap<>()),
+    CASE_EXISTED(OK, "CAS-03", "Tên vụ án đã tồn tại", new HashMap<>()),
+    CASE_CODE_EXISTED(OK, "CAS-04", "Mã vụ án đã tồn tại", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;
@@ -28,7 +32,55 @@ public enum CaseErrorCode implements BaseErrorCode {
     }
 
     @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public HttpStatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    @Override
+    public Map<String, Optional<?>> getResult() {
+        return result;
+    }
+
+    @Override
     public void setResult(Optional<?> value) {
-        this.result.put(code, value);
+        // Kiểm tra nếu Optional chứa giá trị
+        if (value.isPresent()) {
+            Object object = value.get();
+            if (object instanceof HashMap) {
+                HashMap<?, ?> map = (HashMap<?, ?>) object;
+                map.forEach((key, val) -> {
+                    this.result.put(key.toString(), Optional.ofNullable(val));
+                });
+            }
+        }
+        if (value.isPresent()) {
+            Object object = value.get();
+            // Sử dụng reflection để lấy tất cả các trường (fields) của object
+            Field[] fields = object.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                field.setAccessible(true); // Cho phép truy cập vào các trường private
+
+                try {
+                    // Lấy tên trường (field name) làm key
+                    String key = field.getName();
+                    // Lấy giá trị của trường (field value) làm value và gán vào result
+                    Object fieldValue = field.get(object);
+                    this.result.put(key, Optional.ofNullable(fieldValue)); // Sử dụng Optional để bọc giá trị
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace(); // Xử lý ngoại lệ nếu không thể truy cập vào trường
+                }
+            }
+        }
     }
 }

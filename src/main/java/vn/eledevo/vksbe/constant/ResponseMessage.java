@@ -88,4 +88,20 @@ public class ResponseMessage {
     public static final String COMPUTER_CONNECTED_WITH_THIS_ACCOUNT = "Thiết bị đã được kết nối với tài khoản này";
 
     public static final String MIND_MAP_IMG_URL_INVALID = "Đường dẫn ảnh sơ đồ mẫu không hợp lệ";
+    public static final String CASE_NAME_CANNOT_BE_BLANK = "Tên vụ án không được để trống";
+    public static final String CASE_NAME_SPECIAL = "Tên vụ án không được chứa các kí tự đặc biệt";
+    public static final String CASE_NAME_CANNOT_EXCEED_255_CHARACTER = "Tên vụ án không được quá 255 kí tự";
+    public static final String CASE_CODE_CANNOT_BE_BLANK = "Mã vụ án không được để trống";
+    public static final String CASE_CODE_SPECIAL = "Mã vụ án không được chứa các kí tự đặc biệt";
+    public static final String CASE_CODE_CANNOT_EXCEED_255_CHARACTER = "Mã vụ án không được quá 255 kí tự";
+
+    public static final String CITIZEN_NAME_NOT_BLANK = "Tên công dân không được để trống";
+    public static final String CITIZEN_GENDER_NOT_BLANK = "Giới tính công dân không được để trống";
+    public static final String CITIZEN_NAME_SIZE = "Tên công dân tối đa 225 kí tự";
+    public static final String CITIZEN_PROFILE_IMAGE_SIZE = "Đường dẫn ảnh tối đa 225 kí tự";
+    public static final String CITIZEN_GENDER_SIZE = "Giới tính tối đa 4 kí tự";
+    public static final String CITIZEN_WORKINGADDRESS_SIZE = "Địa chỉ làm việc tối đa 225 kí tự";
+    public static final String CITIZEN_JOB_SIZE = "Công việc tối đa 225 kí tự";
+    public static final String PROFILE_IMG_URL_INVALID = "Đường dẫn ảnh công dân không hợp lệ";
+
 }

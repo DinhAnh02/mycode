@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.constant.ErrorCodes;
 
 import static org.springframework.http.HttpStatus.*;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,8 +17,7 @@ public enum SystemErrorCode implements BaseErrorCode {
     BAD_REQUEST_SERVER(BAD_REQUEST, "400", "Bad Request", new HashMap<>()),
     VALIDATE_FORM(OK, "422", "Dữ liệu không hợp lệ", new HashMap<>()),
     ORGANIZATION_STRUCTURE(
-            OK, "1000", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất", new HashMap<>()),
-    PAGE_NOT_VALID(BAD_REQUEST, "400", "Trang hiện tại hoặc số kích thước trang không được nhỏ hơn 1", new HashMap<>());
+            OK, "1000", "Cơ cấu tổ chức đã thay đổi. Vui lòng đăng nhập lại để có dữ liệu mới nhất", new HashMap<>());
 
     private final HttpStatusCode statusCode;
     private final String code; // Đảm bảo `code` là String
@@ -32,12 +32,7 @@ public enum SystemErrorCode implements BaseErrorCode {
     }
 
     @Override
-    public HttpStatusCode getStatusCode() {
-        return statusCode;
-    }
-
-    @Override
-    public String getCode() { // Trả về kiểu String
+    public String getCode() {
         return code;
     }
 
@@ -47,7 +42,18 @@ public enum SystemErrorCode implements BaseErrorCode {
     }
 
     @Override
+    public HttpStatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    @Override
+    public Map<String, Optional<?>> getResult() {
+        return result;
+    }
+
+    @Override
     public void setResult(Optional<?> value) {
+        // Kiểm tra nếu Optional chứa giá trị
         if (value.isPresent()) {
             Object object = value.get();
             if (object instanceof HashMap) {
@@ -57,10 +63,24 @@ public enum SystemErrorCode implements BaseErrorCode {
                 });
             }
         }
-    }
+        if (value.isPresent()) {
+            Object object = value.get();
+            // Sử dụng reflection để lấy tất cả các trường (fields) của object
+            Field[] fields = object.getClass().getDeclaredFields();
 
-    @Override
-    public Map<String, Optional<?>> getResult() { // Đảm bảo `result` là Map<String, String>
-        return result;
+            for (Field field : fields) {
+                field.setAccessible(true); // Cho phép truy cập vào các trường private
+
+                try {
+                    // Lấy tên trường (field name) làm key
+                    String key = field.getName();
+                    // Lấy giá trị của trường (field value) làm value và gán vào result
+                    Object fieldValue = field.get(object);
+                    this.result.put(key, Optional.ofNullable(fieldValue)); // Sử dụng Optional để bọc giá trị
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace(); // Xử lý ngoại lệ nếu không thể truy cập vào trường
+                }
+            }
+        }
     }
 }
