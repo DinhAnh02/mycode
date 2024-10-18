@@ -6,12 +6,14 @@ import jakarta.validation.constraints.Size;
 
 import lombok.*;
 import vn.eledevo.vksbe.constant.ResponseMessage;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Trimmed
 public class MindMapTemplateRequest {
     @NotNull(message = ResponseMessage.MINDMAPTEMPLATE_NOT_NULL)
     Long departmentId;

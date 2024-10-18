@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 
 @Getter
 @Setter
@@ -11,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Trimmed
 public class UsbRequest {
     String usbCode;
     String createByAccountName;

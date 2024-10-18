@@ -4,12 +4,14 @@ import java.time.LocalDate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Trimmed
 public class AccountRequest {
     String username;
     String fullName;

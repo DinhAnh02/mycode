@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 import vn.eledevo.vksbe.utils.minio.MinioService;
 
 @RestController

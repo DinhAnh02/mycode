@@ -5,12 +5,14 @@ import jakarta.validation.constraints.Size;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Trimmed
 public class ComputerRequestForCreate {
     @NotBlank(message = "Tên máy tính không được để trống")
     @Size(max = 255, message = "Tên máy tính có tối đa 255 kí tự")
