@@ -10,5 +10,5 @@ COPY --from=build src/target/vks-be-0.0.1-SNAPSHOT.jar /run/vks-be-0.0.1-SNAPSHO
 
 EXPOSE 8081
 
-ENV JAVA_OPTIONS="-Xmx2048m -Xms256m"
+ENV JAVA_OPTIONS="-Xmx4096m -Xms512m"
 ENTRYPOINT java -jar $JAVA_OPTIONS /run/vks-be-0.0.1-SNAPSHOT.jar
