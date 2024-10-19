@@ -59,7 +59,8 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/change-pin-code",
                                 "/api/v1/private/accounts/{id}/update-avatar-user-info",
                                 "/api/v1/private/case-status",
-                                "/api/v1/private/case-status/{id}/detail")
+                                "/api/v1/private/case-status/{id}/detail",
+                                "/api/v1/private/accounts/upload-image")
                         .hasAnyAuthority(
                                 Role.IT_ADMIN.name(),
                                 Role.KIEM_SAT_VIEN.name(),
@@ -99,8 +100,7 @@ public class SecurityConfiguration {
                                 "/api/v1/private/accounts/create",
                                 "/api/v1/private/accounts/{updatedAccId}/update-info",
                                 "/api/v1/private/accounts/connect-computer/{id}/computers",
-                                "/api/v1/private/computers/check-exist-computer",
-                                "/api/v1/private/accounts/upload-image")
+                                "/api/v1/private/computers/check-exist-computer")
                         .hasAuthority(Role.IT_ADMIN.name())
                         .requestMatchers(
                                 "/api/v1/private/departments/{id}/update-department",
