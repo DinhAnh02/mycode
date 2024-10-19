@@ -17,7 +17,7 @@ public interface UsbRepository extends BaseRepository<Usbs, Long> {
     Optional<Usbs> findByAccounts_Id(Long id);
 
     @Query(
-            "SELECT new vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse(u.id, u.name, u.usbCode, u.usbVendorCode) "
+            "SELECT new vn.eledevo.vksbe.dto.response.usb.UsbConnectedResponse(u.id, u.name, u.usbCode, u.createdAt, u.usbVendorCode) "
                     + "FROM Usbs u "
                     + "WHERE u.accounts.id = :accountId")
     List<UsbConnectedResponse> findUsbConnectedByAccountId(@Param("accountId") Long accountId);
