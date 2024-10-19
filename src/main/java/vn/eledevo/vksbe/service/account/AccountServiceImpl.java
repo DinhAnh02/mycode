@@ -1,38 +1,26 @@
 package vn.eledevo.vksbe.service.account;
 
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
-import vn.eledevo.vksbe.constant.ErrorCodes.*;
+import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.RoleErrorCode;
+import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.dto.model.account.AccountDetailResponse;
 import vn.eledevo.vksbe.dto.model.account.AccountQueryToFilter;
 import vn.eledevo.vksbe.dto.model.account.UserInfo;
@@ -56,6 +44,18 @@ import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -593,7 +593,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
-                        && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
+                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
                 || !accountUpdate.getStatus().equals(Status.ACTIVE.name())) {
             accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
@@ -605,21 +605,15 @@ public class AccountServiceImpl implements AccountService {
             return AccountSwapResponse.builder().build();
         }
 
-        if (!req.getSwappedAccId().equals(0L) && !oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
 
-        if (!req.getSwappedAccId().equals(0L)) {
-            Accounts accountLead =
-                    accountRepository.findById(req.getSwappedAccId()).orElseThrow();
-            accountLead.setStatus(Status.INACTIVE.name());
-            Accounts account = accountToUpdate(req, updatedAccId, requestRole);
-            account.setStatus(Status.ACTIVE.name());
-            return AccountSwapResponse.builder().build();
-        }
-
-        accountToUpdate(req, updatedAccId, requestRole);
+        Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
+        accountLead.setStatus(Status.INACTIVE.name());
+        Accounts account = accountToUpdate(req, updatedAccId, requestRole);
+        account.setStatus(Status.ACTIVE.name());
         return AccountSwapResponse.builder().build();
     }
 
@@ -634,6 +628,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws Exception {
         Map<String, String> error = new HashMap<>();
         validateAvatar(request.getAvatar(), error);
@@ -642,13 +637,9 @@ public class AccountServiceImpl implements AccountService {
         }
         Accounts account =
                 accountRepository.findById(id).orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
-        if (account.getProfile().getAvatar().isEmpty()
-                || account.getProfile().getAvatar().isBlank()) {
-            account.getProfile().setAvatar(null);
-            accountRepository.save(account);
-            return AccountResponse.builder().build();
+        if (account.getProfile().getAvatar() != null && !account.getProfile().getAvatar().isEmpty()) {
+            minioService.deleteFile(account.getProfile().getAvatar());
         }
-        minioService.deleteFile(account.getProfile().getAvatar());
         account.getProfile().setAvatar(request.getAvatar());
         accountRepository.save(account);
         return AccountResponse.builder().build();
