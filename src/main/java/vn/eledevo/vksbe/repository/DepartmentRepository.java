@@ -26,4 +26,5 @@ public interface DepartmentRepository extends BaseRepository<Departments, Long> 
     boolean existsDepartmentsByName(String name);
 
     Optional<Departments> findDepartmentsByName(String name);
+    Optional<Departments> findDepartmentsByIdAndName(Long id, String name);
 }

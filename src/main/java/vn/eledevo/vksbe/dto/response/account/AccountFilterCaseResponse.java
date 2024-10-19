@@ -16,16 +16,18 @@ public class AccountFilterCaseResponse {
     String avatar;
     String roleName;
     String status;
-    Boolean isChecked;
+    String gender;
+    Boolean isAssigned;
 
     public AccountFilterCaseResponse(
-            Long id, String username, String fullName, String avatar, String roleName, Boolean isChecked) {
+            Long id, String username, String fullName, String avatar, String roleName, String gender, Boolean isAssigned) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
         this.avatar = avatar;
         this.roleName = roleName;
-        this.isChecked = isChecked;
+        this.gender = gender;
+        this.isAssigned = isAssigned;
     }
 
     public AccountFilterCaseResponse(

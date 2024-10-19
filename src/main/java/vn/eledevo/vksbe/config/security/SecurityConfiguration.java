@@ -120,8 +120,12 @@ public class SecurityConfiguration {
                                 "/api/v1/private/cases/{id}/update",
                                 "/api/v1/private/cases/create",
                                 "/api/v1/private/cases/{id}/case-person/suspect-defendant",
-                                "/api/v1/private/citizens/{id}/update"
-
+                                "/api/v1/private/citizens/{id}/update",
+                                "/api/v1/private/cases",
+                                "/api/v1/private/cases/{caseId}/documents/folder/create",
+                                "/api/v1/private/cases/{id}/user-in-charge",
+                                "/api/v1/private/cases/{id}/account-case/prosecutor",
+                                "/api/v1/private/citizens/create"
                         )
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),

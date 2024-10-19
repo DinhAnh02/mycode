@@ -26,4 +26,6 @@ public class SecurityUtils {
     public static Roles getRole() {
         return getUser().getRoles();
     }
+
+    public static Long getDepartmentId() { return getUser().getDepartments().getId(); }
 }
