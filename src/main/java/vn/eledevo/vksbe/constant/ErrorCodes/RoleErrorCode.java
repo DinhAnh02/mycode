@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatusCode;
 public enum RoleErrorCode implements BaseErrorCode {
     CURRENT_ROLE_NOT_CHANGEABLE(
             OK,
-            "ROL-1",
+            "ROL-01",
             "Chức vụ của tài khoản không phải là Viện trưởng/Trưởng phòng nên sẽ không hoán đổi vị trí",
             new HashMap<>()),
     ;

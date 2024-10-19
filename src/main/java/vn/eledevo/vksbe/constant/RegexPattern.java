@@ -9,5 +9,8 @@ public class RegexPattern {
     public static final String ACCOUNT_FULL_NAME = "^[A-Za-zÀ-ỹ\\s]{1,255}$";
 
     public static final String CASE_STATUS_NAME = "^[\\p{L}\\s]+$";
+
     public static final String MINDMAP_NAME = "^(?!\\s*$)[a-zA-ZÀ-ỹà-ỹ\\s]+$";
+
+    public static final String USERNAME = "^[a-zA-Z0-9]+$";
 }
