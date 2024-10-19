@@ -3,12 +3,14 @@ package vn.eledevo.vksbe.dto.request.cases;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.utils.TrimData.Trimmed;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Trimmed
 public class CaseUpdateRequest {
     @Size(min = 1, max = 255,message = "Tên vụ án có kích thước từ 1 đến 255 kí tự")
     String name;

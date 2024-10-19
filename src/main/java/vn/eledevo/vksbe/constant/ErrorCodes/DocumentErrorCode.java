@@ -1,28 +1,22 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.OK;
-@Getter
-public enum CitizenErrorCode implements BaseErrorCode {
-    CITIZEN_NOT_FOUND(OK, "CIT-01", "Công dân không tồn tại", new HashMap<>()),
-    CITIZEN_ID_ALREADY_EXISTS(OK, "CIT-02", "ID công dân đã tồn tại trong hệ thống", new HashMap<>()),
-    ;
 
+public enum DocumentErrorCode  implements BaseErrorCode {
+    DOCUMENT_NOT_FOUND(OK,"DOC-01","Tài liệu không tồn tại",new HashMap<>());
     private final HttpStatusCode statusCode;
-    private final String code;
+    private final String code; // Đảm bảo `code` là String
     private final String message;
     private final Map<String, Optional<?>> result;
 
-    CitizenErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, Optional<?>> result) {
+    DocumentErrorCode(HttpStatusCode statusCode, String code, String message, Map<String, Optional<?>> result) {
         this.code = code;
         this.message = message;
         this.statusCode = statusCode;

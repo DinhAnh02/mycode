@@ -107,5 +107,6 @@ public class ResponseMessage {
     public static final String CITIZEN_WORKINGADDRESS_SIZE = "Địa chỉ làm việc tối đa 225 kí tự";
     public static final String CITIZEN_JOB_SIZE = "Công việc tối đa 225 kí tự";
     public static final String PROFILE_IMG_URL_INVALID = "Đường dẫn ảnh công dân không hợp lệ";
-
+    public static final String CITIZEN_ID_NOT_BANK = "ID công dân không được để trống";
+    public static final String CITIZEN_ID_SIZE = "ID công dân tối đa 225 kí tự";
 }

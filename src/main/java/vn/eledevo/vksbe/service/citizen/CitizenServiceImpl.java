@@ -1,5 +1,13 @@
 package vn.eledevo.vksbe.service.citizen;
 
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.utils.FileUtils.isPathAllowedExtension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +21,7 @@ import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.constant.ErrorCodes.CitizenErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.ResponseMessage;
+import vn.eledevo.vksbe.dto.request.citizens.CitizensRequest;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.citizen.CitizenResponse;
 import vn.eledevo.vksbe.dto.response.citizen.CitizenUpdateRequest;
@@ -21,18 +30,6 @@ import vn.eledevo.vksbe.exception.ApiException;
 import vn.eledevo.vksbe.repository.CitizenRepository;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.utils.FileUtils.isPathAllowedExtension;
-
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -88,11 +85,36 @@ public class CitizenServiceImpl implements CitizenService {
         return new HashMap<>();
     }
 
+    @Override
+    public Map<String, String> createCitizens(CitizensRequest request) throws ApiException {
+        Map<String, String> errors = new HashMap<>();
+        validateUrlImg(request.getProfileImage(), errors);
+        if (!errors.isEmpty()) {
+            SystemErrorCode errorCode = SystemErrorCode.VALIDATE_FORM;
+            errorCode.setResult(Optional.of(errors));
+            throw new ApiException(errorCode);
+        }
+        Boolean existCitizensID = citizenRepository.existsByCitizenId(request.getCitizenId());
+        if(Boolean.TRUE.equals(existCitizensID)){
+            throw new ApiException(CitizenErrorCode.CITIZEN_ID_ALREADY_EXISTS);
+        }
+        citizenRepository.save(Citizens.builder()
+                .name(request.getFullName())
+                .gender(request.getGender())
+                .address(request.getAddress())
+                .profileImage(request.getProfileImage())
+                .workingAddress(request.getWorkingAddress())
+                .position(request.getJob())
+                .citizenId(request.getCitizenId())
+                .build());
+        return new HashMap<>();
+    }
+
     public void validateUrlImg(String avatarUrl, Map<String, String> errors) {
         if (StringUtils.isBlank(avatarUrl)) {
             return;
         }
-        String keyError = "url";
+        String keyError = "profileImage";
 
         try {
             URI uri = new URI(avatarUrl);
@@ -120,9 +142,7 @@ public class CitizenServiceImpl implements CitizenService {
             }
 
         } catch (URISyntaxException e) {
-            errors.put("url", ResponseMessage.PROFILE_IMG_URL_INVALID);
+            errors.put("profileImage", ResponseMessage.PROFILE_IMG_URL_INVALID);
         }
     }
-
-
 }

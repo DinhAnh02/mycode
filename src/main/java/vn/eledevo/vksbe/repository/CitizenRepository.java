@@ -32,4 +32,6 @@ public interface CitizenRepository extends BaseRepository<Citizens, Long> {
             + "OR LOWER(c.name) LIKE CONCAT('%', LOWER(:textSearch), '%')"
             + "OR c.citizenId LIKE %:textSearch% ) ")
     Page<CitizenResponse> getListCitizenByTextSearch(String textSearch, Pageable pageable);
+
+    boolean existsByCitizenId(String citizenId);
 }
