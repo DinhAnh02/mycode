@@ -34,4 +34,18 @@ public interface CitizenRepository extends BaseRepository<Citizens, Long> {
     Page<CitizenResponse> getListCitizenByTextSearch(String textSearch, Pageable pageable);
 
     boolean existsByCitizenId(String citizenId);
+
+    @Query("SELECT new vn.eledevo.vksbe.dto.response.citizen.CitizenCaseResponse (" +
+            "c.id, CASE WHEN cp.type IS NULL THEN '' ELSE cp.type END, c.name, c.citizenId,  " + // Sử dụng CASE WHEN ở đây
+            "c.gender, c.profileImage, c.workingAddress, c.address, c.position) " +
+            "FROM Citizens c " +
+            "LEFT JOIN CasePerson cp ON c.id = cp.citizens.id AND cp.cases.id = :caseId " +
+            "AND (:listType IS NULL OR cp.type IN :listType) " +
+            "AND (:textSearch IS NULL OR LOWER(c.name) LIKE CONCAT('%', :textSearch, '%') OR c.citizenId LIKE CONCAT('%', :textSearch, '%')) " +
+            "ORDER BY cp.type DESC")
+    Page<CitizenCaseResponse> findCitizenCaseResponses(
+            @Param("caseId") Long caseId,
+            @Param("listType") List<String> listType,
+            @Param("textSearch") String textSearch,
+            Pageable pageable);
 }

@@ -13,4 +13,6 @@ public interface MindmapTemplateRepository extends BaseRepository<MindmapTemplat
             + " where m.departments.id =:departmentId "
             + "And ((COALESCE(:textSearch, NULL) IS NULL OR m.name LIKE %:textSearch% )) ")
     Page<MindmapTemplate> getListMindmapTemplate(Long departmentId, String textSearch, Pageable pageable);
+
+    boolean existsByUrl(String url);
 }

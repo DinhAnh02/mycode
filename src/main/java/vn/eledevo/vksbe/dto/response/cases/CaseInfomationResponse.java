@@ -19,7 +19,7 @@ public class CaseInfomationResponse {
     String departmentName;
     String statusName;
     Long statusId;
-    LocalDate createAt;
+    LocalDate createdAt;
     String type;
     String description;
     String createdBy;

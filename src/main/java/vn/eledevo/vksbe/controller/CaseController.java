@@ -15,17 +15,26 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.constant.CasePosition;
+import vn.eledevo.vksbe.constant.ErrorCodes.TypeCaseCitizen;
+import vn.eledevo.vksbe.dto.request.case_flow.CaseFlowCreateRequest;
+import vn.eledevo.vksbe.dto.request.case_flow.CaseFlowUpdateRequest;
+import vn.eledevo.vksbe.dto.request.cases.*;
+import vn.eledevo.vksbe.dto.request.document.DocumentFolderCreationRequest;
 import vn.eledevo.vksbe.dto.request.cases.CaseCreateRequest;
 import vn.eledevo.vksbe.dto.request.cases.CaseFilterRequest;
 import vn.eledevo.vksbe.dto.request.cases.CaseUpdateRequest;
-import vn.eledevo.vksbe.dto.request.document.DocumentFolderCreationRequest;
-import vn.eledevo.vksbe.dto.request.cases.CaseCitizenUpdateRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
+import vn.eledevo.vksbe.dto.response.CaseMindmapTemplateResponse;
+import vn.eledevo.vksbe.dto.response.MindmapTemplateResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
+import vn.eledevo.vksbe.dto.response.case_flow.CaseFlowResponse;
 import vn.eledevo.vksbe.dto.response.cases.CaseFilterResponse;
 import vn.eledevo.vksbe.dto.response.cases.CaseInfomationResponse;
 import vn.eledevo.vksbe.dto.response.citizen.CitizenCaseResponse;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.service.account.AccountService;
+import vn.eledevo.vksbe.service.case_flow.CaseFlowService;
 import vn.eledevo.vksbe.service.cases.CaseService;
 import vn.eledevo.vksbe.dto.response.account.AccountFilterCaseResponse;
 
@@ -37,6 +46,8 @@ import vn.eledevo.vksbe.dto.response.account.AccountFilterCaseResponse;
 @Tag(name = "Quản lý vụ án")
 public class CaseController {
     CaseService caseService;
+    AccountService accountService;
+    CaseFlowService caseFlowService;
 
     @GetMapping("/{id}/case-person/investigator")
     @Operation(summary = "Xem và tìm kiếm danh sách điều tra viên")
@@ -122,5 +133,83 @@ public class CaseController {
             @PathVariable Long id,
             @RequestBody CaseCitizenUpdateRequest request) throws ApiException {
         return ApiResponse.ok(caseService.updateInvestigator(id, request));
+    }
+
+    @GetMapping("/accounts")
+    @Operation(summary = "Xem và tìm kiếm danh sách lãnh đạo vụ án và kiểm sát viên trong filter vụ án")
+    public ApiResponse<ResponseFilter<AccountFilterCaseResponse>> getAccountCaseFilter(
+            @RequestParam String textSearch,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize
+    )
+            throws ApiException {
+        return ApiResponse.ok(accountService.getAccountCaseFilter(textSearch,page,pageSize));
+    }
+
+    @PatchMapping("/{id}/account-cases/update")
+    @Operation(summary = "Chỉnh sửa danh sách kiểm sát viên")
+    public ApiResponse<HashMap<String, String>> updateProsecutorList(@RequestParam CasePosition type,
+                                                                     @PathVariable Long id, @RequestBody CaseAccountRequest request) throws ApiException {
+        return ApiResponse.ok(caseService.updateProsecutorList(type, id, request.getCasePersons()));
+    }
+
+    @PatchMapping("/{id}/case-person/suspect-defendant/update")
+    @Operation(summary = "Chỉnh sửa danh sách bị can, bị cáo")
+    public ApiResponse<HashMap<String, String>> updateSuspectAndDefendantByCase(
+            @PathVariable Long id,
+            @RequestBody CaseCitizenUpdateRequest request) throws ApiException {
+        return ApiResponse.ok(caseService.updateSuspectAndDefendant(id, request));
+    }
+
+    @PatchMapping("/{id}/case-person/suspect-defendant/type/update")
+    @Operation(summary = "Chỉnh sửa quyền bị can, bị cáo")
+    public ApiResponse<HashMap<String, String>> updateTypeCasePersons(
+            @PathVariable Long id,
+            @RequestBody CaseCitizenUpdateRequest request) throws ApiException {
+        return ApiResponse.ok(caseService.updateTypeCasePerson(id, request));
+    }
+
+    @PostMapping("/{id}/case-flow/create")
+    @Operation(summary = "Tạo mới vụ án")
+    public ApiResponse<CaseFlowResponse> createCaseFlow(
+            @PathVariable Long id,
+            @Valid @RequestBody CaseFlowCreateRequest caseFlowCreateRequest)
+            throws ApiException {
+        return ApiResponse.ok(caseFlowService.addCaseFlow(id, caseFlowCreateRequest));
+    }
+    @GetMapping("/{caseId}/case-flow")
+    @Operation(summary = "xem sơ đồ vụ án")
+    public ApiResponse<CaseFlowResponse> getCaseFlow(@PathVariable Long caseId) throws ApiException {
+        return ApiResponse.ok(caseFlowService.getCaseFlow(caseId));
+    }
+
+    @PatchMapping("/{id}/case-flow/{idCaseFlow}")
+    @Operation(summary = "Chỉnh sửa sơ đồ vụ án")
+    public ApiResponse<HashMap<String, String>> update(
+            @PathVariable Long id, @PathVariable Long idCaseFlow ,@Valid @RequestBody CaseFlowUpdateRequest caseFlowUpdateRequest)
+            throws Exception {
+        return ApiResponse.ok(caseFlowService.updateCaseFlow(id,idCaseFlow, caseFlowUpdateRequest));
+    }
+
+@GetMapping("/{caseId}/mindMapTemplate")
+    @Operation(summary = "Xem danh sách sơ đồ mẫu trong vụ án")
+    public ApiResponse<CaseMindmapTemplateResponse<MindmapTemplateResponse>> getAllMindMapTemplates(
+            @PathVariable Long caseId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "6") Integer pageSize,
+            @RequestParam(required = false) String textSearch
+    ) throws ApiException {
+        return ApiResponse.ok(caseService.getAllMindMapTemplates(caseId, page, pageSize, textSearch));
+    }
+
+    @GetMapping("/{id}/citizen")
+    @Operation(summary = "lấy danh sách công dân")
+    public ApiResponse<ResponseFilter<CitizenCaseResponse>> getList_investigator_suspect_defendant(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "") String textSearch,
+            @RequestParam TypeCaseCitizen type,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize ) throws ApiException{
+        return ApiResponse.ok(caseService.getListInvestigatorSuspectDefendant(id, textSearch,type, page, pageSize));
     }
 }

@@ -19,4 +19,13 @@ public class CitizenCaseResponse {
     String workingAddress;
     String address;
     String job;
+
+
+    public CitizenCaseResponse(Long id, String fullName, String citizenId, String type, String profileImage) {
+        this.id = id;
+        this.fullName = fullName;
+        this.citizenId = citizenId;
+        this.type = type;
+        this.profileImage = profileImage;
+    }
 }

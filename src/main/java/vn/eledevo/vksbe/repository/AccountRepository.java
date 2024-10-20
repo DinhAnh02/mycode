@@ -14,6 +14,7 @@ import vn.eledevo.vksbe.dto.response.account.AccountFilterCaseResponse;
 import vn.eledevo.vksbe.dto.response.account.AccountSwapResponse;
 import vn.eledevo.vksbe.entity.Accounts;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AccountRepository extends BaseRepository<Accounts, Long> {
@@ -92,4 +93,6 @@ public interface AccountRepository extends BaseRepository<Accounts, Long> {
             +"AND ((COALESCE(:departmentId, NULL) IS NULL) OR (a.departments.id =:departmentId) OR (r.code IN ('VIEN_TRUONG','VIEN_PHO')) )"
             +"AND (r.code <> 'IT_ADMIN') ")
     Page<AccountFilterCaseResponse> getAccountCaseListFilter(@Param("textSearch") String textSearch, Long departmentId, Pageable pageable);
+
+    List<Accounts> findByIdIn(List<Long> ids);
 }

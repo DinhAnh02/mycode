@@ -48,4 +48,5 @@ public class CitizenController {
     public ApiResponse<Map<String,String>> createCitizens(@Valid @RequestBody CitizensRequest citizensRequest) throws ApiException {
         return ApiResponse.ok(citizenService.createCitizens(citizensRequest));
     }
+
 }

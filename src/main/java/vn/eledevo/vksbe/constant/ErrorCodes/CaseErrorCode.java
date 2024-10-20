@@ -19,9 +19,12 @@ public enum CaseErrorCode implements BaseErrorCode {
     CASE_EXISTED(OK, "CAS-03", "Tên vụ án đã tồn tại", new HashMap<>()),
     CASE_CODE_EXISTED(OK, "CAS-04", "Mã vụ án đã tồn tại", new HashMap<>()),
     START_TIME_GREATER_THAN_END_TIME(BAD_REQUEST ,"CAS-05", "Thời gian bắt đầu không được lớn hơn thời gian kết thúc.", new HashMap<>()),
-    CASE_ACCESS_DENIED(OK, "CS-05", "Bạn không có quyền vào vụ án của phòng ban này", new HashMap<>()),
-    CASE_EDIT_PERMISSION_DENIED(OK, "CS-06", "Bạn không có quyền chỉnh sửa trong vụ án này", new HashMap<>()),
-    CASE_CITIZEN_NOT_FOUND_IN_LIST(OK, "CS-07", "Danh sách bạn gửi xuống có công dân không tồn tại", new HashMap<>())
+    CASE_ACCESS_DENIED(OK, "CAS-06", "Bạn không có quyền vào vụ án của phòng ban này", new HashMap<>()),
+    CASE_EDIT_PERMISSION_DENIED(OK, "CAS-07", "Bạn không có quyền chỉnh sửa trong vụ án này", new HashMap<>()),
+    CASE_CITIZEN_NOT_FOUND_IN_LIST(OK, "CAS-08", "Danh sách bạn gửi xuống có công dân không tồn tại", new HashMap<>()),
+    CASE_ACCOUNT_NOT_DEPARTMENT(OK, "CAS-09", "Bạn không thuộc phòng ban trong vụ án này", new HashMap<>()),
+    CASE_NOT_PERMISSION_EDIT(OK, "CAS-10", "Bạn không có quyền chỉnh sửa danh sách kiểm sát viên trong vụ án này", new HashMap<>()),
+    ACCOUNT_NOT_FOUND_IN_LIST(OK, "CAS-11", "Trong danh sách có id ko tồn tại trong hệ thống", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

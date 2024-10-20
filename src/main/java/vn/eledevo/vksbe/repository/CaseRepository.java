@@ -1,14 +1,15 @@
 package vn.eledevo.vksbe.repository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.repository.Query;
-import vn.eledevo.vksbe.dto.response.cases.CaseFilterResponse;
 import org.springframework.data.domain.Pageable;
-import vn.eledevo.vksbe.dto.response.account.AccountFilterCaseResponse;
-import vn.eledevo.vksbe.entity.Cases;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
+import vn.eledevo.vksbe.dto.response.account.AccountFilterCaseResponse;
+import vn.eledevo.vksbe.dto.response.cases.CaseFilterResponse;
+import vn.eledevo.vksbe.entity.Cases;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public interface CaseRepository extends BaseRepository<Cases, Long> {
     boolean existsByName(String name);
@@ -89,4 +90,13 @@ public interface CaseRepository extends BaseRepository<Cases, Long> {
             Long departmentId,
             Pageable pageable
     );
+    @Query("SELECT c " +
+            "FROM Cases c " +
+            "WHERE c.id = :id and c.departments.id = :departmentId")
+    Optional<Cases> findByCaseAndDepartment(Long id, Long departmentId );
+    @Query("select COUNT(ac) > 0 FROM AccountCase ac "+
+            "where ac.accounts.id = :accountId "+
+            "and ac.cases.id = :caseId "+
+            "and ac.hasAccess = true ")
+    boolean checkCaseAccess(Long accountId, Long caseId);
 }

@@ -5,12 +5,11 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class CaseCitizenUpdateRequest {
-    List<CaseCitizenRequest> listCitizens;
+public class CaseAccountRequest {
+    List<CaseAccountUpdateRequest> casePersons;
 }
