@@ -18,6 +18,7 @@ import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
 import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.organization.OrganizationService;
 
 @RestController
@@ -41,7 +42,7 @@ public class OrganizationController {
     @PatchMapping("/{id}/update")
     @Operation(summary = "Chỉnh sửa đơn vị")
     public ApiResponse<Organizations> updateOrganization(
-            @PathVariable Long id, @Valid @RequestBody OrganizationRequest organizationRequest) throws ApiException {
+            @PathVariable Long id, @Valid @RequestBody OrganizationRequest organizationRequest) throws ApiException, ValidationException {
         return ApiResponse.ok(organizationService.updateOrganization(id, organizationRequest));
     }
 

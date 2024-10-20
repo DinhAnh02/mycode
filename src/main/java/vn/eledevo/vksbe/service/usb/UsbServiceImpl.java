@@ -27,6 +27,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Status;
 import vn.eledevo.vksbe.dto.request.DataChange;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
@@ -98,7 +99,7 @@ public class UsbServiceImpl implements UsbService {
 
         Optional<Accounts> account = accountRepository.findById(idAccount);
         if (account.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, AccountErrorCode.ACCOUNT_NOT_FOUND.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ResponseMessage.ACCOUNT_NOT_FOUND);
         }
         if (Boolean.FALSE.equals(account.get().getIsConnectComputer())) {
             throw new ResponseStatusException(

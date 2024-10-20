@@ -22,6 +22,7 @@ import vn.eledevo.vksbe.dto.request.account.CreateAccountTest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.AuthenticationResponse;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.authenticate.AuthenticationService;
 
 @RestController
@@ -35,7 +36,7 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     @Operation(summary = "Đăng nhập bước 1 bằng tài khoản và mật khẩu")
     public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request)
-            throws ApiException {
+            throws ApiException, ValidationException {
         return ApiResponse.ok(service.authenticate(request));
     }
 
@@ -55,14 +56,14 @@ public class AuthenticationController {
     @PatchMapping("/create-pin")
     @Operation(summary = "Tạo mã PIN khi đăng nhật lần đầu")
     public ApiResponse<HashMap<String, String>> createPin(@RequestBody @Valid PinRequest pinRequest)
-            throws ApiException {
+            throws ApiException, ValidationException {
         return ApiResponse.ok(service.createPin(pinRequest));
     }
 
     @PatchMapping("/change-password")
     @Operation(summary = "Đổi mật khẩu thành tài khoản")
     public ApiResponse<HashMap<String, String>> changePassword(@RequestBody @Valid ChangePasswordRequest request)
-            throws ApiException {
+            throws ApiException, ValidationException {
         return ApiResponse.ok(service.changePassword(request));
     }
 

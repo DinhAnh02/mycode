@@ -165,7 +165,7 @@ public class AccountController {
     @PostMapping("/change-pin-code")
     @Operation(summary = "Thay đổi mã PIN của tài khoản đang đăng nhập")
     public ApiResponse<HashMap<String, String>> changePinCodeUserLogin(@Valid @RequestBody PinChangeRequest pinRequest)
-            throws ApiException {
+            throws ApiException, ValidationException {
         return ApiResponse.ok(accountService.changePinUserLogin(pinRequest));
     }
 

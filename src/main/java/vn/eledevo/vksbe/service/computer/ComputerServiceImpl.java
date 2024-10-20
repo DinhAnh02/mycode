@@ -1,9 +1,6 @@
 package vn.eledevo.vksbe.service.computer;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -18,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.dto.model.computer.ComputersModel;
 import vn.eledevo.vksbe.dto.request.ComputerRequest;
 import vn.eledevo.vksbe.dto.request.computer.ComputerRequestForCreate;
@@ -28,6 +26,7 @@ import vn.eledevo.vksbe.dto.response.computer.ComputerResponse;
 import vn.eledevo.vksbe.dto.response.computer.ComputerResponseFilter;
 import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.ComputerMapper;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 
@@ -53,14 +52,16 @@ public class ComputerServiceImpl implements ComputerService {
     }
 
     @Override
-    public HashMap<String, String> updateComputer(Long requestId, ComputersModel computerRequest) throws ApiException {
+    public HashMap<String, String> updateComputer(Long requestId, ComputersModel computerRequest) throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         Computers computer = computerRepository
                 .findById(requestId)
                 .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
         Computers computerByName = computerRepository.findByName(computerRequest.getName());
         if (computerRepository.existsByName(computerRequest.getName())
                 && !computerByName.getId().equals(requestId)) {
-            throw new ApiException(ComputerErrorCode.PC_NAME_ALREADY_EXISTS);
+            errors.put("name", ResponseMessage.PC_NAME_ALREADY_EXISTS);
+            throw new ValidationException(errors);
         }
 
         computer.setName(computerRequest.getName());
@@ -81,13 +82,15 @@ public class ComputerServiceImpl implements ComputerService {
 
     @Override
     @Transactional
-    public HashMap<String, String> createComputer(ComputerRequestForCreate request) throws ApiException {
+    public HashMap<String, String> createComputer(ComputerRequestForCreate request) throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         Boolean computerExist = computerRepository.existsByCode(request.getCode());
         if (Objects.equals(computerExist, Boolean.TRUE)) {
             throw new ApiException(ComputerErrorCode.PC_CODE_ALREADY_EXISTS);
         }
         if (computerRepository.existsByName(request.getName())) {
-            throw new ApiException(ComputerErrorCode.PC_NAME_ALREADY_EXISTS);
+            errors.put("name", ResponseMessage.PC_NAME_ALREADY_EXISTS);
+            throw new ValidationException(errors);
         }
 
         Computers computersCreate = computerRepository.save(computerMapper.toResource(request));

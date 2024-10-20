@@ -56,7 +56,7 @@ public interface AccountService {
 
     AccountResponse updateAvatarUserInfo(Long id, AvatarRequest request) throws Exception;
 
-    HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException;
+    HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException, ValidationException;
 
     ResponseFilter<AccountFilterCaseResponse> getAccountCaseFilter(
             String textSearch, Integer currentPage, Integer limit) throws ApiException;

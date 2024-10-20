@@ -10,9 +10,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatusCode;
 
 public enum OrganizationErrorCode implements BaseErrorCode {
-    ORGANIZATION_NAME_EXIST(OK, "ORG-01", "Tên đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác", new HashMap<>()),
-    ORGANIZATION_CODE_EXIST(OK, "ORG-02", "Mã code đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác", new HashMap<>()),
-    ORGANIZATION_NOT_FOUND(OK, "ORG-03", "Đơn vị không tồn tại", new HashMap<>()),
+    ORGANIZATION_NOT_FOUND(OK, "ORG-01", "Đơn vị không tồn tại", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

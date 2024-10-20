@@ -77,9 +77,9 @@ public class ResponseMessage {
 
     public static final String ORGANIZATION_NAME_SIZE = "Tên đơn vị tối thiểu 4 kí tự, tối đa 255 kí tự";
 
-    public static final String ORGANIZATION_NAME_EXIST = "Tên đơn vị đã tồn tại";
+    public static final String ORGANIZATION_NAME_EXIST = "Tên đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác";
 
-    public static final String ORGANIZATION_CODE_EXIST = "Mã đơn vị đã tồn tại";
+    public static final String ORGANIZATION_CODE_EXIST = "Mã đơn vị đã tồn tại. Vui lòng nhập tên đơn vị khác";
 
     public static final String ORGANIZATION_CODE_NOT_BLANK = "Mã đơn vị không được để trống";
 
@@ -126,4 +126,30 @@ public class ResponseMessage {
     public static final String CITIZEN_ID_SIZE = "ID công dân tối đa 225 kí tự";
 
     public static final String USERNAME_INVALID = "Mã cán bộ chỉ chứa chữ in hoa và số";
+
+    public static final String ACCOUNT_NOT_FOUND = "Tài khoản không tồn tại";
+
+    public static final String INVALID_ACCOUNT_OR_PASSWORD = "Sai mật khẩu";
+
+    public static final String PIN_CODE_MISMATCH = "Mã PIN nhập lại không trùng khớp";
+
+    public static final String OLD_PASSWORD_INCORRECT = "Mật khẩu cũ không chính xác";
+
+    public static final String NEW_PASSWORD_SAME_AS_OLD = "Mật khẩu mới không được trùng với mật khẩu cũ";
+
+    public static final String CONFIRM_PASSWORD_MISMATCH = "Mật khẩu nhập lại phải giống mật khẩu mới";
+
+    public static final String AVATAR_SIZE_EXCEEDS_LIMIT = "Ảnh đại diện không được vượt quá {0}";
+
+    public static final String AVATAR_INVALID_FORMAT = "Chỉ chấp nhận ảnh có các định dạng {0}";
+
+    public static final String OLD_PIN_INCORRECT = "Mã PIN cũ không chính xác";
+
+    public static final String NEW_PIN_SAME_AS_OLD = "Mã PIN mới không được trùng với mã PIN cũ";
+
+    public static final String CONFIRM_PIN_MISMATCH = "Mã PIN nhập lại phải giống với mã PIN mới";
+
+    public static final String DEPARTMENT_EXISTED = "Không được trùng tên với các phòng ban khác";
+
+    public static final String PC_NAME_ALREADY_EXISTS = "Tên máy tính đã tồn tại trong hệ thống";
 }
