@@ -1,10 +1,17 @@
 package vn.eledevo.vksbe.service.account;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
+import static vn.eledevo.vksbe.constant.RoleCodes.*;
+import static vn.eledevo.vksbe.utils.FileUtils.*;
+import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,6 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import vn.eledevo.vksbe.constant.*;
 import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
@@ -44,18 +57,6 @@ import vn.eledevo.vksbe.repository.*;
 import vn.eledevo.vksbe.utils.SecurityUtils;
 import vn.eledevo.vksbe.utils.minio.MinioProperties;
 import vn.eledevo.vksbe.utils.minio.MinioService;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static vn.eledevo.vksbe.constant.FileConst.AVATAR_ALLOWED_EXTENSIONS;
-import static vn.eledevo.vksbe.constant.RoleCodes.*;
-import static vn.eledevo.vksbe.utils.FileUtils.*;
-import static vn.eledevo.vksbe.utils.SecurityUtils.getUserName;
 
 @Service
 @RequiredArgsConstructor
@@ -139,7 +140,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Page<AccountResponseByFilter> getListAccount(
-            Accounts loginAccount, AccountRequest accountRequest, Integer currentPage, Integer limit){
+            Accounts loginAccount, AccountRequest accountRequest, Integer currentPage, Integer limit) {
         if (currentPage < 1) {
             currentPage = 1;
         }
@@ -593,7 +594,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if ((!requestRole.getCode().equals(Role.VIEN_TRUONG.name())
-                && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
+                        && !requestRole.getCode().equals(Role.TRUONG_PHONG.name()))
                 || !accountUpdate.getStatus().equals(Status.ACTIVE.name())) {
             accountToUpdate(req, updatedAccId, requestRole);
             return AccountSwapResponse.builder().build();
@@ -605,15 +606,27 @@ public class AccountServiceImpl implements AccountService {
             return AccountSwapResponse.builder().build();
         }
 
-        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId())) {
+        if ((req.getSwappedAccId() == 0 && updatedAccId.equals(oldPositionAccInfo.getId()))
+                || (req.getSwappedAccId() != 0
+                        && updatedAccId.equals(oldPositionAccInfo.getId())
+                        && oldPositionAccInfo.getId().equals(req.getSwappedAccId()))) {
+            accountToUpdate(req, updatedAccId, requestRole);
+        }
+
+        if(req.getSwappedAccId() != 0 && !oldPositionAccInfo.getId().equals(updatedAccId) && oldPositionAccInfo.getId().equals(req.getSwappedAccId())){
+            Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
+            accountLead.setStatus(Status.INACTIVE.name());
+            accountRepository.save(accountLead);
+
+            Accounts account = accountToUpdate(req, updatedAccId, requestRole);
+            account.setStatus(Status.ACTIVE.name());
+            accountRepository.save(account);
+        }
+
+        if (!oldPositionAccInfo.getId().equals(req.getSwappedAccId()) && !updatedAccId.equals(oldPositionAccInfo.getId())) {
             AccountErrorCode.ACCOUNT_LIST_EXIT.setResult(Optional.of(oldPositionAccInfo));
             throw new ApiException(AccountErrorCode.ACCOUNT_LIST_EXIT);
         }
-
-        Accounts accountLead = accountRepository.findById(req.getSwappedAccId()).orElseThrow();
-        accountLead.setStatus(Status.INACTIVE.name());
-        Accounts account = accountToUpdate(req, updatedAccId, requestRole);
-        account.setStatus(Status.ACTIVE.name());
         return AccountSwapResponse.builder().build();
     }
 
@@ -637,7 +650,8 @@ public class AccountServiceImpl implements AccountService {
         }
         Accounts account =
                 accountRepository.findById(id).orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
-        if (account.getProfile().getAvatar() != null && !account.getProfile().getAvatar().isEmpty()) {
+        if (account.getProfile().getAvatar() != null
+                && !account.getProfile().getAvatar().isEmpty()) {
             minioService.deleteFile(account.getProfile().getAvatar());
         }
         account.getProfile().setAvatar(request.getAvatar());
@@ -874,10 +888,10 @@ public class AccountServiceImpl implements AccountService {
         profile.setFullName(req.getFullName());
         profile.setPhoneNumber(req.getPhoneNumber());
         profile.setGender(req.getGender());
-        if (!profile.getAvatar().isEmpty()) {
+        if (profile.getAvatar() != null && !profile.getAvatar().isEmpty()) {
             minioService.deleteFile(profile.getAvatar());
         }
-        profile.setAvatar(req.getAvatar().isEmpty() ? null : req.getAvatar());
+        profile.setAvatar(req.getAvatar());
         Profiles profileSave = profileRepository.save(profile);
 
         account.setProfile(profileSave);
@@ -922,7 +936,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ResponseFilter<AccountFilterCaseResponse> getAccountCaseFilter(String textSearch, Integer page, Integer pageSize) throws ApiException {
+    public ResponseFilter<AccountFilterCaseResponse> getAccountCaseFilter(
+            String textSearch, Integer page, Integer pageSize) throws ApiException {
         Long departmentId = null;
         if ((page < 1) || (pageSize < 1)) {
             throw new ApiException(SystemErrorCode.BAD_REQUEST_SERVER);
@@ -939,10 +954,9 @@ public class AccountServiceImpl implements AccountService {
                 || (loginAccount.getRoles().getCode().equals(Role.KIEM_SAT_VIEN.name()))) {
             departmentId = loginAccount.getDepartments().getId();
         }
-            Pageable pageable =
-                PageRequest.of(page - 1, pageSize);
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
         Page<AccountFilterCaseResponse> accountFilterCaseResponses =
-                accountRepository.getAccountCaseListFilter(textSearch, departmentId , pageable);
+                accountRepository.getAccountCaseListFilter(textSearch, departmentId, pageable);
         return new ResponseFilter<>(
                 accountFilterCaseResponses.getContent(),
                 (int) accountFilterCaseResponses.getTotalElements(),
