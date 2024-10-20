@@ -194,8 +194,7 @@ public class AccountServiceImpl implements AccountService {
         if (Boolean.TRUE.equals((account.getStatus().equals(Status.INACTIVE.name())
                                 || account.getStatus().equals(Status.INITIAL.name()))
                         && priorityRoles(loginAccRole) > priorityRoles(viewedAccRole)
-                        && account.getIsConnectComputer())
-                && Boolean.TRUE.equals(account.getIsConnectUsb())) {
+                        && account.getIsConnectComputer() && account.getIsConnectUsb())) {
             account.setIsShowUnlockButton(true);
             account.setIsEnabledUnlockButton(true);
         }
