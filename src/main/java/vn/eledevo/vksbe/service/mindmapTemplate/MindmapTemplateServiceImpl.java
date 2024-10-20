@@ -166,7 +166,7 @@ public class MindmapTemplateServiceImpl implements MindmapTemplateService {
                 && !(accounts.getRoles().getCode().equals(Role.VIEN_PHO.name()))
                 && !accounts.getDepartments()
                         .getId()
-                        .equals(mindmapTemplate.get().getId())) {
+                        .equals(mindmapTemplate.get().getDepartments().getId())) {
             throw new ApiException(MindmapTemplateErrorCode.MINDMAP_TEMPLATE_NO_PERMISSION_TO_ACCESS);
         }
 

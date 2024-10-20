@@ -41,6 +41,7 @@ public class SecurityConfiguration {
         "/swagger-ui/**",
         "/webjars/**",
         "/swagger-ui.html",
+        "/api/v1/private/accounts/download-image/{fileName:.+}",
         "/api/v1/private/minio/**",
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -125,7 +126,17 @@ public class SecurityConfiguration {
                                 "/api/v1/private/cases/{caseId}/documents/folder/create",
                                 "/api/v1/private/cases/{id}/user-in-charge",
                                 "/api/v1/private/cases/{id}/account-case/prosecutor",
-                                "/api/v1/private/citizens/create"
+                                "/api/v1/private/citizens/create",
+                                "/api/v1/private/cases/accounts",
+                                "/api/v1/private/cases/{caseId}/case-flow",
+                                "/api/v1/private/cases/{id}/account-cases/update",
+                                "/api/v1/private/cases/{id}/case-person/suspect-defendant/update",
+                                "/api/v1/private/cases/{id}/case-person/suspect-defendant/type/update",
+                                "/api/v1/private/cases/{caseId}/case-flow/create",
+                                "/api/v1/private/cases",
+                                "/api/v1/private/cases/{id}/case-flow/{idCaseFlow}",
+                                "/api/v1/private/cases/{caseId}/mindMapTemplate",
+                                "/api/v1/private/cases/{id}/citizen"
                         )
                         .hasAnyAuthority(
                                 Role.VIEN_TRUONG.name(),

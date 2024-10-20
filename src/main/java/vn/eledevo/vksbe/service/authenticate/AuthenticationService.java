@@ -101,7 +101,7 @@ public class AuthenticationService {
                     .usbVendorCode(universalSerialBus.get().getUsbVendorCode())
                     .build();
         } catch (BadCredentialsException e) {
-            errors.put("error", ResponseMessage.INVALID_ACCOUNT_OR_PASSWORD);
+            errors.put("password", ResponseMessage.INVALID_ACCOUNT_OR_PASSWORD);
             throw new ValidationException(errors);
         }
     }

@@ -1,12 +1,16 @@
 package vn.eledevo.vksbe.service.cases;
 
 import java.util.HashMap;
+import java.util.List;
 
-import vn.eledevo.vksbe.dto.request.cases.CaseCreateRequest;
-import vn.eledevo.vksbe.dto.request.cases.CaseFilterRequest;
-import vn.eledevo.vksbe.dto.request.cases.CaseUpdateRequest;
+import vn.eledevo.vksbe.constant.CasePosition;
+import vn.eledevo.vksbe.constant.ErrorCodes.TypeCaseCitizen;
+import vn.eledevo.vksbe.dto.request.cases.*;
 import vn.eledevo.vksbe.dto.request.document.DocumentFolderCreationRequest;
-import vn.eledevo.vksbe.dto.request.cases.CaseCitizenUpdateRequest;
+import vn.eledevo.vksbe.dto.request.cases.CaseCreateRequest;
+import vn.eledevo.vksbe.dto.request.cases.CaseUpdateRequest;
+import vn.eledevo.vksbe.dto.response.CaseMindmapTemplateResponse;
+import vn.eledevo.vksbe.dto.response.MindmapTemplateResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.cases.CaseFilterResponse;
 import vn.eledevo.vksbe.dto.response.cases.CaseInfomationResponse;
@@ -40,4 +44,15 @@ public interface CaseService {
     ResponseFilter<AccountFilterCaseResponse> getUserInChargeList(String textSearch, Long caseId, Integer page, Integer pageSize) throws ApiException;
 
     HashMap<String, String> updateInvestigator(Long id, CaseCitizenUpdateRequest request) throws ApiException;
+
+    HashMap<String, String> updateProsecutorList (CasePosition type, Long id, List<CaseAccountUpdateRequest> casePersons) throws ApiException;
+
+    HashMap<String, String> updateSuspectAndDefendant(Long id, CaseCitizenUpdateRequest request) throws ApiException;
+
+    HashMap<String, String> updateTypeCasePerson(Long id, CaseCitizenUpdateRequest request) throws ApiException;
+
+    CaseMindmapTemplateResponse<MindmapTemplateResponse> getAllMindMapTemplates(Long caseId, Integer page, Integer pageSize, String textSearch) throws ApiException;
+
+    ResponseFilter<CitizenCaseResponse> getListInvestigatorSuspectDefendant(Long id, String textSearch, TypeCaseCitizen type, int page, int pageSize)
+            throws  ApiException;
 }

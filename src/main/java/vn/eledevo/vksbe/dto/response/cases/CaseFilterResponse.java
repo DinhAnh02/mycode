@@ -19,5 +19,5 @@ public class CaseFilterResponse {
     String name;
     String departmentName;
     String statusName;
-    LocalDate updateAt;
+    LocalDate updatedAt;
 }
