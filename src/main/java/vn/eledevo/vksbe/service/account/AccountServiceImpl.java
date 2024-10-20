@@ -710,7 +710,9 @@ public class AccountServiceImpl implements AccountService {
         usbToken.get().setKeyUsb(null);
         usbRepository.save(usbToken.get());
         account.setIsConnectUsb(false);
+        account.setStatus(Status.INACTIVE.name());
         accountRepository.save(account);
+        tokenRepository.deleteByAccounts_Id(accountID);
     }
 
     private void validateRoleForViewButton(
