@@ -20,6 +20,7 @@ import vn.eledevo.vksbe.constant.ErrorCodes.AccountErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.ComputerErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.UsbErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.constant.Role;
 import vn.eledevo.vksbe.constant.Status;
 import vn.eledevo.vksbe.constant.TokenType;
@@ -35,6 +36,7 @@ import vn.eledevo.vksbe.entity.AuthTokens;
 import vn.eledevo.vksbe.entity.Computers;
 import vn.eledevo.vksbe.entity.Usbs;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.repository.AccountRepository;
 import vn.eledevo.vksbe.repository.ComputerRepository;
 import vn.eledevo.vksbe.repository.TokenRepository;
@@ -60,12 +62,16 @@ public class AuthenticationService {
      * @param request Đối tượng RegisterRequest chứa thông tin đăng ký
      * @return Đối tượng AuthenticationResponse chứa token truy cập và token làm mới
      */
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws ApiException {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         // Xác thực thông tin đăng nhập của người dùng
         try {
             var account = accountRepository
                     .findAccountInSystem(request.getUsername())
-                    .orElseThrow(() -> new ApiException(AccountErrorCode.ACCOUNT_NOT_FOUND));
+                    .orElseThrow(() -> {
+                        errors.put("username", ResponseMessage.ACCOUNT_NOT_FOUND);
+                        return new ValidationException(errors);
+                    });
             // Xác thực thông tin đăng nhập của người dùng
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
@@ -95,7 +101,8 @@ public class AuthenticationService {
                     .usbVendorCode(universalSerialBus.get().getUsbVendorCode())
                     .build();
         } catch (BadCredentialsException e) {
-            throw new ApiException(AccountErrorCode.INVALID_ACCOUNT_OR_PASSWORD);
+            errors.put("error", ResponseMessage.INVALID_ACCOUNT_OR_PASSWORD);
+            throw new ValidationException(errors);
         }
     }
 
@@ -132,7 +139,8 @@ public class AuthenticationService {
         validUserTokens.forEach(token -> tokenRepository.deleteById(token.getId()));
     }
 
-    public HashMap<String, String> createPin(PinRequest pinRequest) throws ApiException {
+    public HashMap<String, String> createPin(PinRequest pinRequest) throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         String username = SecurityUtils.getUserName();
         Accounts account = accountRepository
                 .findAccountInSystem(username)
@@ -144,7 +152,8 @@ public class AuthenticationService {
             throw new ApiException(AccountErrorCode.CHANGE_FIRST_LOGIN);
         }
         if (!pinRequest.getPin().equals(pinRequest.getPin2())) {
-            throw new ApiException(AccountErrorCode.PIN_CODE_MISMATCH);
+            errors.put("pin2", ResponseMessage.PIN_CODE_MISMATCH);
+            throw new ValidationException(errors);
         }
         String hashedPin = passwordEncoder.encode(pinRequest.getPin2());
         account.setPin(hashedPin);
@@ -155,7 +164,8 @@ public class AuthenticationService {
         return result;
     }
 
-    public HashMap<String, String> changePassword(ChangePasswordRequest request) throws ApiException {
+    public HashMap<String, String> changePassword(ChangePasswordRequest request) throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         String userName = SecurityUtils.getUserName();
         Accounts accountRequest = accountRepository
                 .findAccountInSystem(userName)
@@ -164,13 +174,16 @@ public class AuthenticationService {
             throw new ApiException(AccountErrorCode.ACCOUNT_INACTIVE);
         }
         if (!passwordEncoder.matches(request.getOldPassword(), accountRequest.getPassword())) {
-            throw new ApiException(AccountErrorCode.OLD_PASSWORD_INCORRECT);
+            errors.put("oldPassword", ResponseMessage.OLD_PASSWORD_INCORRECT);
+            throw new ValidationException(errors);
         }
         if (request.getOldPassword().equals(request.getNewPassword())) {
-            throw new ApiException(AccountErrorCode.NEW_PASSWORD_SAME_AS_OLD);
+            errors.put("newPassword", ResponseMessage.NEW_PASSWORD_SAME_AS_OLD);
+            throw new ValidationException(errors);
         }
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new ApiException(AccountErrorCode.CONFIRM_PASSWORD_MISMATCH);
+            errors.put("confirmPassword", ResponseMessage.CONFIRM_PASSWORD_MISMATCH);
+            throw new ValidationException(errors);
         }
         accountRequest.setPassword(passwordEncoder.encode(request.getConfirmPassword()));
         accountRequest.setIsConditionLogin1(Boolean.TRUE);

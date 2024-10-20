@@ -16,6 +16,7 @@ import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.department.DepartmentService;
 
 @RestController
@@ -35,7 +36,7 @@ public class DepartmentController {
     @PatchMapping("/{id}/update-department")
     @Operation(summary = "Cập nhật phòng ban")
     public ApiResponse<HashMap<String, String>> updateDepartment(
-            @PathVariable Long id, @RequestBody @Valid UpdateDepartment departmentRequest) throws ApiException {
+            @PathVariable Long id, @RequestBody @Valid UpdateDepartment departmentRequest) throws ApiException, ValidationException {
         return ApiResponse.ok(departmentService.updateDepartment(id, departmentRequest));
     }
 }

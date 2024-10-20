@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.service.department;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -11,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.constant.ErrorCodes.DepartmentErrorCode;
 import vn.eledevo.vksbe.constant.ErrorCodes.SystemErrorCode;
+import vn.eledevo.vksbe.constant.ResponseMessage;
 import vn.eledevo.vksbe.dto.request.department.UpdateDepartment;
 import vn.eledevo.vksbe.dto.response.ResultList;
 import vn.eledevo.vksbe.dto.response.department.DepartmentResponse;
 import vn.eledevo.vksbe.entity.Departments;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.repository.DepartmentRepository;
 
 @Service
@@ -38,13 +41,15 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public HashMap<String, String> updateDepartment(Long departmentId, UpdateDepartment departmentRequest)
-            throws ApiException {
+            throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         Departments existingDepartment = departmentRepository
                 .findById(departmentId)
                 .orElseThrow(() -> new ApiException(SystemErrorCode.INTERNAL_SERVER));
 
         if (departmentRepository.existsDepartmentsByName(departmentRequest.getDepartmentName())) {
-            throw new ApiException(DepartmentErrorCode.DEPARTMENT_EXISTED);
+            errors.put("departmentName", ResponseMessage.DEPARTMENT_EXISTED);
+            throw new ValidationException(errors);
         }
 
         existingDepartment.setName(departmentRequest.getDepartmentName());

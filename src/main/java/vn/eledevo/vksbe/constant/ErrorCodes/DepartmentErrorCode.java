@@ -1,7 +1,5 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import static org.springframework.http.HttpStatus.OK;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +8,6 @@ import java.util.Optional;
 import org.springframework.http.HttpStatusCode;
 
 public enum DepartmentErrorCode implements BaseErrorCode {
-    DEPARTMENT_EXISTED(OK, "DEP-01", "Không được trùng tên với các phòng ban khác", new HashMap<>()),
     ;
 
     private final HttpStatusCode statusCode;

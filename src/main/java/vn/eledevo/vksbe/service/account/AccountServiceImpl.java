@@ -659,7 +659,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException {
+    public HashMap<String, String> changePinUserLogin(PinChangeRequest pinRequest) throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         String userName = getUserName();
         Accounts accountRequest = accountRepository
                 .findAccountInSystem(userName)
@@ -671,13 +672,16 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(AccountErrorCode.CHANGE_PIN_LOGIN);
         }
         if (!passwordEncoder.matches(pinRequest.getOldPinCode(), accountRequest.getPin())) {
-            throw new ApiException(AccountErrorCode.OLD_PIN_INCORRECT);
+            errors.put("oldPinCode", ResponseMessage.OLD_PIN_INCORRECT);
+            throw new ValidationException(errors);
         }
         if (pinRequest.getOldPinCode().equals(pinRequest.getNewPinCode())) {
-            throw new ApiException(AccountErrorCode.NEW_PIN_SAME_AS_OLD);
+            errors.put("newPinCode", ResponseMessage.NEW_PIN_SAME_AS_OLD);
+            throw new ValidationException(errors);
         }
         if (!pinRequest.getNewPinCode().equals(pinRequest.getConfirmPinCode())) {
-            throw new ApiException(AccountErrorCode.CONFIRM_PIN_MISMATCH);
+            errors.put("newPinCode", ResponseMessage.CONFIRM_PIN_MISMATCH);
+            throw new ValidationException(errors);
         }
         String hashPin = passwordEncoder.encode(pinRequest.getConfirmPinCode());
         accountRequest.setPin(hashPin);
@@ -905,7 +909,8 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.save(account);
     }
 
-    private void validateAvatarFile(MultipartFile file) throws ApiException {
+    private void validateAvatarFile(MultipartFile file) throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         if (file == null || file.isEmpty()) {
             return;
         }
@@ -913,15 +918,17 @@ public class AccountServiceImpl implements AccountService {
         String fileExtension = getFileExtension(file.getOriginalFilename());
         if (!isAllowedExtension(fileExtension, FileConst.AVATAR_ALLOWED_EXTENSIONS)) {
             String msg = MessageFormat.format(
-                    AccountErrorCode.AVATAR_INVALID_FORMAT.getMessage(),
+                    ResponseMessage.AVATAR_INVALID_FORMAT,
                     String.join(", ", FileConst.AVATAR_ALLOWED_EXTENSIONS));
-            throw new ApiException(AccountErrorCode.AVATAR_INVALID_FORMAT, msg);
+            errors.put("avatar", msg);
+            throw new ValidationException(errors);
         }
 
         if (file.getSize() > FileConst.MAX_AVATAR_SIZE * FileConst.BYTES_IN_MB) {
             String msg = MessageFormat.format(
-                    AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT.getMessage(), FileConst.MAX_AVATAR_SIZE);
-            throw new ApiException(AccountErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT, msg);
+                    ResponseMessage.AVATAR_SIZE_EXCEEDS_LIMIT, FileConst.MAX_AVATAR_SIZE);
+            errors.put("avatar", msg);
+            throw new ValidationException(errors);
         }
     }
 

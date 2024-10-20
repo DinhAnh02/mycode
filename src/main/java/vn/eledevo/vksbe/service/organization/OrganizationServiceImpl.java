@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.service.organization;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.organization.OrganizationResponse;
 import vn.eledevo.vksbe.entity.Organizations;
 import vn.eledevo.vksbe.exception.ApiException;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.repository.OrganizationRepository;
 
 @Service
@@ -103,7 +105,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public Organizations updateOrganization(Long organizationId, OrganizationRequest organizationRequest)
-            throws ApiException {
+            throws ApiException, ValidationException {
+        Map<String, String> errors = new HashMap<>();
         Optional<Organizations> organizationOptional = organizationRepository.findById(organizationId);
         if (organizationOptional.isEmpty()) {
             throw new ApiException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
@@ -116,14 +119,16 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (!(organizationRequest.getCode().equals(organizationOptional.get().getCode()))) {
             Boolean checkOrganizationExistByCode = organizationRepository.existsByCode(organizationRequest.getCode());
             if (Boolean.TRUE.equals(checkOrganizationExistByCode)) {
-                throw new ApiException(OrganizationErrorCode.ORGANIZATION_CODE_EXIST);
+                errors.put("code", ResponseMessage.ORGANIZATION_CODE_EXIST);
+                throw new ValidationException(errors);
             }
         }
 
         if (!(organizationRequest.getName().equals(organizationOptional.get().getName()))) {
             Boolean checkOrganizationExistByName = organizationRepository.existsByName(organizationRequest.getName());
             if (Boolean.TRUE.equals(checkOrganizationExistByName)) {
-                throw new ApiException(OrganizationErrorCode.ORGANIZATION_NAME_EXIST);
+                errors.put("name", ResponseMessage.ORGANIZATION_NAME_EXIST);
+                throw new ValidationException(errors);
             }
         }
 
