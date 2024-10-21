@@ -14,6 +14,9 @@ public interface CaseFlowService {
    CaseFlowResponse getCaseFlow(Long caseId) throws ApiException;
 
    CaseFlowResponse addCaseFlow(Long caseId, CaseFlowCreateRequest caseFlowCreateRequest) throws ApiException;
-    HashMap<String, String> updateCaseFlow(Long id, Long idCaseFlow, CaseFlowUpdateRequest caseFlowUpdateRequest)
+
+   HashMap<String, String> updateCaseFlow(Long id, Long idCaseFlow, CaseFlowUpdateRequest caseFlowUpdateRequest)
             throws Exception;
+
+   CaseFlowResponse getDetailCaseFlow(Long caseId, Long id) throws ApiException;
 }

@@ -212,4 +212,13 @@ public class CaseController {
             @RequestParam(defaultValue = "20") int pageSize ) throws ApiException{
         return ApiResponse.ok(caseService.getListInvestigatorSuspectDefendant(id, textSearch,type, page, pageSize));
     }
+
+    @GetMapping("/{caseId}/case-flow/{id}")
+    @Operation(summary = "xem chi tiết sơ đồ vụ án")
+    public ApiResponse<CaseFlowResponse> getDetailCaseFlow(
+            @PathVariable Long caseId,
+            @PathVariable Long id
+    ) throws ApiException {
+        return ApiResponse.ok(caseFlowService.getDetailCaseFlow(caseId, id));
+    }
 }

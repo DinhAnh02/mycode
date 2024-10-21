@@ -23,4 +23,6 @@ public interface CaseFlowRepository extends BaseRepository<CaseFlow, Long> {
             "FROM CaseFlow cf " +
             "WHERE cf.id = :caseFlowId and cf.cases.id = :id ")
     Optional<CaseFlow> existsCaseFlowAndCase(Long id, Long caseFlowId);
+
+    Optional<CaseFlow> findFistByCases_IdAndId (Long caseId, Long id);
 }
