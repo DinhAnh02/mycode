@@ -17,9 +17,21 @@ public class CaseFlowResponse {
     String url;
     String createdBy;
     String updatedBy;
+    String dataLink;
+    String dataNode;
     LocalDate createdAt;
 
     public CaseFlowResponse(Long id) {
         this.id = id;
+    }
+
+    public CaseFlowResponse(Long id, String name, String dataLink, String dataNode, String createdBy, String updatedBy, LocalDate createdAt) {
+        this.id = id;
+        this.name = name;
+        this.dataLink = dataLink;
+        this.dataNode = dataNode;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
+        this.createdAt = createdAt;
     }
 }

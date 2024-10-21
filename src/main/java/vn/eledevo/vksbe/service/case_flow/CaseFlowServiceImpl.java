@@ -154,7 +154,6 @@ public class CaseFlowServiceImpl implements CaseFlowService {
         if (cases.isEmpty()) {
             throw new ApiException(CaseErrorCode.CASE_NOT_FOUND);
         }
-//        Optional<Cases> gg = caseRepository.findByCaseAndDepartment(id, request.getDepartmentId());
         if (caseFlowRepository.existsCaseFlowAndCase(id, idCaseFlow).isEmpty()) {
             throw new ApiException(CaseFlowErrorCode.CASE_FLOW_NOT_MATCH_CASE);
         }
@@ -176,15 +175,14 @@ public class CaseFlowServiceImpl implements CaseFlowService {
             if (!accounts.getDepartments().getId().equals(request.getDepartmentId())) {
                 throw new ApiException(CaseFlowErrorCode.CASE_FLOW_NOT_ACCESS);
             }
-            if (!accounts.getRoles().getCode().equals(Role.TRUONG_PHONG.name())) {
-                if (caseFlowRepository
-                        .existsCaseFlow(
-                                idCaseFlow,
-                                accounts.getId(),
-                                accounts.getDepartments().getId())
-                        .isEmpty()) {
-                    throw new ApiException(CaseFlowErrorCode.CASE_FLOW_NOT_ACCESS);
-                }
+            if (!accounts.getRoles().getCode().equals(Role.TRUONG_PHONG.name())
+                    && caseFlowRepository
+                            .existsCaseFlow(
+                                    idCaseFlow,
+                                    accounts.getId(),
+                                    accounts.getDepartments().getId())
+                            .isEmpty()) {
+                throw new ApiException(CaseFlowErrorCode.CASE_FLOW_NOT_ACCESS);
             }
         }
 
@@ -197,12 +195,11 @@ public class CaseFlowServiceImpl implements CaseFlowService {
                 throw new ApiException(errorCode);
             }
             if (Objects.nonNull(caseFlow.get().getUrl())
-                    && !Objects.equals(caseFlow.get().getUrl(), "")) {
-
-                if (!mindmapTemplateRepository.existsByUrl(request.getUrl())) {
-                    minioService.deleteFile(caseFlow.get().getUrl());
-                }
+                    && !Objects.equals(caseFlow.get().getUrl(), "")
+                    && !mindmapTemplateRepository.existsByUrl(request.getUrl())) {
+                minioService.deleteFile(caseFlow.get().getUrl());
             }
+
             caseFlow.get().setUrl(request.getUrl());
         }
 
@@ -218,7 +215,7 @@ public class CaseFlowServiceImpl implements CaseFlowService {
         return new HashMap<>();
     }
 
-    public void validateUrlImg(String avatarUrl, Map<String, String> errors) {
+    private void validateUrlImg(String avatarUrl, Map<String, String> errors) {
         if (StringUtils.isBlank(avatarUrl)) {
             return;
         }
@@ -250,5 +247,26 @@ public class CaseFlowServiceImpl implements CaseFlowService {
         } catch (URISyntaxException e) {
             errors.put("url", ResponseMessage.MIND_MAP_IMG_URL_INVALID);
         }
+    }
+
+    @Override
+    public CaseFlowResponse getDetailCaseFlow(Long caseId, Long id) throws ApiException {
+        Accounts loginAccount = SecurityUtils.getUser();
+        Cases cases = caseRepository.findById(caseId).orElseThrow(() -> new ApiException(CaseErrorCode.CASE_NOT_FOUND));
+
+        this.checkUser(loginAccount, cases);
+
+        CaseFlow caseFlow = caseFlowRepository
+                .findFistByCases_IdAndId(caseId, id)
+                .orElseThrow(() -> new ApiException(CaseFlowErrorCode.CASE_FLOW_NOT_FOUND));
+
+        return new CaseFlowResponse(
+                id,
+                caseFlow.getName(),
+                caseFlow.getDataLink(),
+                caseFlow.getDataNode(),
+                caseFlow.getCreatedBy(),
+                caseFlow.getUpdatedBy(),
+                caseFlow.getCreatedAt());
     }
 }
