@@ -255,7 +255,7 @@ public class AuthenticationService {
     private void checkComputerForAccount(String deviceCode, Long accountId) throws ApiException {
         Boolean isValid = computerRepository.existsByCode(deviceCode);
         if (Boolean.FALSE.equals(isValid)) {
-            throw new ApiException(SystemErrorCode.INTERNAL_SERVER);
+            throw new ApiException(ComputerErrorCode.PC_INVALID);
         }
         List<Computers> computersList = computerRepository.findByAccounts_Id(accountId);
         boolean deviceExists =

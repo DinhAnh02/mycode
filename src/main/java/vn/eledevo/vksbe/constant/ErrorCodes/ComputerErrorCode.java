@@ -1,7 +1,5 @@
 package vn.eledevo.vksbe.constant.ErrorCodes;
 
-import static org.springframework.http.HttpStatus.OK;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +7,10 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatusCode;
 
+import static org.springframework.http.HttpStatus.*;
+
 public enum ComputerErrorCode implements BaseErrorCode {
+    PC_INVALID(BAD_REQUEST, "400", "Thiết bị máy tính không phù hợp với tài khoản", new HashMap<>()),
     PC_NOT_LINKED_TO_ACCOUNT(OK, "COM-01", "Máy tính chưa được liên kết với tài khoản", new HashMap<>()),
     PC_CODE_ALREADY_EXISTS(OK, "COM-02", "Mã máy tính đã tồn tại trong hệ thống", new HashMap<>()),
     ;
