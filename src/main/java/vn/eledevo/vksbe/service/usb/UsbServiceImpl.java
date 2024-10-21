@@ -32,6 +32,7 @@ import vn.eledevo.vksbe.constant.Status;
 import vn.eledevo.vksbe.dto.request.DataChange;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
 import vn.eledevo.vksbe.dto.request.usb.UsbToken;
+import vn.eledevo.vksbe.dto.request.usb.UsbTokenInfo;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
 import vn.eledevo.vksbe.entity.Accounts;
@@ -246,5 +247,14 @@ public class UsbServiceImpl implements UsbService {
                 throw e;
             }
         }
+    }
+    public String createUsb(UsbTokenInfo usbToken){
+        Usbs usbTokenInfo = Usbs.builder()
+                .usbCode(usbToken.getUsbCode())
+                .usbVendorCode(usbToken.getUsbVendorCode())
+                .status(Status.DISCONNECTED.name())
+                .build();
+        usbRepository.save(usbTokenInfo);
+        return "OK";
     }
 }

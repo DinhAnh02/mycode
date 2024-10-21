@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.eledevo.vksbe.dto.request.UsbRequest;
 import vn.eledevo.vksbe.dto.request.usb.UsbToken;
+import vn.eledevo.vksbe.dto.request.usb.UsbTokenInfo;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.ResponseFilter;
 import vn.eledevo.vksbe.dto.response.usb.UsbResponseFilter;
@@ -59,5 +60,11 @@ public class UsbController {
                 .contentLength(zipFile.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @PostMapping("/create")
+    @Operation(summary = "Tạo USB token")
+    public ApiResponse<String> creatUsb(@RequestBody UsbTokenInfo usbTokenInfo){
+        return ApiResponse.ok(usbService.createUsb(usbTokenInfo));
     }
 }
