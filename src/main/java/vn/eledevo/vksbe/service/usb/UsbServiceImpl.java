@@ -252,6 +252,7 @@ public class UsbServiceImpl implements UsbService {
         Usbs usbTokenInfo = Usbs.builder()
                 .usbCode(usbToken.getUsbCode())
                 .usbVendorCode(usbToken.getUsbVendorCode())
+                .name(usbToken.getNameUsb())
                 .status(Status.DISCONNECTED.name())
                 .build();
         usbRepository.save(usbTokenInfo);
